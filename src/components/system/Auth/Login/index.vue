@@ -10,20 +10,22 @@
     <div class="pl-5 pr-5 pt-5 pb-5 bg-white text-center" :class="$style.container">
       <div class="text-dark font-size-30 mb-2 text-center">Log In</div>
       <div class="text-muted text-center mb-4">Login and password - admin@mediatec.org / mediatec</div>
-      <a-form class="mb-4" :form="form" @submit="handleSubmit">
+      <a-form class="mb-4" :form="form" @submit.prevent="handleSubmit">
         <a-form-item>
           <a-input
             size="large"
+            v-model="email"
             placeholder="Email"
-            v-decorator="['email', { initialValue: 'admin@mediatec.org', rules: [{ required: true, message: 'Please input your username!' }]}]"
+            v-decorator="['email', { initialValue: '', rules: [{ required: true, message: 'Please input your username!' }]}]"
           />
         </a-form-item>
         <a-form-item>
           <a-input
             size="large"
+            v-model="password"
             placeholder="Password"
             type="password"
-            v-decorator="['password', {initialValue: 'mediatec', rules: [{ required: true, message: 'Please input your Password!' }]}]"
+            v-decorator="['password', {initialValue: '', rules: [{ required: true, message: 'Please input your Password!' }]}]"
           />
         </a-form-item>
         <a-button
@@ -78,30 +80,32 @@ export default {
   data: function () {
     return {
       form: this.$form.createForm(this),
+      email: '',
+      password: '',
     }
   },
   methods: {
-    handleSubmit(e) {
-      e.preventDefault()
+    handleSubmit() {
       this.form.validateFields((err, values) => {
         if (!err) {
           this.$nprogress.start()
-          this.$auth.login(values.email, values.password)
-            .then(() => {
-              this.$nprogress.done()
-              this.$router.push('/')
-              this.$notification['success']({
-                message: 'Logged In',
-                description: 'You have successfully logged in to Air UI Vue Admin Template!',
-              })
+          this.$store.dispatch('LOGIN', {
+            email: this.email,
+            password: this.password,
+          }).then((data) => {
+            this.$nprogress.done()
+            this.$router.push({ name: 'dashboard' })
+            this.$notification['success']({
+              message: 'Logged In',
+              description: 'You have successfully logged in to Air UI Vue Admin Template!',
             })
-            .catch((error) => {
-              this.$nprogress.done()
-              this.$notification['warning']({
-                message: error.code,
-                description: error.message,
-              })
+          }).catch((error) => {
+            this.$nprogress.done()
+            this.$notification['warning']({
+              message: error.code,
+              description: error.message,
             })
+          })
         }
       })
     },

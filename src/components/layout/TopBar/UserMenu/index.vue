@@ -34,7 +34,7 @@
         </a>
       </a-menu-item>
       <a-menu-item>
-        <a href="javascript: void(0);" @click="logout">
+        <a @click="logout">
           <i :class="$style.menuIcon" class="fe fe-log-out"></i>
           {{ $t('topBar.profileMenu.logout') }}
         </a>
@@ -55,7 +55,7 @@ export default {
       this.count++
     },
     logout() {
-      this.$auth.logout()
+      this.$store.dispatch('LOGOUT')
     },
   },
 }

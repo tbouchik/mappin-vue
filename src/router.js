@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import AuthLayout from '@/layouts/Auth'
 import AppLayout from '@/layouts/App'
-import store from '@/store'
 
 Vue.use(Router)
 
@@ -22,6 +21,7 @@ const router = new Router({
         // Dashboards
         {
           path: '/dashboard/analytics',
+          name: 'dashboard',
           meta: {
             title: 'Dashboard Analytics',
           },
@@ -480,7 +480,7 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.authRequired)) {
-    if (!store.state.user.user) {
+    if (!localStorage.getItem('user')) {
       next({
         path: '/system/login',
         query: { redirect: to.fullPath },

@@ -3,8 +3,8 @@ import VuePageTitle from 'vue-page-title'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import axios from 'axios'
 import NProgress from 'vue-nprogress'
-import FirebaseAuthService from './services/firebase'
 import { i18n } from '@/localization'
 import VueLayers from 'vuelayers'
 import BootstrapVue from 'bootstrap-vue'
@@ -79,7 +79,6 @@ Vue.prototype.$notification = notification
 Vue.prototype.$message = message
 
 Vue.use(NProgress)
-Vue.use(FirebaseAuthService)
 Vue.use(VuePageTitle, {
   prefix: 'Air UI Vue | ',
   router,
@@ -93,5 +92,21 @@ new Vue({
   store,
   nprogress,
   i18n,
+  created () {
+    const userString = localStorage.getItem('user')
+    if (userString) {
+      const userData = JSON.parse(userString)
+      this.$store.commit('SET_USER_DATA', userData)
+    }
+    axios.interceptors.response.use(
+      response => response,
+      error => {
+        if (error.response.status === 401) {
+          this.$store.dispatch('LOGOUT')
+        }
+        return Promise.reject(error)
+      }
+    )
+  },
   render: h => h(App),
 }).$mount('#app')

@@ -9,27 +9,38 @@
     </div>
     <div class="pl-5 pr-5 pt-5 pb-5 bg-white text-center" :class="$style.container">
       <div class="text-dark font-size-30 mb-4">Register</div>
-      <a-form class="mb-4" :form="form">
+      <a-form class="mb-4" :form="form" @submit.prevent="register">
         <a-form-item>
           <a-input
             placeholder="Full Name"
+            v-model="fullName"
             v-decorator="['fullName', {rules: [{ required: true, message: 'Please input your full name!' }]}]"
           />
         </a-form-item>
         <a-form-item>
           <a-input
             placeholder="Email Address"
-            v-decorator="['fullName', {rules: [{ required: true, message: 'Please input your email address!' }]}]"
+            v-model="email"
+            v-decorator="['email', {rules: [{ required: true, message: 'Please input your email address!' }]}]"
+          />
+        </a-form-item>
+        <a-form-item>
+          <a-input
+            placeholder="Company Name"
+            v-model="company"
+            v-decorator="['company', {rules: [{ required: true, message: 'Please input your email address!' }]}]"
           />
         </a-form-item>
         <a-form-item>
           <a-input
             placeholder="Password"
+            v-model="password"
             v-decorator="['password', {rules: [{ required: true, message: 'Please input your Password!' }]}]"
           />
         </a-form-item>
         <button
-          type="button"
+          type="submit"
+          name="button"
           class="text-center btn btn-success w-100 font-weight-bold font-size-18"
         >Sign Up</button>
       </a-form>
@@ -82,7 +93,39 @@ export default {
   data: function () {
     return {
       form: this.$form.createForm(this),
+      fullName: '',
+      email: '',
+      password: '',
+      company: '',
     }
+  },
+  methods: {
+    register() {
+      this.form.validateFields((err, values) => {
+        if (!err) {
+          this.$nprogress.start()
+          this.$store.dispatch('REGISTER', {
+            name: this.fullName,
+            email: this.email,
+            password: this.password,
+            company: this.company,
+          }).then((data) => {
+            this.$nprogress.done()
+            this.$router.push({ name: 'dashboard' })
+            this.$notification['success']({
+              message: 'Signed Up',
+              description: 'You have successfully signed up Mappin!',
+            })
+          }).catch((error) => {
+            this.$nprogress.done()
+            this.$notification['warning']({
+              message: error.code,
+              description: error.message,
+            })
+          })
+        }
+      })
+    },
   },
 }
 </script>
