@@ -1,13 +1,13 @@
 <template>
   <div>
-    <air-login />
+    <air-register />
   </div>
 </template>
 <script>
-import AirLogin from '@/components/system/Auth/Login'
+import AirRegister from '@/components/system/Auth/register.vue'
 export default {
   components: {
-    AirLogin,
+    AirRegister,
   },
 }
 </script>

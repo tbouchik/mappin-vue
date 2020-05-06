@@ -11,7 +11,6 @@
     }"
     >
       <air-sidebar />
-      <air-support-chat />
       <air-menu-left v-if="settings.menuLayoutType === 'left'" />
       <air-menu-top v-if="settings.menuLayoutType === 'top'" />
       <a-layout>
@@ -23,8 +22,6 @@
         }"
         >
           <air-topbar v-if="settings.menuLayoutType !== 'top-dark'" />
-          <air-topbar-dark v-if="settings.menuLayoutType === 'top-dark'" />
-          <air-subbar />
         </a-layout-header>
         <a-layout-content>
           <div class="air__utils__content">
@@ -33,10 +30,6 @@
             </transition>
           </div>
         </a-layout-content>
-        <a-layout-footer>
-          <air-footer v-if="!settings.isFooterDark" />
-          <air-footer-dark v-if="settings.isFooterDark" />
-        </a-layout-footer>
       </a-layout>
     </a-layout>
   </div>
@@ -44,20 +37,15 @@
 
 <script>
 import { mapState } from 'vuex'
-import AirTopbar from '@/components/layout/TopBar'
-import AirTopbarDark from '@/components/layout/TopBarDark'
-import AirSubbar from '@/components/layout/SubBar'
+import AirTopbar from '@/components/layout/TopBar/topBar.vue'
 import AirMenuLeft from '@/components/layout/MenuLeft'
 import AirMenuTop from '@/components/layout/MenuTop'
-import AirFooter from '@/components/layout/Footer'
-import AirFooterDark from '@/components/layout/FooterDark'
-import AirSupportChat from '@/components/layout/SupportChat'
 import AirSidebar from '@/components/layout/Sidebar'
 
 export default {
   name: 'AppLayout',
   computed: mapState(['settings']),
-  components: { AirTopbar, AirSubbar, AirMenuLeft, AirMenuTop, AirFooter, AirSupportChat, AirSidebar, AirTopbarDark, AirFooterDark },
+  components: { AirTopbar, AirMenuLeft, AirMenuTop, AirSidebar },
   mounted() {
     this.detectViewPort(true)
     window.addEventListener('resize', this.detectViewPortListener)

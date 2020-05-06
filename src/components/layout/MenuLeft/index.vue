@@ -68,37 +68,16 @@
         </a>
         <a href="javascript: void(0);" :class="$style.air__menuLeft__user">
           <div :class="$style.air__menuLeft__user__avatar">
-            <img src="resources/images/avatars/avatar.png" alt="David Beckham" />
+            <img src="resources/images/avatars/avatar.png" alt="User Name" />
           </div>
-          <div :class="$style.air__menuLeft__user__name">David Beckham</div>
+          <div :class="$style.air__menuLeft__user__name">{{user.name}}</div>
           <div :class="$style.air__menuLeft__user__role">Administrator</div>
         </a>
         <vue-custom-scrollbar>
           <div :class="$style.air__menuLeft__container">
             <ul :class="$style.air__menuLeft__list">
               <li :class="$style.air__menuLeft__category">
-                <span>Information</span>
-              </li>
-              <li :class="$style.air__menuLeft__item">
-                <a
-                  href="javascript: void(0);"
-                  :class="$style.air__menuLeft__link"
-                  @click="toggleSettings"
-                >
-                  <i class="fe fe-settings" :class="$style.air__menuLeft__icon" />
-                  <span>Settings</span>
-                </a>
-              </li>
-              <li :class="$style.air__menuLeft__item">
-                <a
-                  href="https://docs.airuitemplate.com/"
-                  :class="$style.air__menuLeft__link"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <i class="fe fe-compass" :class="$style.air__menuLeft__icon" />
-                  <span>Documentation</span>
-                </a>
+                <span>Company name</span>
               </li>
               <template v-for="(item, index) in menuData">
                 <item
@@ -122,15 +101,6 @@
                 <category v-if="item.category" :key="index" :item="item" :styles="$style" />
               </template>
             </ul>
-            <div :class="$style.air__menuLeft__banner">
-              <p>More components, more styles, more themes, and premium support!</p>
-              <a
-                href="https://themeforest.net/item/air-ui-multi-concept-admin-template/24434456"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="btn btn-white text-center d-block"
-              >Buy Air UI</a>
-            </div>
           </div>
         </vue-custom-scrollbar>
       </div>
@@ -146,7 +116,7 @@
 <script>
 import vueCustomScrollbar from 'vue-custom-scrollbar'
 import _ from 'lodash'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import { getMenuData } from '@/services/menu'
 import SubMenu from './partials/submenu'
 import Item from './partials/item'
@@ -157,6 +127,7 @@ export default {
   components: { vueCustomScrollbar, SubMenu, Item, Category },
   computed: {
     ...mapState(['settings']),
+    ...mapGetters(['user']),
     flyoutActive() {
       return (this.settings.menuType === 'flyout' || this.settings.menuType === 'compact' || this.settings.isMenuCollapsed) && !this.settings.isMobileView
     },

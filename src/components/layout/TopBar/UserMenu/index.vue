@@ -1,7 +1,7 @@
 <template>
-  <a-dropdown :trigger="['click']" placement="bottomLeft" @visibleChange="addCount">
+  <a-dropdown :trigger="['click']" placement="bottomLeft">
     <div :class="$style.dropdown">
-      <a-badge :count="count">
+      <a-badge >
         <a-avatar shape="square" icon="user" size="large" :class="$style.avatar" />
       </a-badge>
     </div>

@@ -251,15 +251,7 @@
         </div>
       </vue-custom-scrollbar>
     </div>
-    <a
-      href="javascript: void(0);"
-      @click="toggleSidebar()"
-      :class="$style.air__sidebar__toggleButton"
-      class="btn btn-rounded btn-light text-nowrap text-dark font-weight-bold font-size-18"
-    >
-      <i class="fe fe-settings text-blue mr-md-2" />
-      <span class="d-none d-md-inline">Settings</span>
-    </a>
+
   </div>
 </template>
 

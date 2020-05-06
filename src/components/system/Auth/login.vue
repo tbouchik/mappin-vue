@@ -9,7 +9,6 @@
     </div>
     <div class="pl-5 pr-5 pt-5 pb-5 bg-white text-center" :class="$style.container">
       <div class="text-dark font-size-30 mb-2 text-center">Log In</div>
-      <div class="text-muted text-center mb-4">Login and password - admin@mediatec.org / mediatec</div>
       <a-form class="mb-4" :form="form" @submit.prevent="handleSubmit">
         <a-form-item>
           <a-input
@@ -94,7 +93,7 @@ export default {
             password: this.password,
           }).then((data) => {
             this.$nprogress.done()
-            this.$router.push({ name: 'dashboard' })
+            this.$router.push({ name: 'documents' })
             this.$notification['success']({
               message: 'Logged In',
               description: 'You have successfully logged in to Air UI Vue Admin Template!',

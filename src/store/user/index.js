@@ -44,7 +44,7 @@ export default {
     },
   },
   getters: {
-    user: state => state.user,
+    user: state => state.user.user,
     loggedIn: state => !!state.user,
   },
 }

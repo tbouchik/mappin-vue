@@ -112,10 +112,10 @@ export default {
             company: this.company,
           }).then((data) => {
             this.$nprogress.done()
-            this.$router.push({ name: 'dashboard' })
+            this.$router.push({ name: 'documents' })
             this.$notification['success']({
               message: 'Signed Up',
-              description: 'You have successfully signed up Mappin!',
+              description: 'You have successfully signed up to Mappin!',
             })
           }).catch((error) => {
             this.$nprogress.done()
