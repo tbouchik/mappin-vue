@@ -19,6 +19,10 @@ export default {
         userData.tokens.access.token
       }`
     },
+    SET_USER_COMPANY_NAME(state, companyName) {
+      state.user.user.company = companyName
+      localStorage.setItem('user', JSON.stringify(state.user))
+    },
     CLEAR_USER_DATA() {
       localStorage.removeItem('user')
       location.reload()
@@ -26,18 +30,26 @@ export default {
   },
   actions: {
     REGISTER({ commit }, credentials) {
-      return axios.post('http://localhost:3000/v1/auth/register', credentials).then(
-        ({ data }) => {
-          commit('SET_USER_DATA', data)
-        }
-      )
+      return axios.post('http://localhost:3000/v1/auth/register', credentials)
+        .then(
+          ({ data }) => {
+            commit('SET_USER_DATA', data)
+            return axios.get(`http://localhost:3000/v1/companies/${data.user.company}`, credentials)
+          })
+        .then(({ data }) => {
+          commit('SET_USER_COMPANY_NAME', data.name)
+        })
     },
     LOGIN({ commit }, credentials) {
-      return axios.post('http://localhost:3000/v1/auth/login', credentials).then(
-        ({ data }) => {
-          commit('SET_USER_DATA', data)
-        }
-      )
+      return axios.post('http://localhost:3000/v1/auth/login', credentials)
+        .then(
+          ({ data }) => {
+            commit('SET_USER_DATA', data)
+            return axios.get(`http://localhost:3000/v1/companies/${data.user.company}`, credentials)
+          })
+        .then(({ data }) => {
+          commit('SET_USER_COMPANY_NAME', data.name)
+        })
     },
     LOGOUT({ commit }) {
       commit('CLEAR_USER_DATA')

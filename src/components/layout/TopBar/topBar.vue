@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import AirUserMenu from '@/components/layout/TopBar/UserMenu'
+import AirUserMenu from '@/components/layout/TopBar/UserMenu/userMenu.vue'
 
 export default {
   components: {

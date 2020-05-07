@@ -7,20 +7,20 @@
     </div>
     <a-menu slot="overlay">
       <a-menu-item>
-        <strong>{{ $t('topBar.profileMenu.hello') }}, Username</strong>
+        <strong>{{ $t('topBar.profileMenu.hello') }}, {{user.name}}</strong>
         <div>
-          <strong class="mr-1">{{ $t('topBar.profileMenu.billingPlan') }}:</strong>
-          Professional
+          <strong class="mr-1">{{ $t('topBar.profileMenu.company') }}:</strong>
+          {{user.company}}
         </div>
         <div>
           <strong>{{ $t('topBar.profileMenu.role') }}:</strong>
-          Administrator
+          {{user.role}}
         </div>
       </a-menu-item>
       <a-menu-divider />
       <a-menu-item>
         <div>
-          <strong class="mr-1">{{ $t('topBar.profileMenu.email') }}:</strong> admin@mediatec.org
+          <strong class="mr-1">{{ $t('topBar.profileMenu.email') }}:</strong> {{user.email}}
         </div>
         <div>
           <strong class="mr-1">{{ $t('topBar.profileMenu.phone') }}:</strong> -
@@ -44,16 +44,18 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   data: function () {
     return {
       count: 7,
     }
   },
+  computed: {
+    ...mapGetters(['user']),
+  },
   methods: {
-    addCount() {
-      this.count++
-    },
     logout() {
       this.$store.dispatch('LOGOUT')
     },

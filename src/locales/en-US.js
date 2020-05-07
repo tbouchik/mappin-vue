@@ -8,7 +8,7 @@ const messages = {
     status: 'Status',
     profileMenu: {
       hello: 'Hello',
-      billingPlan: 'Billing Plan',
+      company: 'Company',
       role: 'Role',
       email: 'Email',
       phone: 'Phone',

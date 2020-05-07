@@ -63,21 +63,21 @@
         </a>
         <a href="javascript: void(0);" :class="$style.air__menuLeft__logo">
           <img src="resources/images/air-logo.png" alt="Air UI" />
-          <div :class="$style.air__menuLeft__logo__name">AIR UI</div>
-          <div :class="$style.air__menuLeft__logo__descr">Admin Template</div>
+          <div :class="$style.air__menuLeft__logo__name">Mappin</div>
+          <div :class="$style.air__menuLeft__logo__descr">Data extraction</div>
         </a>
         <a href="javascript: void(0);" :class="$style.air__menuLeft__user">
           <div :class="$style.air__menuLeft__user__avatar">
             <img src="resources/images/avatars/avatar.png" alt="User Name" />
           </div>
           <div :class="$style.air__menuLeft__user__name">{{user.name}}</div>
-          <div :class="$style.air__menuLeft__user__role">Administrator</div>
+          <div :class="$style.air__menuLeft__user__role">{{user.role}}</div>
         </a>
         <vue-custom-scrollbar>
           <div :class="$style.air__menuLeft__container">
             <ul :class="$style.air__menuLeft__list">
               <li :class="$style.air__menuLeft__category">
-                <span>Company name</span>
+                <span>{{user.company}}</span>
               </li>
               <template v-for="(item, index) in menuData">
                 <item
