@@ -14,7 +14,7 @@
       </div>
       <div class="card-body">
         <div class="air__utils__scrollTable">
-          <a-table :data-source="data" :columns="columns">
+          <a-table :data-source="documentsList" :columns="columns">
             <div
               slot="filterDropdown"
               slot-scope="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }"
@@ -64,17 +64,17 @@
               </span>
               <template v-else>{{ text }}</template>
             </template>
-            <span slot="action">
-              <a href="javascript: void(0);" class="btn btn-sm btn-light mr-2">
+            <span slot="action" slot-scope="record">
+              <button @click="view(record)" class="btn btn-sm btn-light mr-2">
                 <i class="fe fe-edit mr-2" />
                 View
-              </a>
-              <a href="javascript: void(0);" class="btn btn-sm btn-light">
+              </button>
+              <button href="javascript: void(0);" class="btn btn-sm btn-light">
                 <small>
                   <i class="fe fe-trash mr-2" />
                 </small>
                 Remove
-              </a>
+              </button>
             </span>
           </a-table>
         </div>
@@ -84,6 +84,8 @@
 </template>
 <script>
 import data from './data.json'
+import { mapGetters } from 'vuex'
+
 const columns = [
   {
     title: 'Name',
@@ -201,6 +203,12 @@ export default {
       columns,
     }
   },
+  computed: {
+    ...mapGetters(['documentsList']),
+  },
+  created() {
+    this.$store.dispatch('FETCH_DOCUMENTS')
+  },
   methods: {
     handleSearch(selectedKeys, confirm, dataIndex) {
       confirm()
@@ -216,6 +224,11 @@ export default {
     newUpload() {
       this.$router.push({ name: 'upload' })
     },
+
+    view(record){
+      this.$store.dispatch('UPDATE_DOCUMENT', record)
+      this.$router.push('/smelter/viewer')
+    }
   },
 }
 </script>

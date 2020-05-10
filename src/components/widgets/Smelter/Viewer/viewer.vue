@@ -1,11 +1,11 @@
 <template>
   <div>
-    <div class="air__utils__heading">
+    <div v-if="!insideUploaderView" class="air__utils__heading">
       <h5>Smeltor Viewer</h5>
     </div>
     <div class="card">
-      <div class="card-body">
-        <div v-for="(page, index, i) in mappinJson.metadata" :key="i">
+      <div v-if="current" class="card-body">
+        <div v-for="(page, index, i) in current.metadata" :key="i">
           <div class="display-6">
             <strong>Page {{i + 1}}:</strong>
           </div>
@@ -45,15 +45,23 @@
   </div>
 </template>
 <script>
-import mappinJson from './docMock.json'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'SmelterViewer',
   data() {
     return {
-      mappinJson,
       editMode: false,
     }
+  },
+  props: {
+    insideUploaderView: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  computed: {
+    ...mapGetters(['current']),
   },
   methods: {
     activateEditMode() {
@@ -62,6 +70,9 @@ export default {
     save() {
       this.editMode = !this.editMode
     },
+  },
+  destroyed() {
+      this.$store.dispatch('CLEAR_DOCUMENT')
   },
 }
 </script>

@@ -57,7 +57,7 @@ export default {
       form: this.$form.createForm(this),
       multiple: false,
       uploadPossible: false,
-      mappinJson: '',
+      documentData: {},
       image: '',
       blobData: '',
     }
@@ -66,6 +66,9 @@ export default {
     fileType: function() {
       return this.fileList[0] ? this.fileList[0].type : null
     },
+  },
+  destroyed() {
+      this.$store.dispatch('CLEAR_DOCUMENT')
   },
   methods: {
     handleChange(info) {
@@ -129,9 +132,9 @@ export default {
         method: 'PUT',
         body: data,
       })
-      this.mappinJson = await this.postFilename(filename)
-      this.$message.success('Smelted successfully.')
-      console.log(this.mappinJson)
+      this.documentData = await this.postFilename(filename) // TODO: move this operation to store level
+      this.$store.dispatch('UPDATE_DOCUMENT', this.documentData.data)
+      this.$message.success('Document smelted successfully')
       this.uploadPossible = !this.uploadPossible
     },
     /**
@@ -142,7 +145,7 @@ export default {
         return await SmelterService.postSmelter(fileName)
       } catch (err) {
         this.error = err.message
-        this.$message.error('Smeltor failed.')
+        this.$message.error('Smeltor failed')
         console.log(err)
       }
     },
