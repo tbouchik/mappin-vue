@@ -25,7 +25,15 @@ const router = new Router({
           meta: {
             title: 'Smelter Uploading',
           },
-          component: () => import('./views/smelter/upload.vue'),
+          component: () => import('./views/smelter/uploader.vue'),
+        },
+        {
+          path: '/smelter/viewer',
+          name: 'viewer',
+          meta: {
+            title: 'Smelter Uploading',
+          },
+          component: () => import('./views/smelter/viewer.vue'),
         },
         // Dashboards
         {

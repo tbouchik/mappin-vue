@@ -1,0 +1,32 @@
+{
+    "id":"1",
+    "name": "kaka.jpeg",
+    "type": "Invoice",
+    "extraction": "FORMS",
+    "date":"23/12/2002 4:04 PM",
+    "status": "Complete",
+    "metadata":{
+        "page_1": [
+            {
+                "Key": "Test1",
+                "KeyConfidence": "39.189903259277344",
+                "Value": "Value1",
+                "ValueConfidence": "39.189903259277344"
+            },
+            {
+                "Key": "Test2",
+                "KeyConfidence": "38.996761322021484",
+                "Value": "Value2",
+                "ValueConfidence": "38.996761322021484"
+            }
+        ],
+        "page_2": [
+            {
+                "Key": "Test3",
+                "KeyConfidence": "34.58271026611328",
+                "Value": "Value3",
+                "ValueConfidence": "34.58271026611328"
+            }
+        ]
+    }
+}

@@ -63,7 +63,7 @@
         </a>
         <a href="javascript: void(0);" :class="$style.air__menuLeft__logo">
           <img src="resources/images/air-logo.png" alt="Air UI" />
-          <div :class="$style.air__menuLeft__logo__name">Mappin</div>
+          <div :class="$style.air__menuLeft__logo__name">Smeltor</div>
           <div :class="$style.air__menuLeft__logo__descr">Data extraction</div>
         </a>
         <a href="javascript: void(0);" :class="$style.air__menuLeft__user">

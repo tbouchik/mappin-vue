@@ -18,4 +18,26 @@ module.exports = {
       },
     },
   },
+  devServer: {
+    proxy: {
+      '^/v1/**': {
+        target: 'http://localhost:3000/',
+        pathRewrite: { '^/api': '' },
+        secure: false,
+        logLevel: 'debug',
+      },
+      '^/mappin-test': {
+        target: 'https://ltm03gutjl.execute-api.us-east-1.amazonaws.com/',
+      },
+      '^/dev_test': {
+        target: 'https://qcz9i1r3jj.execute-api.us-east-1.amazonaws.com/',
+      },
+    //   '/v1/**': {
+    //     target: 'http://localhost:9596/',
+      // pathRewrite: { '^/api': '' },
+      // secure: false,
+      // logLevel: 'debug'
+    //  }
+    },
+  },
 }

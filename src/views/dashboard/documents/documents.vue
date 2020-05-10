@@ -3,76 +3,232 @@
     <div class="air__utils__heading">
       <h5>Documents</h5>
     </div>
-    <!-- <div class="row">
-      <div class="col-xl-8 col-lg-6">
-        <h5 class="text-dark mb-4">Google Analytics Home</h5>
-        <div class="card">
-          <air-chart-2 />
+    <div class="card">
+      <div class="card-header card-header-flex">
+        <div class="d-flex flex-column justify-content-center mr-auto">
+          <h5 class="mb-0">Your extractions</h5>
         </div>
-        <div class="row">
-          <div class="col-xl-6 col-lg-12">
-            <div class="card">
-              <div class="card-body">
-                <air-chart-9 />
-              </div>
-            </div>
-            <h5 class="text-dark mb-4">How do you acquire users?</h5>
-            <div class="card">
-              <div class="card-body">
-                <air-chart-5 />
-              </div>
-            </div>
-          </div>
-          <div class="col-xl-6 col-lg-12">
-            <div class="card">
-              <div class="card-body">
-                <air-chart-10 />
-              </div>
-            </div>
-            <h5 class="text-dark mb-4">How are your active users trending over time?</h5>
-            <div class="card">
-              <div class="card-body">
-                <air-chart-1 />
-              </div>
-            </div>
-          </div>
+        <div class="d-flex flex-column justify-content-center" @click="() => newUpload()">
+          <div class="btn btn-primary">New Extraction</div>
         </div>
       </div>
-      <div class="col-xl-4 col-lg-6">
-        <h5 class="text-dark mb-4">Ask analytics Intelligence</h5>
-        <div class="card">
-          <div class="card-body">
-            <air-list-15 />
-          </div>
-        </div>
-        <h5 class="text-dark mb-4">What are your top devices?</h5>
-        <div class="card">
-          <div class="card-body">
-            <air-list-12 />
-          </div>
+      <div class="card-body">
+        <div class="air__utils__scrollTable">
+          <a-table :data-source="data" :columns="columns">
+            <div
+              slot="filterDropdown"
+              slot-scope="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }"
+              style="padding: 8px"
+            >
+              <a-input
+                v-ant-ref="c => (searchInput = c)"
+                :placeholder="`Search ${column.dataIndex}`"
+                :value="selectedKeys[0]"
+                style="width: 188px; margin-bottom: 8px; display: block;"
+                @change="e => setSelectedKeys(e.target.value ? [e.target.value] : [])"
+                @pressEnter="() => handleSearch(selectedKeys, confirm, column.dataIndex)"
+              />
+              <a-button
+                type="primary"
+                icon="search"
+                size="small"
+                style="width: 90px; margin-right: 8px"
+                @click="() => handleSearch(selectedKeys, confirm, column.dataIndex)"
+              >Search</a-button>
+              <a-button
+                size="small"
+                style="width: 90px"
+                @click="() => handleReset(clearFilters)"
+              >Reset</a-button>
+            </div>
+            <a-icon
+              slot="filterIcon"
+              slot-scope="filtered"
+              type="search"
+              :style="{ color: filtered ? '#108ee9' : undefined }"
+            />
+            <template slot="customRender" slot-scope="text, record, index, column">
+              <span v-if="searchText && searchedColumn === column.dataIndex">
+                <template
+                  v-for="(fragment, i) in text
+            .toString()
+            .split(new RegExp(`(?<=${searchText})|(?=${searchText})`, 'i'))"
+                >
+                  <mark
+                    v-if="fragment.toLowerCase() === searchText.toLowerCase()"
+                    :key="i"
+                    class="highlight"
+                  >{{ fragment }}</mark>
+                  <template v-else>{{ fragment }}</template>
+                </template>
+              </span>
+              <template v-else>{{ text }}</template>
+            </template>
+            <span slot="action">
+              <a href="javascript: void(0);" class="btn btn-sm btn-light mr-2">
+                <i class="fe fe-edit mr-2" />
+                View
+              </a>
+              <a href="javascript: void(0);" class="btn btn-sm btn-light">
+                <small>
+                  <i class="fe fe-trash mr-2" />
+                </small>
+                Remove
+              </a>
+            </span>
+          </a-table>
         </div>
       </div>
-    </div> -->
+    </div>
   </div>
 </template>
 <script>
-// import AirChart1 from '@/components/widgets/Charts/1/index'
-// import AirChart2 from '@/components/widgets/Charts/2/index'
-// import AirChart5 from '@/components/widgets/Charts/5/index'
-// import AirChart9 from '@/components/widgets/Charts/9/index'
-// import AirChart10 from '@/components/widgets/Charts/10/index'
-// import AirList12 from '@/components/widgets/Lists/12/index'
-// import AirList15 from '@/components/widgets/Lists/15/index'
-
+import data from './data.json'
+const columns = [
+  {
+    title: 'Name',
+    dataIndex: 'name',
+    scopedSlots: {
+      filterDropdown: 'filterDropdown',
+      filterIcon: 'filterIcon',
+      customRender: 'customRender',
+    },
+    sorter: (a, b) => {
+      return a.name.localeCompare(b.name)
+    },
+    sortDirections: ['descend', 'ascend'],
+    onFilter: (value, record) =>
+      record.name
+        .toString()
+        .toLowerCase()
+        .includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: visible => {
+      if (visible) {
+        setTimeout(() => {
+          this.searchInput.focus()
+        }, 0)
+      }
+    },
+  },
+  {
+    title: 'Type',
+    dataIndex: 'type',
+    scopedSlots: {
+      filterDropdown: 'filterDropdown',
+      filterIcon: 'filterIcon',
+      customRender: 'customRender',
+    },
+    sorter: (a, b) => {
+      return a.name.localeCompare(b.name)
+    },
+    onFilter: (value, record) =>
+      record.type
+        .toString()
+        .toLowerCase()
+        .includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: visible => {
+      if (visible) {
+        setTimeout(() => {
+          this.searchInput.focus()
+        }, 0)
+      }
+    },
+  },
+  {
+    title: 'Extraction',
+    dataIndex: 'extraction',
+    scopedSlots: {
+      filterDropdown: 'filterDropdown',
+      filterIcon: 'filterIcon',
+      customRender: 'customRender',
+    },
+    sorter: (a, b) => {
+      return a.name.localeCompare(b.name)
+    },
+    onFilter: (value, record) =>
+      record.extraction
+        .toString()
+        .toLowerCase()
+        .includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: visible => {
+      if (visible) {
+        setTimeout(() => {
+          this.searchInput.focus()
+        }, 0)
+      }
+    },
+  },
+  {
+    title: 'Status',
+    dataIndex: 'status',
+    scopedSlots: {
+      filterDropdown: 'filterDropdown',
+      filterIcon: 'filterIcon',
+      customRender: 'customRender',
+    },
+    sorter: (a, b) => {
+      return a.name.localeCompare(b.name)
+    },
+    onFilter: (value, record) =>
+      record.status
+        .toString()
+        .toLowerCase()
+        .includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: visible => {
+      if (visible) {
+        setTimeout(() => {
+          this.searchInput.focus()
+        }, 0)
+      }
+    },
+  },
+  {
+    title: 'Date Added',
+    dataIndex: 'date',
+  },
+  {
+    title: 'Action',
+    scopedSlots: { customRender: 'action' },
+  },
+]
 export default {
-  components: {
-    // AirChart1,
-    // AirChart2,
-    // AirChart5,
-    // AirChart9,
-    // AirChart10,
-    // AirList12,
-    // AirList15,
+  data: function() {
+    return {
+      searchText: '',
+      searchInput: null,
+      searchedColumn: '',
+      data,
+      columns,
+    }
+  },
+  methods: {
+    handleSearch(selectedKeys, confirm, dataIndex) {
+      confirm()
+      this.searchText = selectedKeys[0]
+      this.searchedColumn = dataIndex
+    },
+
+    handleReset(clearFilters) {
+      clearFilters()
+      this.searchText = ''
+    },
+
+    newUpload() {
+      this.$router.push({ name: 'upload' })
+    },
   },
 }
 </script>
+<style scoped>
+.custom-filter-dropdown {
+  padding: 8px;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.highlight {
+  background-color: rgb(255, 192, 105);
+  padding: 0px;
+}
+</style>
