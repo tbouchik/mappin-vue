@@ -69,7 +69,7 @@
                 <i class="fe fe-edit mr-2" />
                 View
               </button>
-              <button href="javascript: void(0);" class="btn btn-sm btn-light">
+              <button @click="remove(record)" class="btn btn-sm btn-light">
                 <small>
                   <i class="fe fe-trash mr-2" />
                 </small>
@@ -225,9 +225,15 @@ export default {
       this.$router.push({ name: 'upload' })
     },
 
-    view(record){
+    view(record) {
       this.$store.dispatch('UPDATE_DOCUMENT', record)
       this.$router.push('/smelter/viewer')
+    },
+    remove(record) {
+      this.$nprogress.start()
+      this.$store.dispatch('REMOVE_DOCUMENT', record.id)
+      this.$nprogress.done()
+
     }
   },
 }

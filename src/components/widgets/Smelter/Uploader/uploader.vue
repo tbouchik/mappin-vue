@@ -68,7 +68,7 @@ export default {
     },
   },
   destroyed() {
-      this.$store.dispatch('CLEAR_DOCUMENT')
+    this.$store.dispatch('CLEAR_DOCUMENT')
   },
   methods: {
     handleChange(info) {
@@ -110,6 +110,7 @@ export default {
       }
     },
     async handleUpload() {
+      this.$nprogress.start()
       this.uploadPossible = !this.uploadPossible
       let response = null
       let data = null
@@ -134,6 +135,7 @@ export default {
       })
       this.documentData = await this.postFilename(filename) // TODO: move this operation to store level
       this.$store.dispatch('UPDATE_DOCUMENT', this.documentData.data)
+      this.$nprogress.done()
       this.$message.success('Document smelted successfully')
       this.uploadPossible = !this.uploadPossible
     },

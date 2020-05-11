@@ -3,8 +3,8 @@
     <div class="pt-5 pb-5 d-flex align-items-end mt-auto">
       <img src="resources/images/air-logo.png" alt="AIR UI Logo" />
       <div class="air__utils__logo__text">
-        <div class="air__utils__logo__name text-uppercase text-dark font-size-21">AIR UI</div>
-        <div class="air__utils__logo__descr text-uppercase font-size-12 text-gray-6">Admin template</div>
+        <div class="air__utils__logo__name text-uppercase text-dark font-size-21">SMELTOR</div>
+        <div class="air__utils__logo__descr text-uppercase font-size-12 text-gray-6">DATA EXTRACTION</div>
       </div>
     </div>
     <div class="pl-5 pr-5 pt-5 pb-5 bg-white text-center" :class="$style.container">

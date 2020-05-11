@@ -15,7 +15,7 @@ export default {
     SmelterViewer,
   },
   computed: {
-    ...mapGetters(['documentExist'])
+    ...mapGetters(['documentExist']),
   },
 }
 </script>

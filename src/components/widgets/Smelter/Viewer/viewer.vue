@@ -13,8 +13,8 @@
             inline
             class="mb-3 mr-sm-3 mb-sm-3"
             :label="item.Key"
-            v-for="item in page"
-            :key="item.Key"
+            v-for="(item, i) in page"
+            :key="i"
           >
             <b-input-group prepend="key" class="mb-3 mr-sm-3 mb-sm-0">
               <b-input
@@ -37,8 +37,16 @@
           </b-form>
         </div>
         <div class="row">
-          <b-button variant="btn btn-outline-primary  ml-sm-3 mr-sm-3 col-md-1" :disabled="editMode" @click="activateEditMode">Edit</b-button>
-          <b-button variant="btn btn-success btn-lg btn-block col-md-1" :disabled="!editMode" @click="save">Save</b-button>
+          <b-button
+            variant="btn btn-outline-primary  ml-sm-3 mr-sm-3 col-md-1"
+            :disabled="editMode"
+            @click="activateEditMode"
+          >Edit</b-button>
+          <b-button
+            variant="btn btn-success btn-lg btn-block col-md-1"
+            :disabled="!editMode"
+            @click="save"
+          >Save</b-button>
         </div>
       </div>
     </div>
@@ -46,6 +54,7 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
+import DocumentService from '../../../../services/documentService.js'
 
 export default {
   name: 'SmelterViewer',
@@ -64,15 +73,20 @@ export default {
     ...mapGetters(['current']),
   },
   methods: {
-    activateEditMode() {
+    async save() {
+      await DocumentService.updateDocument({
+        name: this.current.name,
+        metadata: this.current.metadata,
+      }, this.current.id)
       this.editMode = !this.editMode
+      this.$router.push('/dashboard/documents')
     },
-    save() {
+    activateEditMode() {
       this.editMode = !this.editMode
     },
   },
   destroyed() {
-      this.$store.dispatch('CLEAR_DOCUMENT')
+    this.$store.dispatch('CLEAR_DOCUMENT')
   },
 }
 </script>
