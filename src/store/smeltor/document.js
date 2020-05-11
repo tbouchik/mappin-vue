@@ -26,8 +26,8 @@ export default {
       state.documentsList = documentsList
     },
     REMOVE_DOC_FROM_LIST(state, id) {
-    state.documentsList = state.documentsList.filter(item => item.id !== id)
-    }
+      state.documentsList = state.documentsList.filter(item => item.id !== id)
+    },
   },
   actions: {
     UPDATE_DOCUMENT({ commit }, document) {
@@ -42,12 +42,12 @@ export default {
           commit('SET_DOCUMENTS_LIST', data)
         })
     },
-    REMOVE_DOCUMENT({commit}, id) {
+    REMOVE_DOCUMENT({ commit }, id) {
       return axios.delete(`http://localhost:3000/v1/documents/${id}`,)
         .then(() => {
           commit('REMOVE_DOC_FROM_LIST', id)
         })
-    }
+    },
   },
   getters: {
     current: state => state.document,

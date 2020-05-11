@@ -18,7 +18,7 @@ axios.interceptors.request.use(
 class DocumentService {
   static updateDocument(body, documentId) {
     return axios.patch(`http://localhost:3000/v1/documents/${documentId}`, {
-      ...body
+      ...body,
     })
   }
 }

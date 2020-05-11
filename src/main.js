@@ -8,6 +8,7 @@ import NProgress from 'vue-nprogress'
 import { i18n } from '@/localization'
 import VueLayers from 'vuelayers'
 import BootstrapVue from 'bootstrap-vue'
+import moment from 'moment'
 import {
   Avatar, TreeSelect, Rate, Breadcrumb, InputNumber, Steps, Message,
   Upload, Button, Layout, Table, Icon, Progress, Radio, Dropdown, Menu,
@@ -18,6 +19,11 @@ import {
 } from 'ant-design-vue'
 
 import './global.scss'
+
+Vue.filter('timestamp', function (value) {
+  if (!value) return ''
+  return moment(value).format('DD/MM/YYYY h:mm A')
+})
 
 Vue.use(BootstrapVue)
 Vue.use(VueLayers)

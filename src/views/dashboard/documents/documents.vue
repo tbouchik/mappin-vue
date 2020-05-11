@@ -64,6 +64,7 @@
               </span>
               <template v-else>{{ text }}</template>
             </template>
+            <span slot="date" slot-scope="text">{{text | timestamp}}</span>
             <span slot="action" slot-scope="record">
               <button @click="view(record)" class="btn btn-sm btn-light mr-2">
                 <i class="fe fe-edit mr-2" />
@@ -187,6 +188,10 @@ const columns = [
   {
     title: 'Date Added',
     dataIndex: 'date',
+    scopedSlots: { customRender: 'date' },
+    sorter: (a, b) => {
+      return new Date(a.date) - new Date(b.date)
+    },
   },
   {
     title: 'Action',
@@ -233,8 +238,7 @@ export default {
       this.$nprogress.start()
       this.$store.dispatch('REMOVE_DOCUMENT', record.id)
       this.$nprogress.done()
-
-    }
+    },
   },
 }
 </script>
