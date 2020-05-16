@@ -11,13 +11,15 @@
                 "Key": "Test1",
                 "KeyConfidence": "39.189903259277344",
                 "Value": "Value1",
-                "ValueConfidence": "39.189903259277344"
+                "ValueConfidence": "39.189903259277344",
+                "editable": false
             },
             {
                 "Key": "Test2",
                 "KeyConfidence": "38.996761322021484",
                 "Value": "Value2",
-                "ValueConfidence": "38.996761322021484"
+                "ValueConfidence": "38.996761322021484",
+                "editable": false
             }
         ],
         "page_2": [
@@ -25,7 +27,8 @@
                 "Key": "Test3",
                 "KeyConfidence": "34.58271026611328",
                 "Value": "Value3",
-                "ValueConfidence": "34.58271026611328"
+                "ValueConfidence": "34.58271026611328",
+                "editable": false
             }
         ]
     }
