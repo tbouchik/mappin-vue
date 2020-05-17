@@ -31,9 +31,17 @@ const router = new Router({
           path: '/smelter/viewer',
           name: 'viewer',
           meta: {
-            title: 'Smelter Uploading',
+            title: 'Smelter Viewer',
           },
           component: () => import('./views/smelter/viewer.vue'),
+        },
+        {
+          path: '/smelter/window',
+          name: 'window',
+          meta: {
+            title: 'Smelter Window',
+          },
+          component: () => import('./views/smelter/pdfwindow.vue'),
         },
         // Dashboards
         {

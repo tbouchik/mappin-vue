@@ -24,7 +24,6 @@ Vue.filter('timestamp', function (value) {
   if (!value) return ''
   return moment(value).format('DD/MM/YYYY h:mm A')
 })
-
 Vue.use(BootstrapVue)
 Vue.use(VueLayers)
 Vue.use(Skeleton)

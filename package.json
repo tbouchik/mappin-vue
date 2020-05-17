@@ -20,6 +20,7 @@
     "firebase": "^6.2.0",
     "lodash": "^4.17.11",
     "moment": "^2.24.0",
+    "pdfjs-dist": "^2.3.200",
     "sortablejs": "1.8.4",
     "store": "^2.0.12",
     "v-chartist": "^0.1.6",

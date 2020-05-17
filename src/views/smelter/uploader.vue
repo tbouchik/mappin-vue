@@ -2,6 +2,7 @@
   <div>
       <smelter-uploader />
       <smelter-viewer v-if="documentExist" insideUploaderView="true"/>
+
   </div>
 </template>
 <script>
@@ -17,5 +18,6 @@ export default {
   computed: {
     ...mapGetters(['documentExist']),
   },
+
 }
 </script>
