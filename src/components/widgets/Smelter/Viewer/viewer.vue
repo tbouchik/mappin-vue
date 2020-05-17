@@ -144,19 +144,19 @@ export default {
       this.document.metadata[page].splice(itemIdx, 1)
       await this.$store.dispatch('SAVE_DOCUMENT', this.document)
     },
-    addRecord(pageIdx){
+    addRecord(pageIdx) {
       this.switchEditMode()
       this.cacheData = cloneDeep(this.document)
       const page = Object.keys(this.document.metadata)[pageIdx]
       const newElement = {
-        "Key":"",
-        "KeyConfidence":"100",
-        "Value":"",
-        "ValueConfidence":"100",
-        "key":page.length,
-        "editable":true}
+        'Key': '',
+        'KeyConfidence': '100',
+        'Value': '',
+        'ValueConfidence': '100',
+        'key': page.length,
+        'editable': true }
       this.document.metadata[page].push(newElement)
-    }
+    },
   },
   destroyed() {
     this.$store.dispatch('CLEAR_DOCUMENT')
