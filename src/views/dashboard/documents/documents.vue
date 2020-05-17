@@ -232,7 +232,7 @@ export default {
 
     view(record) {
       this.$store.dispatch('UPDATE_DOCUMENT', record)
-      this.$router.push('/smelter/viewer')
+      this.$router.push({ name: 'viewer' })
     },
     remove(record) {
       this.$nprogress.start()

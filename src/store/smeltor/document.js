@@ -1,20 +1,50 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
+import { cloneDeep, omit } from 'lodash'
+import DocumentService from '../../services/documentService.js'
 
 Vue.use(Vuex)
 
+function omitEditableFromMetadata(document) {
+  let formattedCopy = cloneDeep(document)
+  for (let page of Object.keys(formattedCopy.metadata)) {
+    formattedCopy.metadata[page] = formattedCopy.metadata[page].map(item => {
+      return omit(item, ['editable', 'key'])
+    })
+  }
+  return formattedCopy
+}
+
 export default {
   state: {
-    document: null,
+    formattedDocument: null,
     documentsList: [],
   },
   mutations: {
     UPDATE_DOCUMENT_DATA(state, document) {
-      state.document = document
+      state.formattedDocument = document
+      for (let page of Object.keys(state.formattedDocument.metadata)) {
+        state.formattedDocument.metadata[page] = state.formattedDocument.metadata[page].map((item, index) => {
+          item.key = index
+          item.editable = false
+          return item
+        })
+      }
+    },
+    async SAVE_CURRENT_DOCUMENT(state, document) {
+      const updatedDocument = {
+        name: state.formattedDocument.name,
+        metadata: omitEditableFromMetadata(document).metadata,
+      }
+      await DocumentService.updateDocument(
+        updatedDocument,
+        state.formattedDocument.id
+      )
+      state.formattedDocument = document
     },
     CLEAR_DOCUMENT_DATA(state) {
-      state.document = null
+      state.formattedDocument = null
     },
     SET_DOCUMENTS_LIST(state, documentsList) {
       documentsList.map(x => { // TODO: Implement these properties in DB
@@ -33,6 +63,9 @@ export default {
     UPDATE_DOCUMENT({ commit }, document) {
       commit('UPDATE_DOCUMENT_DATA', document)
     },
+    SAVE_DOCUMENT({ commit }, document) {
+      commit('SAVE_CURRENT_DOCUMENT', document)
+    },
     CLEAR_DOCUMENT({ commit }) {
       commit('CLEAR_DOCUMENT_DATA')
     },
@@ -50,8 +83,8 @@ export default {
     },
   },
   getters: {
-    current: state => state.document,
-    documentExist: state => !!state.document,
+    current: state => state.formattedDocument,
+    documentExist: state => !!state.formattedDocument,
     documentsList: state => state.documentsList,
   },
 }
