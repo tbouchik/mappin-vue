@@ -14,6 +14,7 @@
       </span>
     </div>
     <canvas id="pdf-render"></canvas>
+
   </div>
 </template>
 
@@ -90,7 +91,7 @@ export default {
 
     // Get Document
     pdfjsLib
-      .getDocument('https://arxiv.org/pdf/2005.06584.pdf')
+      .getDocument(`http://localhost:3000/media/${this.name}`)
       .promise.then(pdfDoc_ => {
         pdfDoc = pdfDoc_
 

@@ -17,12 +17,18 @@ import {
   Cascader, DatePicker, TimePicker, Divider, Anchor, AutoComplete, BackTop, Collapse, Card, List, Popover,
   Tree, Timeline, Row, Col, Transfer, Modal, message, Popconfirm, Skeleton, LocaleProvider,
 } from 'ant-design-vue'
+import Cloudinary from 'cloudinary-vue'
 
 import './global.scss'
 
 Vue.filter('timestamp', function (value) {
   if (!value) return ''
   return moment(value).format('DD/MM/YYYY h:mm A')
+})
+Vue.use(Cloudinary, {
+  configuration: {
+    cloudName: 'smeltor',
+  },
 })
 Vue.use(BootstrapVue)
 Vue.use(VueLayers)
