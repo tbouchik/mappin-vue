@@ -1,20 +1,26 @@
 <template>
   <div>
-    <div class="air__utils__heading">
-      <h5>PDF window</h5>
-    </div>    <div class="top-bar">
-      <button class="btn" id="prev-page">
-        <i class="fe fe-arrow-left"></i> Prev Page
-      </button>
-      <button class="btn" id="next-page">
-        Next Page <i class="fe fe-arrow-right"></i>
-      </button>
+
+    <div class="row">
+      <div class="col-md-4"></div>
+    <a-button-group>
+      <a-button type="primary" id="prev-page"> <a-icon type="left" /> </a-button>
+      <a-button type="primary">
       <span class="page-info">
         Page <span id="page-num"></span> of <span id="page-count"></span>
       </span>
+      </a-button>
+      <a-button type="primary" id="next-page"> <a-icon type="right" /> </a-button>
+    </a-button-group>
     </div>
-    <canvas id="pdf-render"></canvas>
+    <br>
+    <div class="row">
+     <div class="col-12">
+        <div class="card">
+          <div class="card-body">
 
+    <canvas id="pdf-render"></canvas>
+    </div></div></div></div>
   </div>
 </template>
 
@@ -28,7 +34,7 @@ export default {
     let pageIsRendering = false
     let pageNumIsPending = null
 
-    const scale = 1.5
+    const scale = 0.9
     const canvas = document.querySelector('#pdf-render')
     const ctx = canvas.getContext('2d')
 
@@ -121,7 +127,3 @@ export default {
 }
 
 </script>
-
-<style>
-
-</style>

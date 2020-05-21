@@ -1,9 +1,9 @@
 <template>
   <div class="row">
-    <div class="col-6">
+    <div class="col-md-6">
       <smelter-viewer />
     </div>
-    <div class="col-6">
+    <div class="col-md-6">
       <div class="sticky">
       <smelter-pdf-window  :name="pdfName" />
       </div>
@@ -33,7 +33,7 @@ export default {
 div.sticky {
   position: -webkit-sticky; /* Safari */
   position: sticky;
-  top: 0;
+  top: 10px;
 }
 
 </style>

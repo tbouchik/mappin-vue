@@ -30,7 +30,7 @@
           New Record
         </button>
       </div>
-      <a-table :columns="columns" :data-source="page" bordered>
+      <a-table :columns="columns" :data-source="page" :pagination=false bordered>
         <template v-for="col in ['Key', 'Value']" :slot="col" slot-scope="text, record, dataIndex">
           <div :key="col">
             <a-input
