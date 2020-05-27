@@ -48,10 +48,7 @@ export default {
     },
     SET_DOCUMENTS_LIST(state, documentsList) {
       documentsList.map(x => { // TODO: Implement these properties in DB
-        x.type = 'Invoice'
-        x.extraction = 'Forms'
         x.date = x.createdAt
-        x.status = 'Complete'
       })
       state.documentsList = documentsList
     },

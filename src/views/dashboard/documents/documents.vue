@@ -1,8 +1,6 @@
 <template>
   <div>
-    <div class="air__utils__heading">
-      <h5>Documents</h5>
-    </div>
+    <smelter-uppy-loader :maxFileSizeInBytes=10000000></smelter-uppy-loader>
     <div class="card">
       <div class="card-header card-header-flex">
         <div class="d-flex flex-column justify-content-center mr-auto">
@@ -86,6 +84,7 @@
 <script>
 import data from './data.json'
 import { mapGetters } from 'vuex'
+import SmelterUppyLoader from '@/components/widgets/Smelter/Uploader/uppyloader.vue'
 
 const columns = [
   {
@@ -199,6 +198,9 @@ const columns = [
   },
 ]
 export default {
+  components: {
+    SmelterUppyLoader,
+  },
   data: function() {
     return {
       searchText: '',

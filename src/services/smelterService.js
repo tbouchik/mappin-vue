@@ -17,8 +17,13 @@ axios.interceptors.request.use(
 
 class SmelterService {
   static postSmelter(file) {
-    return axios.post('http://localhost:3000/v1/scan', {
+    return axios.post('http://localhost:3000/v1/smelt', {
       filename: file,
+    })
+  }
+  static postBulkSmelter(files) {
+    return axios.post('http://localhost:3000/v1/smelt/bulk', {
+      files: files,
     })
   }
 }

@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <div class="row">
       <div class="col-md-4"></div>
     <a-button-group>
@@ -18,9 +17,11 @@
      <div class="col-12">
         <div class="card">
           <div class="card-body">
-
-    <canvas id="pdf-render"></canvas>
-    </div></div></div></div>
+            <canvas id="pdf-render"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -100,9 +101,7 @@ export default {
       .getDocument(`http://localhost:3000/media/${this.name}`)
       .promise.then(pdfDoc_ => {
         pdfDoc = pdfDoc_
-
         document.querySelector('#page-count').textContent = pdfDoc.numPages
-
         renderPage(pageNum)
       })
       .catch(err => {
@@ -127,3 +126,11 @@ export default {
 }
 
 </script>
+<style >
+div.card-body {
+  overflow: auto;
+}
+div.card-body {
+  overflow: hidden;
+}
+</style>
