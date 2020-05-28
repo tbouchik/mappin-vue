@@ -6,9 +6,6 @@
         <div class="d-flex flex-column justify-content-center mr-auto">
           <h5 class="mb-0">Your extractions</h5>
         </div>
-        <div class="d-flex flex-column justify-content-center" @click="() => newUpload()">
-          <div class="btn btn-primary">New Extraction</div>
-        </div>
       </div>
       <div class="card-body">
         <div class="air__utils__scrollTable">
@@ -63,8 +60,9 @@
               <template v-else>{{ text }}</template>
             </template>
             <span slot="date" slot-scope="text">{{text | timestamp}}</span>
+            <span slot="status" slot-scope="text" >{{text}}</span>
             <span slot="action" slot-scope="record">
-              <button @click="view(record)" class="btn btn-sm btn-light mr-2">
+              <button @click="view(record)" :disabled="record.status !== 'smelted'" class="btn btn-sm btn-light mr-2">
                 <i class="fe fe-edit mr-2" />
                 View
               </button>
@@ -114,7 +112,7 @@ const columns = [
   },
   {
     title: 'Type',
-    dataIndex: 'type',
+    dataIndex: 'businessPurpose',
     scopedSlots: {
       filterDropdown: 'filterDropdown',
       filterIcon: 'filterIcon',
@@ -138,7 +136,7 @@ const columns = [
   },
   {
     title: 'Extraction',
-    dataIndex: 'extraction',
+    dataIndex: 'extractionType',
     scopedSlots: {
       filterDropdown: 'filterDropdown',
       filterIcon: 'filterIcon',

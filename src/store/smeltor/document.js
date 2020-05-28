@@ -6,11 +6,11 @@ import DocumentService from '../../services/documentService.js'
 
 Vue.use(Vuex)
 
-function omitEditableFromMetadata(document) {
+function omitKeyFromMetadata(document) {
   let formattedCopy = cloneDeep(document)
   for (let page of Object.keys(formattedCopy.metadata)) {
     formattedCopy.metadata[page] = formattedCopy.metadata[page].map(item => {
-      return omit(item, ['editable', 'key'])
+      return omit(item, ['key'])
     })
   }
   return formattedCopy
@@ -27,7 +27,6 @@ export default {
       for (let page of Object.keys(state.formattedDocument.metadata)) {
         state.formattedDocument.metadata[page] = state.formattedDocument.metadata[page].map((item, index) => {
           item.key = index
-          item.editable = false
           return item
         })
       }
@@ -35,7 +34,7 @@ export default {
     async SAVE_CURRENT_DOCUMENT(state, document) {
       const updatedDocument = {
         name: state.formattedDocument.name,
-        metadata: omitEditableFromMetadata(document).metadata,
+        metadata: omitKeyFromMetadata(document).metadata,
       }
       await DocumentService.updateDocument(
         updatedDocument,
@@ -50,7 +49,9 @@ export default {
       documentsList.map(x => { // TODO: Implement these properties in DB
         x.date = x.createdAt
       })
-      state.documentsList = documentsList
+      state.documentsList = documentsList.sort((a, b) => {
+        return -(new Date(a.date) - new Date(b.date))
+      },)
     },
     REMOVE_DOC_FROM_LIST(state, id) {
       state.documentsList = state.documentsList.filter(item => item.id !== id)

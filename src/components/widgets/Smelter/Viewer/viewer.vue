@@ -1,5 +1,27 @@
 <template>
   <div>
+      <div :class="$style.chat">
+      <button
+        type="button"
+        :class="$style.toggleButton"
+        class="btn btn-rounded btn-light text-nowrap text-dark font-weight-bold font-size-18"
+        @click="saveVersion"
+      >
+        <i :class="$style.icon" class="fe fe-check-circle text-blue mr-md-2" />
+        <span class="d-none d-md-inline">Save Version</span>
+      </button>
+      <button
+        type="button"
+        :class="$style.toggleButton"
+        class="btn btn-rounded btn-light text-nowrap text-dark font-weight-bold font-size-18"
+        @click="cancelChanges"
+      >
+        <i :class="$style.icon" class="fe fe-rotate-ccw text-blue mr-md-2" />
+        <span class="d-none d-md-inline">Cancel Changes</span>
+      </button>
+
+    </div>
+
     <div v-if="!insideUploaderView" >
       <h5><strong> Smeltor Viewer </strong></h5>
       <div :class="$style.subbar">
@@ -34,30 +56,15 @@
         <template v-for="col in ['Key', 'Value']" :slot="col" slot-scope="text, record, dataIndex">
           <div :key="col">
             <a-input
-              v-if="record.editable"
               style="margin: -5px 0"
               :value="text"
               @change="e => handleChange(e.target.value, i, dataIndex, col)"
             />
-            <template v-else>{{ text }}</template>
           </div>
         </template>
         <template slot="operation" slot-scope="text, record, dataIndex">
           <div class="editable-row-operations">
-            <span v-if="record.editable">
-              <a style="color:#1c54e4" @click="() => save(record, i, dataIndex)">Save</a>
-              <a-divider type="vertical" />
-              <a-popconfirm title="Sure to cancel?" @confirm="() => cancel(record, i, dataIndex)">
-                <a style="color:#7b6ca4">Cancel</a>
-              </a-popconfirm>
-            </span>
-            <span v-else>
-              <a
-                style="color:#7799ec"
-                :disabled="editMode"
-                @click="() => edit(record, i, dataIndex)"
-              >Edit</a>
-              <a-divider type="vertical" />
+            <span>
               <a-popconfirm title="Sure to delete?" @confirm="() => remove(record, i, dataIndex)">
                 <a style="color:#b793c3">Delete</a>
               </a-popconfirm>
@@ -103,6 +110,7 @@ export default {
   },
   created() {
     this.document = cloneDeep(this.current)
+    this.cacheData = cloneDeep(this.current)
   },
   props: {
     insideUploaderView: {
@@ -117,18 +125,14 @@ export default {
     switchEditMode() {
       this.editMode = !this.editMode
     },
-    edit(record, pageIdx, itemIdx) {
-      this.switchEditMode()
-      this.cacheData = cloneDeep(this.document)
-      const page = Object.keys(this.document.metadata)[pageIdx]
-      this.document.metadata[page][itemIdx].editable = true
-    },
-    async save(record, pageIdx, itemIdx) {
-      this.cacheData = null
-      const page = Object.keys(this.document.metadata)[pageIdx]
-      this.document.metadata[page][itemIdx].editable = false
+    async saveVersion() {
+      console.log('doc', this.document)
+      console.log('cache', this.cacheData)
       await this.$store.dispatch('SAVE_DOCUMENT', this.document)
-      this.switchEditMode()
+      this.cacheData = cloneDeep(this.document)
+    },
+    async cancelChanges() {
+      this.document = cloneDeep(this.cacheData)
     },
     handleChange(value, pageIdx, itemIdx, column) {
       const page = Object.keys(this.document.metadata)[pageIdx]
@@ -154,7 +158,7 @@ export default {
         'Value': '',
         'ValueConfidence': '100',
         'key': page.length,
-        'editable': true }
+      }
       this.document.metadata[page].push(newElement)
     },
   },
