@@ -43,7 +43,6 @@
         <button
           type="button"
           class="btn btn-primary btn-with-addon mr-auto text-nowrap d-none d-md-block"
-          :disabled="editMode"
           @click="() => addRecord(i)"
         >
           <span class="btn-addon">
@@ -126,8 +125,6 @@ export default {
       this.editMode = !this.editMode
     },
     async saveVersion() {
-      console.log('doc', this.document)
-      console.log('cache', this.cacheData)
       await this.$store.dispatch('SAVE_DOCUMENT', this.document)
       this.cacheData = cloneDeep(this.document)
     },
@@ -149,8 +146,6 @@ export default {
       await this.$store.dispatch('SAVE_DOCUMENT', this.document)
     },
     addRecord(pageIdx) {
-      this.switchEditMode()
-      this.cacheData = cloneDeep(this.document)
       const page = Object.keys(this.document.metadata)[pageIdx]
       const newElement = {
         'Key': '',

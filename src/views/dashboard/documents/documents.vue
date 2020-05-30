@@ -60,9 +60,17 @@
               <template v-else>{{ text }}</template>
             </template>
             <span slot="date" slot-scope="text">{{text | timestamp}}</span>
-            <span slot="status" slot-scope="text" >{{text}}</span>
+            <span slot="status" slot-scope="text">
+              <a-tag
+                :key="text"
+                :color="text === 'pending' ? 'volcano' : text === 'smelted' ? 'geekblue' : 'green'"
+              >
+                {{ text.toUpperCase() }}
+              </a-tag>
+            </span>
+            <!-- <span slot="status" slot-scope="text" >{{text}}</span> -->
             <span slot="action" slot-scope="record">
-              <button @click="view(record)" :disabled="record.status !== 'smelted'" class="btn btn-sm btn-light mr-2">
+              <button @click="view(record)" :disabled="record.status === 'pending'" class="btn btn-sm btn-light mr-2">
                 <i class="fe fe-edit mr-2" />
                 View
               </button>
@@ -164,7 +172,7 @@ const columns = [
     scopedSlots: {
       filterDropdown: 'filterDropdown',
       filterIcon: 'filterIcon',
-      customRender: 'customRender',
+      customRender: 'status',
     },
     sorter: (a, b) => {
       return a.name.localeCompare(b.name)

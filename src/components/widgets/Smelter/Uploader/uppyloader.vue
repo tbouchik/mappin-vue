@@ -46,7 +46,7 @@ export default {
         restrictions: {
           maxFileSize: this.maxFileSizeInBytes,
           minNumberOfFiles: 1,
-          maxNumberOfFiles: 10,
+          maxNumberOfFiles: 100,
           allowedFileTypes: ['image/png', 'image/jpeg', 'application/pdf'],
         },
         onBeforeUpload: (files) => {
@@ -69,8 +69,6 @@ export default {
               metadata: {},
             })
           })
-          console.log('updatedFiles: \n', updatedFiles)
-          console.log('files to backend: \n', this.files)
           return updatedFiles
         },
       })
