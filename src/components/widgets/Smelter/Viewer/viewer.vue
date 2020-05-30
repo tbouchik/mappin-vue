@@ -8,7 +8,7 @@
         @click="saveVersion"
       >
         <i :class="$style.icon" class="fe fe-check-circle text-blue mr-md-2" />
-        <span class="d-none d-md-inline">Save Version</span>
+        <span class="d-none d-md-inline">Validate Changes</span>
       </button>
       <button
         type="button"
@@ -125,6 +125,7 @@ export default {
       this.editMode = !this.editMode
     },
     async saveVersion() {
+      this.document.status = 'validated'
       await this.$store.dispatch('SAVE_DOCUMENT', this.document)
       this.cacheData = cloneDeep(this.document)
     },

@@ -35,6 +35,7 @@ export default {
       const updatedDocument = {
         name: state.formattedDocument.name,
         metadata: omitKeyFromMetadata(document).metadata,
+        status: document.status,
       }
       await DocumentService.updateDocument(
         updatedDocument,
