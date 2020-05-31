@@ -22,21 +22,6 @@
 
     </div>
 
-    <div v-if="!insideUploaderView" >
-      <h5><strong> Smeltor Viewer </strong></h5>
-      <div :class="$style.subbar">
-      <ul :class="$style.breadcrumbs" class="mr-4">
-      <li :class="$style.breadcrumb">
-        <a href="#" class="style.breadcrumbLink">PDF</a>
-      </li>
-      <li :class="$style.breadcrumb">
-        <a href="#" :class="[$style.breadcrumbLink, $style.breadcrumbLink__current]">{{document.name}}</a>
-      </li>
-    </ul>
-    <div :class="$style.divider" class="mr-4 d-none d-xl-block" />
-    <p class="color-gray-4 text-uppercase font-size-18 mb-0 mr-4 d-none d-xl-block">{{document.type}}</p>
-    </div>
-    </div>
     <div v-for="(page, index, i) in document.metadata" :key="i">
       <div :class="$style.subbar">
         <p class="color-gray-4 text-uppercase font-size-18 mb-0 mr-4 d-none d-xl-block">PAGE {{i+1}}</p>
@@ -75,7 +60,6 @@
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex'
 import { cloneDeep } from 'lodash'
 
 const columns = [
@@ -103,8 +87,8 @@ export default {
     return {
       editMode: false,
       columns,
-      cacheData: null,
-      document: null,
+      document: {},
+      cacheData: {},
     }
   },
   created() {
@@ -114,11 +98,17 @@ export default {
   props: {
     insideUploaderView: {
       type: Boolean,
-      default: false,
+    },
+    current: {
+      type: Object,
+      required: true,
     },
   },
-  computed: {
-    ...mapGetters(['current']),
+  watch: {
+    current: function () {
+      this.document = cloneDeep(this.current)
+      this.cacheData = cloneDeep(this.current)
+    },
   },
   methods: {
     switchEditMode() {

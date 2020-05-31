@@ -33,6 +33,7 @@ const router = new Router({
           meta: {
             title: 'Smelter Viewer',
           },
+          props: true,
           component: () => import('./views/smelter/viewer.vue'),
         },
         {

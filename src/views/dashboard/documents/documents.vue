@@ -6,6 +6,14 @@
         <div class="d-flex flex-column justify-content-center mr-auto">
           <h5 class="mb-0">Your extractions</h5>
         </div>
+        <div class="d-flex flex-column justify-content-center">
+          <button class="btn btn-primary"
+                :disabled="everythingIsValidated"
+                @click="() => goToValidation()"
+          >
+            Validate Smelted
+          </button>
+        </div>
       </div>
       <div class="card-body">
         <div class="air__utils__scrollTable">
@@ -88,7 +96,6 @@
   </div>
 </template>
 <script>
-import data from './data.json'
 import { mapGetters } from 'vuex'
 import SmelterUppyLoader from '@/components/widgets/Smelter/Uploader/uppyloader.vue'
 
@@ -212,12 +219,14 @@ export default {
       searchText: '',
       searchInput: null,
       searchedColumn: '',
-      data,
       columns,
     }
   },
   computed: {
-    ...mapGetters(['documentsList']),
+    ...mapGetters(['documentsList', 'smeltedIdList']),
+    everythingIsValidated: function () {
+      return this.smeltedIdList.length === 0
+    },
   },
   created() {
     this.$store.dispatch('FETCH_DOCUMENTS')
@@ -239,13 +248,17 @@ export default {
     },
 
     view(record) {
-      this.$store.dispatch('UPDATE_DOCUMENT', record)
+      this.$store.dispatch('UPDATE_DOCUMENT', record.id)
       this.$router.push({ name: 'viewer' })
     },
     remove(record) {
       this.$nprogress.start()
       this.$store.dispatch('REMOVE_DOCUMENT', record.id)
       this.$nprogress.done()
+    },
+    goToValidation() {
+      this.$store.dispatch('UPDATE_DOCUMENT', this.smeltedIdList[0])
+      this.$router.push({ name: 'viewer', params: { smeltedValidation: true } })
     },
   },
 }

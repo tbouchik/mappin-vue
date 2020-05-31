@@ -134,7 +134,7 @@ export default {
         body: data,
       })
       this.documentData = await this.postFilename(filename) // TODO: move this operation to store level
-      this.$store.dispatch('UPDATE_DOCUMENT', this.documentData.data)
+      this.$store.dispatch('UPDATE_DOCUMENT', this.documentData.data.id)
       this.$nprogress.done()
       this.$message.success('Document smelted successfully')
       this.uploadPossible = !this.uploadPossible
