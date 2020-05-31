@@ -61,6 +61,7 @@
 </template>
 <script>
 import { cloneDeep } from 'lodash'
+import uuidv4 from 'uuid/v4'
 
 const columns = [
   {
@@ -143,7 +144,7 @@ export default {
         'KeyConfidence': '100',
         'Value': '',
         'ValueConfidence': '100',
-        'key': page.length,
+        'key': uuidv4(),
       }
       this.document.metadata[page].push(newElement)
     },

@@ -45,8 +45,13 @@ export default {
       default: false,
     },
   },
+  created() {
+    if (!this.documentExist && this.documentsIdList.length) {
+      this.$store.dispatch('UPDATE_DOCUMENT', this.documentsIdList[0])
+    }
+  },
   computed: {
-    ...mapGetters(['documentExist', 'current']),
+    ...mapGetters(['documentExist', 'current', 'documentsIdList']),
     documentName: function() {
       return this.current.alias
     },

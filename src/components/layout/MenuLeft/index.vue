@@ -61,12 +61,11 @@
           <span />
           <span />
         </a>
-        <a href="javascript: void(0);" :class="$style.air__menuLeft__logo">
-          <img src="resources/images/air-logo.png" alt="Air UI" />
+        <a  :class="$style.air__menuLeft__logo">
           <div :class="$style.air__menuLeft__logo__name">Smeltor</div>
           <div :class="$style.air__menuLeft__logo__descr">Data extraction</div>
         </a>
-        <a href="javascript: void(0);" :class="$style.air__menuLeft__user">
+        <a  :class="$style.air__menuLeft__user">
           <div :class="$style.air__menuLeft__user__avatar">
             <img src="resources/images/avatars/avatar.png" alt="User Name" />
           </div>

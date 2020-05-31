@@ -49,8 +49,10 @@ export default {
       state.formattedDocument = null
     },
     SET_DOCUMENTS_LIST(state, documentsList) {
-      documentsList.map(x => { // TODO: Implement these properties in DB
-        x.date = x.createdAt
+      documentsList.map((item, index) => { // TODO: Implement these properties in DB
+        item.date = item.createdAt
+        item.key = index
+        return item
       })
       state.documentsList = documentsList.sort((a, b) => {
         return -(new Date(a.date) - new Date(b.date))

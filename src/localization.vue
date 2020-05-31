@@ -1,7 +1,7 @@
 <template>
-  <a-locale-provider :locale="locale">
+  <a-config-provider :locale="locale">
     <router-view />
-  </a-locale-provider>
+  </a-config-provider>
 </template>
 
 <script>
