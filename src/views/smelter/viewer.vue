@@ -1,26 +1,26 @@
 <template>
   <div>
     <a-layout-header>
-      <smelter-subbar :smeltedValidation=smeltedValidation />
+      <smelter-subbar :smeltedValidation="smeltedValidation" />
     </a-layout-header>
     <a-layout-content>
-      <div class="air__utils__content">
-    <div class="row">
-      <div class="col-md-6">
-        <smelter-viewer :current="current" />
-      </div>
-      <div v-if="documentIsPdf" class="col-md-6">
-        <div class="sticky">
-        <smelter-pdf-window  :name="documentName" />
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-4">
+            <smelter-viewer :current="current" />
+          </div>
+          <div v-if="documentIsPdf" class="col-md-8">
+            <div class="sticky">
+            <smelter-pdf-window  :name="documentName" :currentPageData="currentPageData" />
+            </div>
+          </div>
+          <div v-else class="col-md-8">
+            <div class="sticky">
+              <smelter-image-window  :name="documentName" />
+            </div>
+          </div>
         </div>
       </div>
-      <div v-else class="col-md-6">
-        <div class="sticky">
-          <smelter-image-window  :name="documentName" />
-        </div>
-      </div>
-    </div>
-    </div>
     </a-layout-content>
   </div>
 </template>
@@ -51,7 +51,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['documentExist', 'current', 'documentsIdList']),
+    ...mapGetters(['documentExist', 'current', 'documentsIdList', 'currentPageData']),
     documentName: function() {
       return this.current.alias
     },

@@ -32,14 +32,27 @@ export default {
   mounted: async function() {
     this.renderPdf()
   },
+  data() {
+    return {
+      pageNum: 1,
+      pageData: [],
+    }
+  },
   props: {
     name: {
       type: String,
     },
+    currentPageData: {
+      required: true,
+    },
   },
   watch: {
     name: async function() {
+      console.log('anas1')
       this.renderPdf()
+    },
+    currentPageData: function() {
+      console.log('anas')
     },
   },
   methods: {
@@ -49,7 +62,6 @@ export default {
       let pageIsRendering = false
       let pageNumIsPending = null
 
-      const scale = 1.0
       const canvas = document.querySelector('#pdf-render')
       const ctx = canvas.getContext('2d')
 
@@ -60,7 +72,7 @@ export default {
         // Get page
         pdfDoc.getPage(num).then(page => {
           // Set scale
-          const viewport = page.getViewport({ scale })
+          const viewport = page.getViewport(document.querySelector('.card-body').offsetWidth / page.getViewport(1.0).width)
           canvas.height = viewport.height
           canvas.width = viewport.width
 
@@ -75,6 +87,14 @@ export default {
             if (pageNumIsPending !== null) {
               renderPage(pageNumIsPending)
               pageNumIsPending = null
+            }
+            for (var i = 0; i < this.currentPageData.length; i++) {
+              ctx.beginPath()
+              ctx.rect(canvas.width * this.currentPageData[i].Left,
+                canvas.height * this.currentPageData[i].Top,
+                canvas.height * this.currentPageData[i].Width,
+                canvas.height * this.currentPageData[i].Height)
+              ctx.stroke()
             }
           })
 
@@ -98,6 +118,7 @@ export default {
           return
         }
         pageNum--
+        this.pageNum--
         queueRenderPage(pageNum)
       }
 
@@ -107,6 +128,7 @@ export default {
           return
         }
         pageNum++
+        this.pageNum++
         queueRenderPage(pageNum)
       }
 

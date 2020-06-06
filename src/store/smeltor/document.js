@@ -18,13 +18,15 @@ function omitKeyFromMetadata(document) {
 
 export default {
   state: {
-    formattedDocument: null,
+    formattedDocument: {},
+    page: 1,
     documentsList: [],
     viewerIdList: [],
   },
   mutations: {
     UPDATE_DOCUMENT_DATA(state, documentId) {
       state.formattedDocument = state.documentsList.find(x => x.id === documentId)
+      console.log(state.formattedDocument)
       for (let page of Object.keys(state.formattedDocument.metadata)) {
         state.formattedDocument.metadata[page] = state.formattedDocument.metadata[page].map((item, index) => {
           item.key = index
@@ -73,6 +75,7 @@ export default {
       commit('CLEAR_DOCUMENT_DATA')
     },
     FETCH_DOCUMENTS({ commit }) {
+      console.log('Action FETCH_DOCUMENTS')
       return axios.get('http://localhost:3000/v1/documents',)
         .then(({ data }) => {
           commit('SET_DOCUMENTS_LIST', data)
@@ -87,6 +90,7 @@ export default {
   },
   getters: {
     current: state => state.formattedDocument,
+    currentPageData: state => ((state.formattedDocument.metadata || {})['page_' + state.page] || []),
     documentExist: state => !!state.formattedDocument,
     documentsList: state => state.documentsList,
     documentsIdList: state => state.documentsList.map(x => x.id),
