@@ -59,12 +59,12 @@ export default {
               ...files[fileID],
               name: `${newName}.${ext}`,
             }
-            updatedFiles[fileID].meta.name = `${newName}.${ext}`
+            updatedFiles[fileID].meta.name = updatedFiles[fileID].meta.namest.replace(/[^0-9a-z.\s]/gi, '')
             this.files.push({
-              name: files[fileID].name,
+              name: files[fileID].meta.name ? files[fileID].meta.name : 'Not Specified',
               mimeType: files[fileID].type,
               alias: `${newName}.${ext}`,
-              businessPurpose: files[fileID].meta.businessPurpose ? files[fileID].meta.businessPurpose : 'Not specified',
+              businessPurpose: files[fileID].meta.businessReason ? files[fileID].meta.businessReason : 'Not specified',
               extractionType: 'FORMS',
               metadata: {},
             })
@@ -86,6 +86,8 @@ export default {
           replaceTargetContent: true,
           showProgressDetails: true,
           browserBackButtonClose: true,
+          proudlyDisplayPoweredByUppy: false,
+
           metaFields: [
             { id: 'name', name: 'Name', placeholder: 'File name' },
             { id: 'businessReason', name: 'Business tag', placeholder: 'Invoice, Bill, Balance Sheet...' },

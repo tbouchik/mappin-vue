@@ -49,7 +49,7 @@ export default {
       let pageIsRendering = false
       let pageNumIsPending = null
 
-      const scale = 0.9
+      const scale = 1.0
       const canvas = document.querySelector('#pdf-render')
       const ctx = canvas.getContext('2d')
 
