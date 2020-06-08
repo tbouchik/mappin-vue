@@ -24,7 +24,7 @@
           <air-topbar v-if="settings.menuLayoutType !== 'top-dark'" />
         </a-layout-header>
         <a-layout-content>
-          <div class="air__utils__content">
+          <div class="container-fluid">
             <transition :name="settings.routerAnimation" mode="out-in">
               <router-view />
             </transition>

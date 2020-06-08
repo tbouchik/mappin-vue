@@ -219,6 +219,7 @@ export default {
       searchText: '',
       searchInput: null,
       searchedColumn: '',
+      timeInterval: null,
       columns,
     }
   },
@@ -230,6 +231,12 @@ export default {
   },
   created() {
     this.$store.dispatch('FETCH_DOCUMENTS')
+    // this.timeInterval = setInterval( () => {
+    //   this.$store.dispatch('FETCH_DOCUMENTS')
+    // }, 10000);
+  },
+  destroyed() {
+    this.timeInterval = undefined
   },
   methods: {
     handleSearch(selectedKeys, confirm, dataIndex) {

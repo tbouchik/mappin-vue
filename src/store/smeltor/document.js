@@ -18,7 +18,8 @@ function omitKeyFromMetadata(document) {
 
 export default {
   state: {
-    formattedDocument: null,
+    formattedDocument: {},
+    page: 1,
     documentsList: [],
     viewerIdList: [],
   },
@@ -73,6 +74,7 @@ export default {
       commit('CLEAR_DOCUMENT_DATA')
     },
     FETCH_DOCUMENTS({ commit }) {
+      console.log('Action FETCH_DOCUMENTS')
       return axios.get('http://localhost:3000/v1/documents',)
         .then(({ data }) => {
           commit('SET_DOCUMENTS_LIST', data)
@@ -87,6 +89,7 @@ export default {
   },
   getters: {
     current: state => state.formattedDocument,
+    currentPageData: state => ((state.formattedDocument.metadata || {})['page_' + state.page] || []),
     documentExist: state => !!state.formattedDocument,
     documentsList: state => state.documentsList,
     documentsIdList: state => state.documentsList.map(x => x.id),
