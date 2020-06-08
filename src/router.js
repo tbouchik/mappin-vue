@@ -20,14 +20,6 @@ const router = new Router({
       children: [
         // Smelter
         {
-          path: '/smelter/upload',
-          name: 'upload',
-          meta: {
-            title: 'Smelter Uploading',
-          },
-          component: () => import('./views/smelter/uploader.vue'),
-        },
-        {
           path: '/smelter/viewer',
           name: 'viewer',
           meta: {
@@ -35,14 +27,6 @@ const router = new Router({
           },
           props: true,
           component: () => import('./views/smelter/viewer.vue'),
-        },
-        {
-          path: '/smelter/window',
-          name: 'window',
-          meta: {
-            title: 'Smelter Window',
-          },
-          component: () => import('./views/smelter/pdfwindow.vue'),
         },
         // Dashboards
         {
