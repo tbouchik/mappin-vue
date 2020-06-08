@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
-import { cloneDeep, omit } from 'lodash'
+import { cloneDeep, omit, get } from 'lodash'
 import DocumentService from '../../services/documentService.js'
 
 Vue.use(Vuex)
@@ -25,7 +25,7 @@ export default {
   mutations: {
     UPDATE_DOCUMENT_DATA(state, documentId) {
       state.formattedDocument = state.documentsList.find(x => x.id === documentId)
-      for (let page of Object.keys(state.formattedDocument.metadata)) {
+      for (let page of Object.keys(get(state, 'formattedDocument.metadata'))) {
         state.formattedDocument.metadata[page] = state.formattedDocument.metadata[page].map((item, index) => {
           item.key = index
           return item

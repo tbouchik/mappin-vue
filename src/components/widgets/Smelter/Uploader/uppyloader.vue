@@ -59,7 +59,7 @@ export default {
               ...files[fileID],
               name: `${newName}.${ext}`,
             }
-            updatedFiles[fileID].meta.name = updatedFiles[fileID].meta.namest.replace(/[^0-9a-z.\s]/gi, '')
+            updatedFiles[fileID].meta.name = updatedFiles[fileID].meta.name.replace(/[^0-9a-z.\s]/gi, '')
             this.files.push({
               name: files[fileID].meta.name ? files[fileID].meta.name : 'Not Specified',
               mimeType: files[fileID].type,
