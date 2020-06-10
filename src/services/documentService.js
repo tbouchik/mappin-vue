@@ -21,6 +21,12 @@ class DocumentService {
       ...body,
     })
   }
+  static fetchDocument(documentId) {
+    console.log('here, ', documentId)
+    return axios.get(`http://localhost:3000/v1/documents/${documentId}`).then((response) => {
+      return response.data
+    })
+  }
 }
 
 export default DocumentService

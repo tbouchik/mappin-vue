@@ -95,6 +95,7 @@ export default {
   created() {
     this.document = cloneDeep(this.current)
     this.cacheData = cloneDeep(this.current)
+    console.log('cachhe data ', this.cacheData)
   },
   props: {
     insideUploaderView: {

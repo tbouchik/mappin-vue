@@ -5,10 +5,4 @@ export const getMenuData = [
     icon: 'fe fe-file-text',
     url: '/dashboard/documents',
   },
-  {
-    title: 'Document Viewer',
-    key: 'documentViewer',
-    icon: 'fe fe-eye',
-    url: '/smelter/viewer',
-  },
 ]

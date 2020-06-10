@@ -10,9 +10,7 @@
       air__layout__borderless: settings.isBorderless,
     }"
     >
-      <air-sidebar />
       <air-menu-left v-if="settings.menuLayoutType === 'left'" />
-      <air-menu-top v-if="settings.menuLayoutType === 'top'" />
       <a-layout>
         <a-layout-header
           class="air__layout__header"
@@ -21,7 +19,6 @@
           air__layout__headerGray: settings.isGrayTopbar,
         }"
         >
-          <air-topbar v-if="settings.menuLayoutType !== 'top-dark'" />
         </a-layout-header>
         <a-layout-content>
           <div class="container-fluid">
@@ -37,15 +34,12 @@
 
 <script>
 import { mapState } from 'vuex'
-import AirTopbar from '@/components/layout/TopBar/topBar.vue'
 import AirMenuLeft from '@/components/layout/MenuLeft'
-import AirMenuTop from '@/components/layout/MenuTop'
-import AirSidebar from '@/components/layout/Sidebar'
 
 export default {
   name: 'AppLayout',
   computed: mapState(['settings']),
-  components: { AirTopbar, AirMenuLeft, AirMenuTop, AirSidebar },
+  components: { AirMenuLeft },
   mounted() {
     this.detectViewPort(true)
     window.addEventListener('resize', this.detectViewPortListener)

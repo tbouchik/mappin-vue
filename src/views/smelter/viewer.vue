@@ -1,13 +1,13 @@
 <template>
-  <div>
+  <div v-if="currentDocument">
     <a-layout-header>
-      <smelter-subbar :smeltedValidation="smeltedValidation" />
+      <smelter-subbar :smeltedValidation="smeltedValidation" :current="currentDocument"/>
     </a-layout-header>
     <a-layout-content>
       <div class="container-fluid">
         <div class="row">
           <div class="col-md-4">
-            <smelter-viewer :current="current" />
+            <smelter-viewer :current="currentDocument" />
           </div>
           <div v-if="documentIsPdf" class="col-md-8">
             <div class="sticky">
@@ -29,7 +29,7 @@ import SmelterViewer from '@/components/widgets/Smelter/Viewer/viewer.vue'
 import SmelterPdfWindow from '@/components/widgets/Smelter/Window/pdfwindow.vue'
 import SmelterImageWindow from '@/components/widgets/Smelter/Window/imgwindow.vue'
 import SmelterSubbar from '@/components/widgets/Smelter/Viewer/subbar.vue'
-
+import DocumentService from '@/services/documentService.js'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -44,19 +44,36 @@ export default {
       type: Boolean,
       default: false,
     },
+    documentId: {
+      type: String,
+      required: true,
+    },
   },
-  created() {
-    if (!this.documentExist && this.documentsIdList.length) {
-      this.$store.dispatch('UPDATE_DOCUMENT', this.documentsIdList[0])
+  data: function() {
+    return {
+      currentDocument: null,
     }
   },
+  created() {
+    DocumentService.fetchDocument(this.documentId).then(doc => {
+      this.currentDocument = doc
+    })
+    this.$store.dispatch('FETCH_DOCUMENTS')
+  },
+  watch: {
+    documentId: function() {
+      return DocumentService.fetchDocument(this.documentId).then(doc => {
+        this.currentDocument = doc
+      })
+    },
+  },
   computed: {
-    ...mapGetters(['documentExist', 'current', 'documentsIdList', 'currentPageData']),
+    ...mapGetters(['current', 'documentsIdList', 'currentPageData']),
     documentName: function() {
-      return this.current.alias
+      return this.currentDocument.alias
     },
     documentIsPdf: function() {
-      return this.current.mimeType === 'application/pdf'
+      return this.currentDocument.mimeType === 'application/pdf'
     },
   },
 }

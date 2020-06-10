@@ -35,15 +35,14 @@ export default {
     },
     async SAVE_CURRENT_DOCUMENT(state, document) {
       const updatedDocument = {
-        name: state.formattedDocument.name,
+        name: document.name,
         metadata: omitKeyFromMetadata(document).metadata,
         status: document.status,
       }
       await DocumentService.updateDocument(
         updatedDocument,
-        state.formattedDocument.id
+        document.id
       )
-      state.formattedDocument = document
       state.documentsList[state.documentsList.findIndex(x => x.id === document.id)] = document
     },
     CLEAR_DOCUMENT_DATA(state) {
@@ -74,7 +73,6 @@ export default {
       commit('CLEAR_DOCUMENT_DATA')
     },
     FETCH_DOCUMENTS({ commit }) {
-      console.log('Action FETCH_DOCUMENTS')
       return axios.get('http://localhost:3000/v1/documents',)
         .then(({ data }) => {
           commit('SET_DOCUMENTS_LIST', data)
@@ -89,8 +87,7 @@ export default {
   },
   getters: {
     current: state => state.formattedDocument,
-    currentPageData: state => ((state.formattedDocument.metadata || {})['page_' + state.page] || []),
-    documentExist: state => !!state.formattedDocument,
+    currentPageData: state => get(state, 'formattedDocument.metadata', {}),
     documentsList: state => state.documentsList,
     documentsIdList: state => state.documentsList.map(x => x.id),
     smeltedIdList: state => state.documentsList.filter(x => {

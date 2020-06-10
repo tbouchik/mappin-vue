@@ -244,19 +244,12 @@ export default {
       this.searchText = selectedKeys[0]
       this.searchedColumn = dataIndex
     },
-
     handleReset(clearFilters) {
       clearFilters()
       this.searchText = ''
     },
-
-    newUpload() {
-      this.$router.push({ name: 'upload' })
-    },
-
     view(record) {
-      this.$store.dispatch('UPDATE_DOCUMENT', record.id)
-      this.$router.push({ name: 'viewer' })
+      this.$router.push({ name: 'viewer', params: { documentId: record.id } })
     },
     remove(record) {
       this.$nprogress.start()
@@ -264,8 +257,7 @@ export default {
       this.$nprogress.done()
     },
     goToValidation() {
-      this.$store.dispatch('UPDATE_DOCUMENT', this.smeltedIdList[0])
-      this.$router.push({ name: 'viewer', params: { smeltedValidation: true } })
+      this.$router.push({ name: 'viewer', params: { documentId: this.smeltedIdList[0], smeltedValidation: true } })
     },
   },
 }

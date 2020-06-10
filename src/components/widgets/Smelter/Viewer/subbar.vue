@@ -3,7 +3,7 @@
     <ul :class="$style.breadcrumbs" class="mr-4">
 
       <li :class="$style.breadcrumb">
-        <a href="#" :class="[$style.breadcrumbLink, $style.breadcrumbLink__current]">{{current.name}}</a>
+        <a href="#" :class="[$style.breadcrumbLink, $style.breadcrumbLink__current]">{{current.name}} - {{currentIndex}}</a>
       </li>
     </ul>
     <div :class="$style.divider" class="mr-4 d-none d-xl-block" />
@@ -62,16 +62,16 @@ export default {
   methods: {
     goNext() {
       if (this.smeltedValidation) {
-        this.$router.push({ name: 'viewer', params: { documentId: this.smeltedIdList[this.currentIndex + 1] } })
+        this.$router.push({ name: 'viewer', params: { documentId: this.smeltedIdList[this.currentIndex + 1], smeltedValidation: this.smeltedValidation } })
       } else {
-        this.$router.push({ name: 'viewer', params: { documentId: this.documentsIdList[this.currentIndex + 1] } })
+        this.$router.push({ name: 'viewer', params: { documentId: this.documentsIdList[this.currentIndex + 1], smeltedValidation: this.smeltedValidation } })
       }
     },
     goPrevious() {
       if (this.smeltedValidation) {
-        this.$router.push({ name: 'viewer', params: { documentId: this.smeltedIdList[this.currentIndex - 1] } })
+        this.$router.push({ name: 'viewer', params: { documentId: this.smeltedIdList[this.currentIndex - 1], smeltedValidation: this.smeltedValidation } })
       } else {
-        this.$router.push({ name: 'viewer', params: { documentId: this.documentsIdList[this.currentIndex - 1] } })
+        this.$router.push({ name: 'viewer', params: { documentId: this.documentsIdList[this.currentIndex - 1], smeltedValidation: this.smeltedValidation } })
       }
     },
   },

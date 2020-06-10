@@ -1,0 +1,13 @@
+diff a/src/components/widgets/Smelter/Viewer/subbar.vue b/src/components/widgets/Smelter/Viewer/subbar.vue	(rejected hunks)
+@@ -65 +65 @@ export default {
+-        this.$router.push({name: 'viewer', params: { documentId:this.smeltedIdList[this.currentIndex + 1] } })
++        this.$router.push({ name: 'viewer', params: { documentId: this.smeltedIdList[this.currentIndex + 1] } })
+@@ -67 +67 @@ export default {
+-        this.$router.push({name: 'viewer', params: { documentId:this.documentsIdList[this.currentIndex + 1] } })
++        this.$router.push({ name: 'viewer', params: { documentId: this.documentsIdList[this.currentIndex + 1] } })
+@@ -72 +72 @@ export default {
+-        this.$router.push({name: 'viewer', params: { documentId:this.smeltedIdList[this.currentIndex - 1] } })
++        this.$router.push({ name: 'viewer', params: { documentId: this.smeltedIdList[this.currentIndex - 1] } })
+@@ -74 +74 @@ export default {
+-        this.$router.push({name: 'viewer', params: { documentId:this.documentsIdList[this.currentIndex - 1] } })
++        this.$router.push({ name: 'viewer', params: { documentId: this.documentsIdList[this.currentIndex - 1] } })
