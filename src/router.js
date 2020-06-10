@@ -20,7 +20,7 @@ const router = new Router({
       children: [
         // Smelter
         {
-          path: '/smelter/viewer',
+          path: '/smelter/viewer/:documentId',
           name: 'viewer',
           meta: {
             title: 'Smelter Viewer',
@@ -35,6 +35,7 @@ const router = new Router({
           meta: {
             title: 'Dashboard Documents',
           },
+          props: true,
           component: () => import('./views/dashboard/documents/documents.vue'),
         },
         // 404
@@ -74,13 +75,6 @@ const router = new Router({
             title: 'Register',
           },
           component: () => import('./views/system/register.vue'),
-        },
-        {
-          path: '/system/lockscreen',
-          meta: {
-            title: 'Lockscreen',
-          },
-          component: () => import('./views/system/lockscreen'),
         },
         {
           path: '/system/404',

@@ -29,7 +29,7 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'SmelterSubbar',
   computed: {
-    ...mapGetters(['current', 'smeltedIdList', 'documentsIdList']),
+    ...mapGetters(['smeltedIdList', 'documentsIdList']),
     currentIndex: function() {
       if (this.smeltedValidation) {
         return this.smeltedIdList.indexOf(this.current.id)
@@ -54,20 +54,24 @@ export default {
       type: Boolean,
       default: false,
     },
+    current: {
+      type: Object,
+      required: true,
+    },
   },
   methods: {
     goNext() {
       if (this.smeltedValidation) {
-        this.$store.dispatch('UPDATE_DOCUMENT', this.smeltedIdList[this.currentIndex + 1])
+        this.$router.push({ name: 'viewer', params: { documentId: this.smeltedIdList[this.currentIndex + 1] } })
       } else {
-        this.$store.dispatch('UPDATE_DOCUMENT', this.documentsIdList[this.currentIndex + 1])
+        this.$router.push({ name: 'viewer', params: { documentId: this.documentsIdList[this.currentIndex + 1] } })
       }
     },
     goPrevious() {
       if (this.smeltedValidation) {
-        this.$store.dispatch('UPDATE_DOCUMENT', this.smeltedIdList[this.currentIndex - 1])
+        this.$router.push({ name: 'viewer', params: { documentId: this.smeltedIdList[this.currentIndex - 1] } })
       } else {
-        this.$store.dispatch('UPDATE_DOCUMENT', this.documentsIdList[this.currentIndex - 1])
+        this.$router.push({ name: 'viewer', params: { documentId: this.documentsIdList[this.currentIndex - 1] } })
       }
     },
   },
