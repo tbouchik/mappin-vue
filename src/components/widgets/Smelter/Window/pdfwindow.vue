@@ -48,11 +48,9 @@ export default {
   },
   watch: {
     name: async function() {
-      console.log('anas1')
       this.renderPdf()
     },
     currentPageData: function() {
-      console.log('anas')
     },
   },
   methods: {

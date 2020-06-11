@@ -1,13 +1,13 @@
 <template>
-  <div v-if="currentDocument">
+  <div v-if="current">
     <a-layout-header>
-      <smelter-subbar :smeltedValidation="smeltedValidation" :current="currentDocument"/>
+      <smelter-subbar :smeltedValidation="smeltedValidation" :current="current"/>
     </a-layout-header>
     <a-layout-content>
       <div class="container-fluid">
         <div class="row">
           <div class="col-md-4">
-            <smelter-viewer :current="currentDocument" />
+            <smelter-viewer :current="current" />
           </div>
           <div v-if="documentIsPdf" class="col-md-8">
             <div class="sticky">
@@ -31,6 +31,7 @@ import SmelterImageWindow from '@/components/widgets/Smelter/Window/imgwindow.vu
 import SmelterSubbar from '@/components/widgets/Smelter/Viewer/subbar.vue'
 import DocumentService from '@/services/documentService.js'
 import { mapGetters } from 'vuex'
+import { get } from 'lodash'
 
 export default {
   components: {
@@ -49,31 +50,26 @@ export default {
       required: true,
     },
   },
-  data: function() {
-    return {
-      currentDocument: null,
-    }
-  },
   created() {
     DocumentService.fetchDocument(this.documentId).then(doc => {
-      this.currentDocument = doc
+      this.$store.dispatch('UPDATE_DOCUMENT', doc.data)
     })
     this.$store.dispatch('FETCH_DOCUMENTS')
   },
   watch: {
     documentId: function() {
       return DocumentService.fetchDocument(this.documentId).then(doc => {
-        this.currentDocument = doc
+        this.$store.dispatch('UPDATE_DOCUMENT', doc.data)
       })
     },
   },
   computed: {
     ...mapGetters(['current', 'documentsIdList', 'currentPageData']),
     documentName: function() {
-      return this.currentDocument.alias
+      return get(this.current, 'alias')
     },
     documentIsPdf: function() {
-      return this.currentDocument.mimeType === 'application/pdf'
+      return get(this.current, 'mimeType') === 'application/pdf'
     },
   },
 }

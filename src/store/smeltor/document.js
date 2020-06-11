@@ -24,8 +24,8 @@ export default {
     viewerIdList: [],
   },
   mutations: {
-    UPDATE_DOCUMENT_DATA(state, documentId) {
-      state.formattedDocument = state.documentsList.find(x => x.id === documentId)
+    UPDATE_DOCUMENT_DATA(state, document) {
+      state.formattedDocument = document
       for (let page of Object.keys(get(state, 'formattedDocument.metadata'))) {
         state.formattedDocument.metadata[page] = state.formattedDocument.metadata[page].map((item, index) => {
           item.key = index
@@ -34,6 +34,7 @@ export default {
       }
     },
     async SAVE_CURRENT_DOCUMENT(state, document) {
+      Object.assign(state.formattedDocument, document)
       const updatedDocument = {
         name: document.name,
         metadata: omitKeyFromMetadata(document).metadata,
@@ -43,7 +44,7 @@ export default {
         updatedDocument,
         document.id
       )
-      state.documentsList[state.documentsList.findIndex(x => x.id === document.id)] = document
+      Object.assign(state.documentsList[state.documentsList.findIndex(x => x.id === document.id)], document)
     },
     CLEAR_DOCUMENT_DATA(state) {
       state.formattedDocument = null
@@ -63,8 +64,8 @@ export default {
     },
   },
   actions: {
-    UPDATE_DOCUMENT({ commit }, documentId) {
-      commit('UPDATE_DOCUMENT_DATA', documentId)
+    UPDATE_DOCUMENT({ commit }, document) {
+      commit('UPDATE_DOCUMENT_DATA', document)
     },
     SAVE_DOCUMENT({ commit }, document) {
       commit('SAVE_CURRENT_DOCUMENT', document)

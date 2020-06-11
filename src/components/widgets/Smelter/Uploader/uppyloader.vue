@@ -98,7 +98,6 @@ export default {
           () => { this.$store.dispatch('FETCH_DOCUMENTS') }
         )
         this.files = []
-        this.$store.dispatch('FETCH_DOCUMENTS')
       })
     },
     updatePreviewPath({ path }) {
