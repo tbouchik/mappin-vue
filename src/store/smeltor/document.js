@@ -62,6 +62,15 @@ export default {
     REMOVE_DOC_FROM_LIST(state, id) {
       state.documentsList = state.documentsList.filter(item => item.id !== id)
     },
+    MUTATION_INCREMENT_PAGE(state) {
+      state.page++
+    },
+    MUTATION_DECREMENT_PAGE(state) {
+      state.page--
+    },
+    MUTATION_RESET_PAGE(state) {
+      state.page = 1
+    },
   },
   actions: {
     UPDATE_DOCUMENT({ commit }, document) {
@@ -85,10 +94,19 @@ export default {
           commit('REMOVE_DOC_FROM_LIST', id)
         })
     },
+    ACTION_INCREMENT_PAGE({ commit }) {
+      commit('MUTATION_INCREMENT_PAGE')
+    },
+    ACTION_DERCREMENT_PAGE({ commit }) {
+      commit('MUTATION_DECREMENT_PAGE')
+    },
+    ACTION_RESET_PAGE({ commit }) {
+      commit('MUTATION_RESET_PAGE')
+    },
   },
   getters: {
     current: state => state.formattedDocument,
-    currentPageData: state => get(state, 'formattedDocument.metadata', {}),
+    currentPageData: state => get(state, 'formattedDocument.metadata', {})['page_' + state.page],
     documentsList: state => state.documentsList,
     documentsIdList: state => state.documentsList.map(x => x.id),
     smeltedIdList: state => state.documentsList.filter(x => {

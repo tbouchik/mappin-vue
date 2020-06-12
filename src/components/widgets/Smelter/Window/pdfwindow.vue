@@ -59,6 +59,7 @@ export default {
       let pageNum = 1
       let pageIsRendering = false
       let pageNumIsPending = null
+      this.$store.dispatch('ACTION_RESET_PAGE')
 
       const canvas = document.querySelector('#pdf-render')
       const ctx = canvas.getContext('2d')
@@ -90,7 +91,7 @@ export default {
               ctx.beginPath()
               ctx.rect(canvas.width * this.currentPageData[i].Left,
                 canvas.height * this.currentPageData[i].Top,
-                canvas.height * this.currentPageData[i].Width,
+                canvas.width * this.currentPageData[i].Width,
                 canvas.height * this.currentPageData[i].Height)
               ctx.stroke()
             }
@@ -117,6 +118,7 @@ export default {
         }
         pageNum--
         this.pageNum--
+        this.$store.dispatch('ACTION_DERCREMENT_PAGE')
         queueRenderPage(pageNum)
       }
 
@@ -127,6 +129,7 @@ export default {
         }
         pageNum++
         this.pageNum++
+        this.$store.dispatch('ACTION_INCREMENT_PAGE')
         queueRenderPage(pageNum)
       }
 
