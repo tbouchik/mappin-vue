@@ -87,6 +87,7 @@ export default {
           showProgressDetails: true,
           browserBackButtonClose: true,
           proudlyDisplayPoweredByUppy: false,
+          showRemoveButton: true,
 
           metaFields: [
             { id: 'name', name: 'Name', placeholder: 'File name' },

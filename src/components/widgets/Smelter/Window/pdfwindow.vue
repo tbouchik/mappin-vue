@@ -84,10 +84,20 @@ export default {
             if (this.currentPageData) {
               for (var i = 0; i < this.currentPageData.length; i++) {
                 ctx.beginPath()
-                ctx.rect(canvas.width * this.currentPageData[i].Left,
-                  canvas.height * this.currentPageData[i].Top,
-                  canvas.width * this.currentPageData[i].Width,
-                  canvas.height * this.currentPageData[i].Height)
+                ctx.rect(
+                  canvas.width * this.currentPageData[i].KeyLeft,
+                  canvas.height * this.currentPageData[i].KeyTop,
+                  canvas.width * this.currentPageData[i].KeyWidth,
+                  canvas.height * this.currentPageData[i].KeyHeight,
+                )
+                ctx.stroke()
+                ctx.beginPath()
+                ctx.rect(
+                  canvas.width * this.currentPageData[i].ValueLeft,
+                  canvas.height * this.currentPageData[i].ValueTop,
+                  canvas.width * this.currentPageData[i].ValueWidth,
+                  canvas.height * this.currentPageData[i].ValueHeight,
+                )
                 ctx.stroke()
               }
             }
