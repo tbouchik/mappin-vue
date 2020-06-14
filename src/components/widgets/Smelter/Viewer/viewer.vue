@@ -22,13 +22,12 @@
 
     </div>
 
-    <div v-for="(page, index, i) in document.metadata" :key="i">
       <div :class="$style.subbar">
-        <p class="color-gray-4 text-uppercase font-size-18 mb-0 mr-4 d-none d-xl-block">PAGE {{i+1}}</p>
+        <p class="color-gray-4 text-uppercase font-size-18 mb-0 mr-4 d-none d-xl-block">PAGE: {{currentPage}}</p>
         <button
           type="button"
           class="btn btn-primary btn-with-addon mr-auto text-nowrap d-none d-md-block"
-          @click="() => addRecord(i)"
+          @click="addRecord"
         >
           <span class="btn-addon">
             <i class="btn-addon-icon fe fe-plus-circle" />
@@ -36,33 +35,32 @@
           New Record
         </button>
       </div>
-      <a-table :columns="columns" :data-source="page" :pagination=false bordered>
+      <a-table :columns="columns" :data-source="pageData" :pagination=false bordered>
         <template v-for="col in ['Key', 'Value']" :slot="col" slot-scope="text, record, dataIndex">
           <div :key="col">
             <a-input
               style="margin: -5px 0"
               :value="text"
-              @change="e => handleChange(e.target.value, i, dataIndex, col)"
+              @change="e => handleChange(e.target.value, dataIndex, col)"
             />
           </div>
         </template>
         <template slot="operation" slot-scope="text, record, dataIndex">
           <div class="editable-row-operations">
             <span>
-              <a-popconfirm title="Sure to delete?" @confirm="() => remove(record, i, dataIndex)">
+              <a-popconfirm title="Sure to delete?" @confirm="() => remove(record, dataIndex)">
                 <a style="color:#b793c3">Delete</a>
               </a-popconfirm>
             </span>
           </div>
         </template>
       </a-table>
-    </div>
   </div>
 </template>
 <script>
 import { cloneDeep } from 'lodash'
 import uuidv4 from 'uuid/v4'
-
+import { mapGetters } from 'vuex'
 const columns = [
   {
     title: 'Key',
@@ -90,6 +88,7 @@ export default {
       columns,
       document: {},
       cacheData: {},
+      pageData: [],
     }
   },
   created() {
@@ -105,10 +104,20 @@ export default {
       required: true,
     },
   },
+  computed: {
+    ...mapGetters(['currentPage']),
+  },
   watch: {
     current: function () {
       this.document = cloneDeep(this.current)
       this.cacheData = cloneDeep(this.current)
+      this.pageData = this.document.metadata['page_' + this.currentPage]
+    },
+    currentPage: function() {
+      this.pageData = this.document.metadata['page_' + this.currentPage]
+    },
+    document: function() {
+      this.pageData = this.document.metadata['page_' + this.currentPage]
     },
   },
   methods: {
@@ -123,22 +132,14 @@ export default {
     async cancelChanges() {
       this.document = cloneDeep(this.cacheData)
     },
-    handleChange(value, pageIdx, itemIdx, column) {
-      const page = Object.keys(this.document.metadata)[pageIdx]
-      this.document.metadata[page][itemIdx][column] = value
+    handleChange(value, itemIdx, column) {
+      this.document.metadata['page_' + this.currentPage][itemIdx][column] = value
     },
-    cancel(record, pageIdx, itemIdx) {
-      this.document = cloneDeep(this.cacheData)
-      this.cacheData = null
-      this.switchEditMode()
-    },
-    async remove(record, pageIdx, itemIdx) {
-      const page = Object.keys(this.document.metadata)[pageIdx]
-      this.document.metadata[page].splice(itemIdx, 1)
+    async remove(record, itemIdx) {
+      this.document.metadata['page_' + this.currentPage].splice(itemIdx, 1)
       await this.$store.dispatch('SAVE_DOCUMENT', this.document)
     },
-    addRecord(pageIdx) {
-      const page = Object.keys(this.document.metadata)[pageIdx]
+    addRecord() {
       const newElement = {
         'Key': '',
         'KeyConfidence': '100',
@@ -146,7 +147,8 @@ export default {
         'ValueConfidence': '100',
         'key': uuidv4(),
       }
-      this.document.metadata[page].push(newElement)
+      this.document.metadata['page_' + this.currentPage].push(newElement)
+      console.log(this.document.metadata['page_' + this.currentPage])
     },
   },
   destroyed() {

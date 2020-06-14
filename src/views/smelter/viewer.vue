@@ -7,15 +7,17 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-md-4">
-            <smelter-viewer :current="current" />
+            <div class="sticky">
+              <smelter-viewer :current="current" />
+            </div>
           </div>
           <div v-if="documentIsPdf" class="col-md-8">
-            <div class="sticky">
+            <div>
             <smelter-pdf-window  :name="documentName" :currentPageData="currentPageData" />
             </div>
           </div>
           <div v-else class="col-md-8">
-            <div class="sticky">
+            <div>
               <smelter-image-window  :name="documentName" />
             </div>
           </div>

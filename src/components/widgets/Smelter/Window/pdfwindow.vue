@@ -32,12 +32,6 @@ export default {
   mounted: async function() {
     this.renderPdf()
   },
-  data() {
-    return {
-      pageNum: 1,
-      pageData: [],
-    }
-  },
   props: {
     name: {
       type: String,
@@ -87,13 +81,15 @@ export default {
               renderPage(pageNumIsPending)
               pageNumIsPending = null
             }
-            for (var i = 0; i < this.currentPageData.length; i++) {
-              ctx.beginPath()
-              ctx.rect(canvas.width * this.currentPageData[i].Left,
-                canvas.height * this.currentPageData[i].Top,
-                canvas.width * this.currentPageData[i].Width,
-                canvas.height * this.currentPageData[i].Height)
-              ctx.stroke()
+            if (this.currentPageData) {
+              for (var i = 0; i < this.currentPageData.length; i++) {
+                ctx.beginPath()
+                ctx.rect(canvas.width * this.currentPageData[i].Left,
+                  canvas.height * this.currentPageData[i].Top,
+                  canvas.width * this.currentPageData[i].Width,
+                  canvas.height * this.currentPageData[i].Height)
+                ctx.stroke()
+              }
             }
           })
 
@@ -117,7 +113,6 @@ export default {
           return
         }
         pageNum--
-        this.pageNum--
         this.$store.dispatch('ACTION_DERCREMENT_PAGE')
         queueRenderPage(pageNum)
       }
@@ -128,7 +123,6 @@ export default {
           return
         }
         pageNum++
-        this.pageNum++
         this.$store.dispatch('ACTION_INCREMENT_PAGE')
         queueRenderPage(pageNum)
       }
