@@ -231,12 +231,12 @@ export default {
   },
   created() {
     this.$store.dispatch('FETCH_DOCUMENTS')
-    // this.timeInterval = setInterval( () => {
-    //   this.$store.dispatch('FETCH_DOCUMENTS')
-    // }, 10000);
+    this.timeInterval = setInterval(() => {
+      this.$store.dispatch('FETCH_DOCUMENTS')
+    }, 10000)
   },
   destroyed() {
-    this.timeInterval = undefined
+    clearInterval(this.timeInterval)
   },
   methods: {
     handleSearch(selectedKeys, confirm, dataIndex) {
