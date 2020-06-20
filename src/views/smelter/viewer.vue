@@ -16,10 +16,8 @@
             <smelter-pdf-window  :name="documentName" :currentPageData="currentPageData" />
             </div>
           </div>
-          <div v-else class="col-md-8">
-            <div>
-              <smelter-image-window  :name="documentName" />
-            </div>
+          <div v-else class="col-md-8 container-fluid">
+              <smelter-image-window  :name="documentName" :currentPageData="currentPageData" />
           </div>
         </div>
       </div>

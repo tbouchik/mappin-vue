@@ -44,8 +44,6 @@ export default {
     name: async function() {
       this.renderPdf()
     },
-    currentPageData: function() {
-    },
   },
   methods: {
     async renderPdf () {
@@ -102,7 +100,6 @@ export default {
               }
             }
           })
-
           // Output current page
           document.querySelector('#page-num').textContent = num
         })

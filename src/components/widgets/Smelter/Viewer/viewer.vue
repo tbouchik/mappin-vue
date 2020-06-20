@@ -148,7 +148,6 @@ export default {
         'key': uuidv4(),
       }
       this.document.metadata['page_' + this.currentPage].push(newElement)
-      console.log(this.document.metadata['page_' + this.currentPage])
     },
   },
   destroyed() {
