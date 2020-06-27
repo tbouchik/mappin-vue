@@ -1,4 +1,17 @@
 <template>
+<div>
+<br>
+ <div class="row">
+    <div class="col-9"></div>
+    <div class="col-3">
+    <a-button-group>
+      <a-button type="primary" icon="download" :size="size">
+      Download Image
+    </a-button>
+    </a-button-group>
+    </div>
+    </div>
+    <br>
   <div class="row">
     <div class="col-12">
       <div class="card">
@@ -10,6 +23,7 @@
     <div v-show=hackyAttribute>
       <img id="stub" :src=src>
     </div>
+  </div>
   </div>
 </template>
 

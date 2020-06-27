@@ -7,11 +7,16 @@
       </li>
     </ul>
     <div :class="$style.divider" class="mr-4 d-none d-xl-block" />
-    <p class="color-gray-4 text-uppercase font-size-18 mb-0 mr-4 d-none d-xl-block">
+    <p class="color-gray-4 text-uppercase font-size-28 mb-0 mr-6 d-none d-xl-block">
         <div>
             <a-tag :color="current.status === 'pending' ? 'volcano' : current.status === 'smelted' ? 'geekblue' : 'green'">
                 {{current.status}}
             </a-tag>
+            <a-button-group>
+        <Tooltip placement="topLeft" title="Export CSV" arrowPointAtCenter>
+          <a-button type="primary" icon="cloud-download" @click="csvExport" />
+        </Tooltip>
+    </a-button-group>
         </div>
     <div :class="$style.amount" class="mr-3 ml-auto d-none d-sm-flex">
       <a-button-group>
@@ -25,11 +30,12 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
+import { pick } from 'lodash'
 
 export default {
   name: 'SmelterSubbar',
   computed: {
-    ...mapGetters(['smeltedIdList', 'documentsIdList']),
+    ...mapGetters(['smeltedIdList', 'documentsIdList', 'current']),
     currentIndex: function() {
       if (this.smeltedValidation) {
         return this.smeltedIdList.indexOf(this.current.id)
@@ -73,6 +79,22 @@ export default {
       } else {
         this.$router.push({ name: 'viewer', params: { documentId: this.documentsIdList[this.currentIndex - 1], smeltedValidation: this.smeltedValidation } })
       }
+    },
+    csvExport() {
+      let csvContent = 'data:text/csv;charset=utf-8,'
+      let arrData = ['Key;Value']
+      Object.values(this.current.metadata).forEach((record) => {
+        arrData.push(
+          ...record.map(item => Object.values(pick(item, ['Key', 'Value'])).join(';'))
+        )
+      })
+      csvContent += arrData.join('\n')
+        .replace(/(^\[)|(\]$)/gm, '')
+      const data = encodeURI(csvContent)
+      const link = document.createElement('a')
+      link.setAttribute('href', data)
+      link.setAttribute('download', `${this.current.name.split('.')[0]}.csv`)
+      link.click()
     },
   },
 }

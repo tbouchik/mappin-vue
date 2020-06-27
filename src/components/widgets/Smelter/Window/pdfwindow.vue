@@ -1,20 +1,35 @@
 <template>
   <div>
+    <br />
     <div class="row">
       <div class="col-md-4"></div>
-    <a-button-group>
-      <a-button type="primary" id="prev-page"> <a-icon type="left" /> </a-button>
-      <a-button type="primary">
-      <span class="page-info">
-        Page <span id="page-num"></span> of <span id="page-count"></span>
-      </span>
-      </a-button>
-      <a-button type="primary" id="next-page"> <a-icon type="right" /> </a-button>
-    </a-button-group>
+      <div class="col-md-6">
+        <a-button-group>
+          <a-button type="primary" id="prev-page">
+            <a-icon type="left" />
+          </a-button>
+          <a-button type="primary">
+            <span class="page-info">
+              Page
+              <span id="page-num"></span> of
+              <span id="page-count"></span>
+            </span>
+          </a-button>
+          <a-button type="primary" id="next-page">
+            <a-icon type="right" />
+          </a-button>
+          <br />
+        </a-button-group>
+      </div>
+      <div class="col-md-2">
+        <a-button-group>
+          <a-button type="primary" icon="download" :size="size">Download PDF</a-button>
+        </a-button-group>
+      </div>
     </div>
-    <br>
+    <br />
     <div class="row">
-     <div class="col-12">
+      <div class="col-12">
         <div class="card">
           <div class="card-body">
             <canvas id="pdf-render"></canvas>
@@ -46,7 +61,7 @@ export default {
     },
   },
   methods: {
-    async renderPdf () {
+    async renderPdf() {
       let pdfDoc = null
       let pageNum = 1
       let pageIsRendering = false
@@ -63,7 +78,10 @@ export default {
         // Get page
         pdfDoc.getPage(num).then(page => {
           // Set scale
-          const viewport = page.getViewport(document.querySelector('.card-body').offsetWidth / page.getViewport(1.0).width)
+          const viewport = page.getViewport(
+            document.querySelector('.card-body').offsetWidth /
+              page.getViewport(1.0).width
+          )
           canvas.height = viewport.height
           canvas.width = viewport.width
 
@@ -86,7 +104,7 @@ export default {
                   canvas.width * this.currentPageData[i].KeyLeft,
                   canvas.height * this.currentPageData[i].KeyTop,
                   canvas.width * this.currentPageData[i].KeyWidth,
-                  canvas.height * this.currentPageData[i].KeyHeight,
+                  canvas.height * this.currentPageData[i].KeyHeight
                 )
                 ctx.stroke()
                 ctx.beginPath()
@@ -94,7 +112,7 @@ export default {
                   canvas.width * this.currentPageData[i].ValueLeft,
                   canvas.height * this.currentPageData[i].ValueTop,
                   canvas.width * this.currentPageData[i].ValueWidth,
-                  canvas.height * this.currentPageData[i].ValueHeight,
+                  canvas.height * this.currentPageData[i].ValueHeight
                 )
                 ctx.stroke()
               }
@@ -153,12 +171,15 @@ export default {
         })
 
       // Button Events
-      document.querySelector('#prev-page').addEventListener('click', showPrevPage)
-      document.querySelector('#next-page').addEventListener('click', showNextPage)
+      document
+        .querySelector('#prev-page')
+        .addEventListener('click', showPrevPage)
+      document
+        .querySelector('#next-page')
+        .addEventListener('click', showNextPage)
     },
   },
 }
-
 </script>
 <style >
 div.card-body {

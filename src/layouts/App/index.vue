@@ -19,6 +19,8 @@
           air__layout__headerGray: settings.isGrayTopbar,
         }"
         >
+        <air-topbar v-if="settings.menuLayoutType !== 'top-dark'" />
+        <air-subbar />
         </a-layout-header>
         <a-layout-content>
           <div class="container-fluid">
@@ -34,12 +36,13 @@
 
 <script>
 import { mapState } from 'vuex'
+import AirTopbar from '@/components/layout/TopBar/topBar.vue'
 import AirMenuLeft from '@/components/layout/MenuLeft'
 
 export default {
   name: 'AppLayout',
   computed: mapState(['settings']),
-  components: { AirMenuLeft },
+  components: { AirTopbar, AirMenuLeft },
   mounted() {
     this.detectViewPort(true)
     window.addEventListener('resize', this.detectViewPortListener)

@@ -34,12 +34,7 @@
           class="text-center btn btn-success w-100 font-weight-bold font-size-18"
         >Log in</a-button>
       </a-form>
-      <a
-        href="#"
-        class="font-weight-bold font-size-18 text-dark btn btn-outline-light w-100 mb-3"
-        :class="$style.googleSign"
-        :style="{ backgroundImage: 'url(resources/images/icons/google-logo.svg)' }"
-      >Log in with Google</a>
+
       <router-link
         to="/system/forgot-password"
         class="text-blue font-weight-bold font-size-18"
