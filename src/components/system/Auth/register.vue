@@ -45,12 +45,6 @@
           class="text-center btn btn-success w-100 font-weight-bold font-size-18"
         >Sign Up</button>
       </a-form>
-      <a
-        href="#"
-        class="font-weight-bold font-size-18 text-dark btn btn-outline-light w-100 mb-3"
-        :class="$style.googleSign"
-        :style="{ backgroundImage: 'url(resources/images/icons/google-logo.svg)' }"
-      >Sign up with Google</a>
       <div class="font-size-18">
         By signing up, you agree to the
         <a
