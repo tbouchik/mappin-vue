@@ -23,7 +23,11 @@
       </div>
       <div class="col-md-2">
         <a-button-group>
-          <a-button type="primary" icon="download" :size="size">Download PDF</a-button>
+          <a-button type="primary" icon="download" :size="size">
+            <a
+            @click.prevent="downloadItem" >Download PDF
+            </a>
+        </a-button>
         </a-button-group>
       </div>
     </div>
@@ -41,6 +45,9 @@
 </template>
 
 <script>
+import DocumentService from '../../../../services/documentService.js'
+import { mapGetters } from 'vuex'
+
 var pdfjsLib = require('pdfjs-dist')
 export default {
   name: 'SmelterPdfWindow',
@@ -59,6 +66,12 @@ export default {
     name: async function() {
       this.renderPdf()
     },
+  },
+  computed: {
+    src: function() {
+      return `http://localhost:3000/media/${this.name}`
+    },
+    ...mapGetters(['current']),
   },
   methods: {
     async renderPdf() {
@@ -106,6 +119,7 @@ export default {
                   canvas.width * this.currentPageData[i].KeyWidth,
                   canvas.height * this.currentPageData[i].KeyHeight
                 )
+                ctx.strokeStyle = 'purple'
                 ctx.stroke()
                 ctx.beginPath()
                 ctx.rect(
@@ -114,6 +128,7 @@ export default {
                   canvas.width * this.currentPageData[i].ValueWidth,
                   canvas.height * this.currentPageData[i].ValueHeight
                 )
+                ctx.strokeStyle = 'blue'
                 ctx.stroke()
               }
             }
@@ -177,6 +192,16 @@ export default {
       document
         .querySelector('#next-page')
         .addEventListener('click', showNextPage)
+    },
+    downloadItem() {
+      DocumentService.downloadPDF(this.src).then(response => {
+        const blob = new Blob([response.data], { type: 'application/pdf' })
+        const link = document.createElement('a')
+        link.href = URL.createObjectURL(blob)
+        link.download = this.current.name
+        link.click()
+        URL.revokeObjectURL(link.href)
+      }).catch(console.error)
     },
   },
 }

@@ -6,7 +6,8 @@
     <div class="col-3">
     <a-button-group>
       <a-button type="primary" icon="download" :size="size">
-      Download Image
+      <a
+      @click.prevent="downloadItem" >Download Image</a>
     </a-button>
     </a-button-group>
     </div>
@@ -28,6 +29,8 @@
 </template>
 
 <script>
+import DocumentService from '../../../../services/documentService.js'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'SmelterImageWindow',
@@ -45,6 +48,7 @@ export default {
     src: function() {
       return `http://localhost:3000/media/${this.name}`
     },
+    ...mapGetters(['current']),
   },
   props: {
     name: {
@@ -78,6 +82,7 @@ export default {
           canvas.width * metadata[i].KeyWidth,
           canvas.height * metadata[i].KeyHeight,
         )
+        context.strokeStyle = 'purple'
         context.stroke()
         context.beginPath()
         context.rect(
@@ -86,6 +91,7 @@ export default {
           canvas.width * metadata[i].ValueWidth,
           canvas.height * metadata[i].ValueHeight,
         )
+        context.strokeStyle = 'blue'
         context.stroke()
       }
     },
@@ -113,6 +119,16 @@ export default {
       this.canvas.width = document.querySelector('.ant-layout-content').scrollWidth * 0.60
       this.canvas.height = document.querySelector('.ant-layout-content').scrollHeight
       this.drawbackground(this.canvas, this.context, this.drawKvpRect)
+    },
+    downloadItem() {
+      DocumentService.downloadMedia(this.src).then(response => {
+        const url = window.URL.createObjectURL(new Blob([response.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', this.current.name)
+        document.body.appendChild(link)
+        link.click()
+      }).catch(console.error)
     },
   },
 }
