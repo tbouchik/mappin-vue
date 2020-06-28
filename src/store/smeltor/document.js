@@ -22,6 +22,7 @@ export default {
     page: 1,
     documentsList: [],
     viewerIdList: [],
+    currentIdx: null,
   },
   mutations: {
     UPDATE_DOCUMENT_DATA(state, document) {
@@ -33,16 +34,16 @@ export default {
         })
       }
     },
-    async SAVE_CURRENT_DOCUMENT(state, document) {
-      Object.assign(state.formattedDocument, document)
+    async SAVE_CURRENT_DOCUMENT(state, filter) {
+      Object.assign(state.formattedDocument, filter)
       const updatedDocument = {
         name: document.name,
-        metadata: omitKeyFromMetadata(document).metadata,
-        status: document.status,
+        stdFilter: filter,
+        status: 'validated',
       }
       await DocumentService.updateDocument(
         updatedDocument,
-        document.id
+        state.formattedDocument.id
       )
       Object.assign(state.documentsList[state.documentsList.findIndex(x => x.id === document.id)], document)
     },
@@ -71,13 +72,19 @@ export default {
     MUTATION_RESET_PAGE(state) {
       state.page = 1
     },
+    MUTATION_UPDATE_INDEX(state, idx) {
+      state.currentIdx = idx
+    },
+    MUTATION_UPDATE_ACTIVE_VALUE(state, value) {
+      state.formattedDocument.stdFilter[state.currentIdx].Value = value
+    },
   },
   actions: {
     UPDATE_DOCUMENT({ commit }, document) {
       commit('UPDATE_DOCUMENT_DATA', document)
     },
-    SAVE_DOCUMENT({ commit }, document) {
-      commit('SAVE_CURRENT_DOCUMENT', document)
+    SAVE_DOCUMENT({ commit }, filter) {
+      commit('SAVE_CURRENT_DOCUMENT', filter)
     },
     CLEAR_DOCUMENT({ commit }) {
       commit('CLEAR_DOCUMENT_DATA')
@@ -102,6 +109,12 @@ export default {
     },
     ACTION_RESET_PAGE({ commit }) {
       commit('MUTATION_RESET_PAGE')
+    },
+    ACTION_UPDATE_ACTIVE_INDEX({ commit }, idx) {
+      commit('MUTATION_UPDATE_INDEX', idx)
+    },
+    ACTION_UPDATE_ACTIVE_VALUE({ commit }, idx) {
+      commit('MUTATION_UPDATE_ACTIVE_VALUE', idx)
     },
   },
   getters: {

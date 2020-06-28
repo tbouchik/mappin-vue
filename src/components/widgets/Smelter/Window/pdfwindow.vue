@@ -25,7 +25,7 @@
         <a-button-group>
           <a-button type="primary" icon="download" :size="size">
             <a
-            @click.prevent="downloadItem" >Download PDF
+            @click.prevent="downloadItem">Download PDF
             </a>
         </a-button>
         </a-button-group>
@@ -83,6 +83,13 @@ export default {
 
       const canvas = document.querySelector('#pdf-render')
       const ctx = canvas.getContext('2d')
+      canvas.addEventListener('click', function(event) {
+        var x = event.layerX
+        var y = event.layerY
+        ctx.beginPath()
+        ctx.arc(x, y, 10, 0, 2 * Math.PI)
+        ctx.stroke()
+      })
 
       // Render the page
       const renderPage = num => {
@@ -114,21 +121,12 @@ export default {
               for (var i = 0; i < this.currentPageData.length; i++) {
                 ctx.beginPath()
                 ctx.rect(
-                  canvas.width * this.currentPageData[i].KeyLeft,
-                  canvas.height * this.currentPageData[i].KeyTop,
-                  canvas.width * this.currentPageData[i].KeyWidth,
-                  canvas.height * this.currentPageData[i].KeyHeight
+                  canvas.width * this.currentPageData[i].Left,
+                  canvas.height * this.currentPageData[i].Top,
+                  canvas.width * this.currentPageData[i].Width,
+                  canvas.height * this.currentPageData[i].Height
                 )
                 ctx.strokeStyle = 'purple'
-                ctx.stroke()
-                ctx.beginPath()
-                ctx.rect(
-                  canvas.width * this.currentPageData[i].ValueLeft,
-                  canvas.height * this.currentPageData[i].ValueTop,
-                  canvas.width * this.currentPageData[i].ValueWidth,
-                  canvas.height * this.currentPageData[i].ValueHeight
-                )
-                ctx.strokeStyle = 'blue'
                 ctx.stroke()
               }
             }

@@ -42,13 +42,13 @@ export default {
     }
   },
   mounted: function() {
-    this.renderImg()
+    this.renderImg(this.currentPageData, this.$store)
   },
   computed: {
     src: function() {
       return `http://localhost:3000/media/${this.name}`
     },
-    ...mapGetters(['current']),
+    ...mapGetters(['current', 'currentPageData']),
   },
   props: {
     name: {
@@ -60,7 +60,7 @@ export default {
   },
   watch: {
     name: function() {
-      this.renderImg()
+      this.renderImg(this.currentPageData, this.$store)
     },
   },
   methods: {
@@ -77,27 +77,30 @@ export default {
       for (var i = 0; i < metadata.length; i++) {
         context.beginPath()
         context.rect(
-          canvas.width * metadata[i].KeyLeft,
-          canvas.height * metadata[i].KeyTop,
-          canvas.width * metadata[i].KeyWidth,
-          canvas.height * metadata[i].KeyHeight,
+          canvas.width * metadata[i].Left,
+          canvas.height * metadata[i].Top,
+          canvas.width * metadata[i].Width,
+          canvas.height * metadata[i].Height,
         )
         context.strokeStyle = 'purple'
         context.stroke()
-        context.beginPath()
-        context.rect(
-          canvas.width * metadata[i].ValueLeft,
-          canvas.height * metadata[i].ValueTop,
-          canvas.width * metadata[i].ValueWidth,
-          canvas.height * metadata[i].ValueHeight,
-        )
-        context.strokeStyle = 'blue'
-        context.stroke()
       }
     },
-    renderImg() {
-      this.canvas = document.getElementById('can')
-      this.context = this.canvas.getContext('2d')
+    renderImg(currentPageData, store) {
+      let canvas = document.getElementById('can')
+      let ctx = canvas.getContext('2d')
+      canvas.addEventListener('click', function(event) {
+        let x = event.layerX
+        let y = event.layerY
+        let selectedTextSection = currentPageData.filter((textInfo) => {
+          let leftBoundary = canvas.width * textInfo.Left
+          let topBoundary = canvas.height * textInfo.Top
+          let rightBoundary = canvas.width * (parseFloat(textInfo.Left) + parseFloat(textInfo.Width))
+          let bottomBoundary = canvas.height * (parseFloat(textInfo.Top) + parseFloat(textInfo.Height))
+          return (x > leftBoundary && x < rightBoundary) && (y > topBoundary && y < bottomBoundary)
+        })
+        store.dispatch('ACTION_UPDATE_ACTIVE_VALUE', selectedTextSection[0].Text)
+      })
       let img = document.getElementById('stub')
       img.onload = function() {
         let imgWidth = img.naturalWidth
@@ -114,11 +117,11 @@ export default {
           imgHeight = imgHeight * scale
           imgWidth = imgWidth * scale
         }
-        this.context.drawImage(img, 1, 1, img.naturalWidth, img.naturalHeight, 0, 0, imgWidth, imgHeight)
+        ctx.drawImage(img, 1, 1, img.naturalWidth, img.naturalHeight, 0, 0, imgWidth, imgHeight)
       }
-      this.canvas.width = document.querySelector('.ant-layout-content').scrollWidth * 0.60
-      this.canvas.height = document.querySelector('.ant-layout-content').scrollHeight
-      this.drawbackground(this.canvas, this.context, this.drawKvpRect)
+      canvas.width = document.querySelector('.ant-layout-content').scrollWidth * 0.60
+      canvas.height = document.querySelector('.ant-layout-content').scrollHeight
+      this.drawbackground(canvas, ctx, this.drawKvpRect)
     },
     downloadItem() {
       DocumentService.downloadMedia(this.src).then(response => {

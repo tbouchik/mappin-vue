@@ -8,7 +8,8 @@
         <div class="row">
           <div class="col-md-4">
             <div class="sticky">
-              <smelter-viewer :current="current" />
+              <template-viewer :filter="currentFilter" />
+              <!-- <smelter-viewer :current="current" /> -->
             </div>
           </div>
           <div v-if="documentIsPdf" class="col-md-8">
@@ -25,7 +26,8 @@
   </div>
 </template>
 <script>
-import SmelterViewer from '@/components/widgets/Smelter/Viewer/viewer.vue'
+// import SmelterViewer from '@/components/widgets/Smelter/Viewer/viewer.vue'
+import TemplateViewer from '@/components/widgets/Smelter/Viewer/template.vue'
 import SmelterPdfWindow from '@/components/widgets/Smelter/Window/pdfwindow.vue'
 import SmelterImageWindow from '@/components/widgets/Smelter/Window/imgwindow.vue'
 import SmelterSubbar from '@/components/widgets/Smelter/Viewer/subbar.vue'
@@ -36,9 +38,15 @@ import { get } from 'lodash'
 export default {
   components: {
     SmelterSubbar,
-    SmelterViewer,
+    // SmelterViewer,
     SmelterPdfWindow,
     SmelterImageWindow,
+    TemplateViewer,
+  },
+  data() {
+    return {
+      filter: [],
+    }
   },
   props: {
     smeltedValidation: {
@@ -55,12 +63,16 @@ export default {
       this.$store.dispatch('UPDATE_DOCUMENT', doc.data)
     })
     this.$store.dispatch('FETCH_DOCUMENTS')
+    this.currentFilter = this.current.stdFilter
   },
   watch: {
     documentId: function() {
       return DocumentService.fetchDocument(this.documentId).then(doc => {
         this.$store.dispatch('UPDATE_DOCUMENT', doc.data)
       })
+    },
+    current: function() {
+      this.currentFilter = this.current.stdFilter
     },
   },
   computed: {

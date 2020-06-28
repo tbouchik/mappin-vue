@@ -19,7 +19,6 @@
         <i :class="$style.icon" class="fe fe-rotate-ccw text-blue mr-md-2" />
         <span class="d-none d-md-inline">Cancel Changes</span>
       </button>
-
     </div>
 
       <div :class="$style.subbar">
@@ -37,7 +36,7 @@
       </div>
       <a-table :columns="columns" :data-source="pageData" :pagination=false bordered>
         <template v-for="col in ['Key', 'Value']" :slot="col" slot-scope="text, record, dataIndex" >
-          <div :key="col" @click="logg(dataIndex)">
+          <div :key="col" @click="activateIndex(dataIndex)">
             <a-input
               style="margin: -5px 0"
               :value="text"
@@ -81,26 +80,25 @@ const columns = [
   },
 ]
 export default {
-  name: 'SmelterViewer',
+  name: 'TemplateViewer',
   data() {
     return {
       editMode: false,
       columns,
       document: {},
       cacheData: {},
-      pageData: [],
     }
   },
   created() {
-    this.document = cloneDeep(this.current)
-    this.cacheData = cloneDeep(this.current)
+    this.document = cloneDeep(this.filter)
+    this.cacheData = cloneDeep(this.filter)
+    this.pageData = this.filter
   },
   props: {
     insideUploaderView: {
       type: Boolean,
     },
-    current: {
-      type: Object,
+    filter: {
       required: true,
     },
   },
@@ -108,16 +106,21 @@ export default {
     ...mapGetters(['currentPage']),
   },
   watch: {
-    current: function () {
-      this.document = cloneDeep(this.current)
-      this.cacheData = cloneDeep(this.current)
-      this.pageData = this.document.metadata['page_' + this.currentPage]
+    filter: function () {
+      this.document = cloneDeep(this.filter)
+      this.cacheData = cloneDeep(this.filter)
+      this.pageData = this.filter
+    },
+    formattedDocument: function () {
+      this.document = cloneDeep(this.formattedDocument)
+      this.cacheData = cloneDeep(this.formattedDocument)
+      this.pageData = this.filter
     },
     currentPage: function() {
-      this.pageData = this.document.metadata['page_' + this.currentPage]
+      this.pageData = this.filter
     },
     document: function() {
-      this.pageData = this.document.metadata['page_' + this.currentPage]
+      this.pageData = this.filter
     },
   },
   methods: {
@@ -125,15 +128,14 @@ export default {
       this.editMode = !this.editMode
     },
     async saveVersion() {
-      this.document.status = 'validated'
-      await this.$store.dispatch('SAVE_DOCUMENT', this.document)
+      await this.$store.dispatch('SAVE_DOCUMENT', this.pageData)
       this.cacheData = cloneDeep(this.document)
     },
-    async cancelChanges() {
+    cancelChanges() {
       this.document = cloneDeep(this.cacheData)
     },
     handleChange(value, itemIdx, column) {
-      this.document.metadata['page_' + this.currentPage][itemIdx][column] = value
+      this.filter[itemIdx][column] = value
     },
     async remove(record, itemIdx) {
       this.document.metadata['page_' + this.currentPage].splice(itemIdx, 1)
@@ -142,15 +144,13 @@ export default {
     addRecord() {
       const newElement = {
         'Key': '',
-        'KeyConfidence': '100',
         'Value': '',
-        'ValueConfidence': '100',
         'key': uuidv4(),
       }
       this.document.metadata['page_' + this.currentPage].push(newElement)
     },
-    logg(dataIndex) {
-      console.log(dataIndex)
+    activateIndex(idx) {
+      this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', idx)
     },
   },
   destroyed() {
