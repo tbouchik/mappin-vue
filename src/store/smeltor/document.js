@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import axios from 'axios'
 import { cloneDeep, omit, get } from 'lodash'
 import DocumentService from '../../services/documentService.js'
+import uuidv4 from 'uuid/v4'
 
 Vue.use(Vuex)
 
@@ -89,6 +90,20 @@ export default {
       tempDoc.stdFilter[itemIdx][column] = value
       state.formattedDocument = tempDoc
     },
+    MUTATION_ADD_RECORD_AFTER_INDEX(state) {
+      const newElement = {
+        'Key': '',
+        'Value': '',
+        'key': uuidv4(),
+      }
+      let tempDoc = cloneDeep(state.formattedDocument)
+      if (state.currentIdx !== null) {
+        tempDoc.stdFilter.splice(state.currentIdx, 0, newElement)
+      } else {
+        tempDoc.stdFilter.push(newElement)
+      }
+      state.formattedDocument = cloneDeep(tempDoc)
+    },
   },
   actions: {
     UPDATE_DOCUMENT({ commit }, document) {
@@ -132,6 +147,9 @@ export default {
     },
     ACTION_DO_CHANGES_TO_DOCUMENT({ commit }, changeData) {
       commit('MUTATION_DO_CHANGES_TO_DOCUMENT', changeData)
+    },
+    ACTION_ADD_RECORD_AFTER_INDEX({ commit }) {
+      commit('MUTATION_ADD_RECORD_AFTER_INDEX')
     },
 
   },

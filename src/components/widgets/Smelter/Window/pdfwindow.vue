@@ -23,7 +23,7 @@
       </div>
       <div class="col-md-2">
         <a-button-group>
-          <a-button type="primary" icon="download" :size="size">
+          <a-button type="primary" icon="download" >
             <a
             @click.prevent="downloadItem">Download PDF
             </a>
@@ -52,7 +52,7 @@ var pdfjsLib = require('pdfjs-dist')
 export default {
   name: 'SmelterPdfWindow',
   mounted: async function() {
-    this.renderPdf()
+    this.renderPdf(this.currentPageData, this.$store)
   },
   props: {
     name: {
@@ -64,7 +64,7 @@ export default {
   },
   watch: {
     name: async function() {
-      this.renderPdf()
+      this.renderPdf(this.currentPageData, this.$store)
     },
   },
   computed: {
@@ -74,7 +74,7 @@ export default {
     ...mapGetters(['current']),
   },
   methods: {
-    async renderPdf() {
+    async renderPdf(currentPageData, store) {
       let pdfDoc = null
       let pageNum = 1
       let pageIsRendering = false
@@ -84,11 +84,16 @@ export default {
       const canvas = document.querySelector('#pdf-render')
       const ctx = canvas.getContext('2d')
       canvas.addEventListener('click', function(event) {
-        var x = event.layerX
-        var y = event.layerY
-        ctx.beginPath()
-        ctx.arc(x, y, 10, 0, 2 * Math.PI)
-        ctx.stroke()
+        let x = event.layerX
+        let y = event.layerY
+        let selectedTextSection = currentPageData.filter((textInfo) => {
+          let leftBoundary = canvas.width * textInfo.Left
+          let topBoundary = canvas.height * textInfo.Top
+          let rightBoundary = canvas.width * (parseFloat(textInfo.Left) + parseFloat(textInfo.Width))
+          let bottomBoundary = canvas.height * (parseFloat(textInfo.Top) + parseFloat(textInfo.Height))
+          return (x > leftBoundary && x < rightBoundary) && (y > topBoundary && y < bottomBoundary)
+        })
+        store.dispatch('ACTION_UPDATE_ACTIVE_VALUE', selectedTextSection[0].Text)
       })
 
       // Render the page

@@ -58,7 +58,6 @@
 </template>
 <script>
 import { cloneDeep } from 'lodash'
-import uuidv4 from 'uuid/v4'
 import { mapGetters } from 'vuex'
 const columns = [
   {
@@ -125,12 +124,7 @@ export default {
       await this.$store.dispatch('SAVE_DOCUMENT', this.pageData)
     },
     addRecord() {
-      const newElement = {
-        'Key': '',
-        'Value': '',
-        'key': uuidv4(),
-      }
-      this.pageData.push(newElement)
+      this.$store.dispatch('ACTION_ADD_RECORD_AFTER_INDEX')
     },
     activateIndex(idx) {
       this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', idx)
