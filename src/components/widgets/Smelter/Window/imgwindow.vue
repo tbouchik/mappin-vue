@@ -115,7 +115,6 @@ export default {
           imgHeight = imgHeight * scale
           imgWidth = imgWidth * scale
         }
-        ctx.drawImage(img, 1, 1, img.naturalWidth, img.naturalHeight, 0, 0, imgWidth, imgHeight)
       }
       canvas.width = document.querySelector('.ant-layout-content').scrollWidth * 0.60
       canvas.height = document.querySelector('.ant-layout-content').scrollHeight

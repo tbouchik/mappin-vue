@@ -20,7 +20,6 @@
         }"
         >
         <air-topbar v-if="settings.menuLayoutType !== 'top-dark'" />
-        <air-subbar />
         </a-layout-header>
         <a-layout-content>
           <div class="container-fluid">
