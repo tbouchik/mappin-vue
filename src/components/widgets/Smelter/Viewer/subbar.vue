@@ -13,9 +13,9 @@
                 {{current.status}}
             </a-tag>
             <a-button-group>
-        <Tooltip placement="topLeft" title="Export CSV" arrowPointAtCenter>
+        <a-tooltip placement="topLeft" title="Export CSV" arrowPointAtCenter>
           <a-button type="primary" icon="cloud-download" @click="csvExport" />
-        </Tooltip>
+        </a-tooltip>
     </a-button-group>
         </div>
     <div :class="$style.amount" class="mr-3 ml-auto d-none d-sm-flex">
@@ -35,7 +35,7 @@ import { pick } from 'lodash'
 export default {
   name: 'SmelterSubbar',
   computed: {
-    ...mapGetters(['smeltedIdList', 'documentsIdList', 'current']),
+    ...mapGetters(['smeltedIdList', 'documentsIdList']),
     currentIndex: function() {
       if (this.smeltedValidation) {
         return this.smeltedIdList.indexOf(this.current.id)
@@ -83,10 +83,8 @@ export default {
     csvExport() {
       let csvContent = 'data:text/csv;charset=utf-8,'
       let arrData = ['Key;Value']
-      Object.values(this.current.metadata).forEach((record) => {
-        arrData.push(
-          ...record.map(item => Object.values(pick(item, ['Key', 'Value'])).join(';'))
-        )
+      this.current.stdFilter.map(item => {
+        arrData.push(Object.values(pick(item, ['Key', 'Value'])).join(';'))
       })
       csvContent += arrData.join('\n')
         .replace(/(^\[)|(\]$)/gm, '')

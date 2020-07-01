@@ -5,7 +5,7 @@
     <div class="col-9"></div>
     <div class="col-3">
     <a-button-group>
-      <a-button type="primary" icon="download" :size="size">
+      <a-button type="primary" icon="download">
       <a
       @click.prevent="downloadItem" >Download Image</a>
     </a-button>
@@ -30,7 +30,6 @@
 
 <script>
 import DocumentService from '../../../../services/documentService.js'
-import { mapGetters } from 'vuex'
 
 export default {
   name: 'SmelterImageWindow',
@@ -48,7 +47,6 @@ export default {
     src: function() {
       return `http://localhost:3000/media/${this.name}`
     },
-    ...mapGetters(['current', 'currentPageData']),
   },
   props: {
     name: {
@@ -128,7 +126,7 @@ export default {
         const url = window.URL.createObjectURL(new Blob([response.data]))
         const link = document.createElement('a')
         link.href = url
-        link.setAttribute('download', this.current.name)
+        link.setAttribute('download', this.name)
         document.body.appendChild(link)
         link.click()
       }).catch(console.error)

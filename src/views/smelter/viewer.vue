@@ -9,7 +9,6 @@
           <div class="col-md-4">
             <div class="sticky">
               <template-viewer :filter="currentFilter" />
-              <!-- <smelter-viewer :current="current" /> -->
             </div>
           </div>
           <div v-if="documentIsPdf" class="col-md-8">
@@ -38,14 +37,13 @@ import { get } from 'lodash'
 export default {
   components: {
     SmelterSubbar,
-    // SmelterViewer,
     SmelterPdfWindow,
     SmelterImageWindow,
     TemplateViewer,
   },
   data() {
     return {
-      filter: [],
+      currentFilter: [],
     }
   },
   props: {
@@ -61,9 +59,9 @@ export default {
   created() {
     DocumentService.fetchDocument(this.documentId).then(doc => {
       this.$store.dispatch('UPDATE_DOCUMENT', doc.data)
+      this.currentFilter = this.current.stdFilter
     })
     this.$store.dispatch('FETCH_DOCUMENTS')
-    this.currentFilter = this.current.stdFilter
   },
   watch: {
     documentId: function() {

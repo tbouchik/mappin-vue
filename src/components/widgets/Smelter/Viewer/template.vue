@@ -85,14 +85,13 @@ export default {
     return {
       editMode: false,
       columns,
-      document: {},
+      pageData: [],
       cacheData: {},
     }
   },
   created() {
-    this.document = cloneDeep(this.filter)
     this.cacheData = cloneDeep(this.filter)
-    this.pageData = this.filter
+    this.pageData = cloneDeep(this.filter)
   },
   props: {
     insideUploaderView: {
@@ -107,20 +106,8 @@ export default {
   },
   watch: {
     filter: function () {
-      this.document = cloneDeep(this.filter)
       this.cacheData = cloneDeep(this.filter)
-      this.pageData = this.filter
-    },
-    formattedDocument: function () {
-      this.document = cloneDeep(this.formattedDocument)
-      this.cacheData = cloneDeep(this.formattedDocument)
-      this.pageData = this.filter
-    },
-    currentPage: function() {
-      this.pageData = this.filter
-    },
-    document: function() {
-      this.pageData = this.filter
+      this.pageData = cloneDeep(this.filter)
     },
   },
   methods: {
@@ -129,17 +116,17 @@ export default {
     },
     async saveVersion() {
       await this.$store.dispatch('SAVE_DOCUMENT', this.pageData)
-      this.cacheData = cloneDeep(this.document)
+      this.cacheData = cloneDeep(this.pageData)
     },
     cancelChanges() {
-      this.document = cloneDeep(this.cacheData)
+      this.pageData = cloneDeep(this.cacheData)
     },
     handleChange(value, itemIdx, column) {
-      this.filter[itemIdx][column] = value
+      this.pageData[itemIdx][column] = value
     },
     async remove(record, itemIdx) {
-      this.document.metadata['page_' + this.currentPage].splice(itemIdx, 1)
-      await this.$store.dispatch('SAVE_DOCUMENT', this.document)
+      this.pageData.splice(itemIdx, 1)
+      await this.$store.dispatch('SAVE_DOCUMENT', this.pageData)
     },
     addRecord() {
       const newElement = {
@@ -147,7 +134,7 @@ export default {
         'Value': '',
         'key': uuidv4(),
       }
-      this.document.metadata['page_' + this.currentPage].push(newElement)
+      this.pageData.push(newElement)
     },
     activateIndex(idx) {
       this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', idx)

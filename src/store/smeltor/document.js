@@ -6,13 +6,11 @@ import DocumentService from '../../services/documentService.js'
 
 Vue.use(Vuex)
 
-function omitKeyFromMetadata(document) {
-  let formattedCopy = cloneDeep(document)
-  for (let page of Object.keys(formattedCopy.metadata)) {
-    formattedCopy.metadata[page] = formattedCopy.metadata[page].map(item => {
-      return omit(item, ['key'])
-    })
-  }
+function omitKeyFromFilter(filter) {
+  let formattedCopy = cloneDeep(filter)
+  formattedCopy = filter.map(item => {
+    return omit(item, ['key'])
+  })
   return formattedCopy
 }
 
@@ -27,25 +25,23 @@ export default {
   mutations: {
     UPDATE_DOCUMENT_DATA(state, document) {
       state.formattedDocument = document
-      for (let page of Object.keys(get(state, 'formattedDocument.metadata'))) {
-        state.formattedDocument.metadata[page] = state.formattedDocument.metadata[page].map((item, index) => {
-          item.key = index
-          return item
-        })
-      }
+      state.formattedDocument.stdFilter = state.formattedDocument.stdFilter.map((item, index) => {
+        item.key = index // This is to avoid ant design spitting on your face for
+        return item // inserting items from stdFilter in ant table <a-table> without a unique key
+      })
     },
     async SAVE_CURRENT_DOCUMENT(state, filter) {
       Object.assign(state.formattedDocument, filter)
       const updatedDocument = {
         name: document.name,
-        stdFilter: filter,
+        stdFilter: omitKeyFromFilter(filter),
         status: 'validated',
       }
       await DocumentService.updateDocument(
         updatedDocument,
         state.formattedDocument.id
       )
-      Object.assign(state.documentsList[state.documentsList.findIndex(x => x.id === document.id)], document)
+      state.documentsList[state.documentsList.findIndex(x => x.id === state.formattedDocument.id)].stdFilter = filter
     },
     CLEAR_DOCUMENT_DATA(state) {
       state.formattedDocument = null
@@ -76,7 +72,9 @@ export default {
       state.currentIdx = idx
     },
     MUTATION_UPDATE_ACTIVE_VALUE(state, value) {
-      state.formattedDocument.stdFilter[state.currentIdx].Value = value
+      let updateFormattedDoc = cloneDeep(state.formattedDocument)
+      updateFormattedDoc.stdFilter[state.currentIdx].Value = value
+      state.formattedDocument = updateFormattedDoc
     },
   },
   actions: {
