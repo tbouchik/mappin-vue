@@ -17,6 +17,7 @@ function omitKeyFromFilter(filter) {
 export default {
   state: {
     formattedDocument: {},
+    formattedDocumentCache: {},
     page: 1,
     documentsList: [],
     viewerIdList: [],
@@ -29,9 +30,11 @@ export default {
         item.key = index // This is to avoid ant design spitting on your face for
         return item // inserting items from stdFilter in ant table <a-table> without a unique key
       })
+      state.formattedDocumentCache = cloneDeep(state.formattedDocument)
     },
     async SAVE_CURRENT_DOCUMENT(state, filter) {
-      Object.assign(state.formattedDocument, filter)
+      Object.assign(state.formattedDocument.stdFilter, filter)
+      Object.assign(state.formattedDocumentCache.stdFilter, filter)
       const updatedDocument = {
         name: document.name,
         stdFilter: omitKeyFromFilter(filter),
@@ -45,6 +48,7 @@ export default {
     },
     CLEAR_DOCUMENT_DATA(state) {
       state.formattedDocument = null
+      state.formattedDocumentCache = null
     },
     SET_DOCUMENTS_LIST(state, documentsList) {
       documentsList.map((item, index) => { // TODO: Implement these properties in DB
@@ -75,6 +79,15 @@ export default {
       let updateFormattedDoc = cloneDeep(state.formattedDocument)
       updateFormattedDoc.stdFilter[state.currentIdx].Value = value
       state.formattedDocument = updateFormattedDoc
+    },
+    MUTATION_UNDO_CHANGES_TO_DOCUMENT(state) {
+      state.formattedDocument = cloneDeep(state.formattedDocumentCache)
+    },
+    MUTATION_DO_CHANGES_TO_DOCUMENT(state, changeData) {
+      let { value, itemIdx, column } = changeData
+      let tempDoc = cloneDeep(state.formattedDocument)
+      tempDoc.stdFilter[itemIdx][column] = value
+      state.formattedDocument = tempDoc
     },
   },
   actions: {
@@ -114,6 +127,13 @@ export default {
     ACTION_UPDATE_ACTIVE_VALUE({ commit }, idx) {
       commit('MUTATION_UPDATE_ACTIVE_VALUE', idx)
     },
+    ACTION_UNDO_CHANGES_TO_DOCUMENT({ commit }) {
+      commit('MUTATION_UNDO_CHANGES_TO_DOCUMENT')
+    },
+    ACTION_DO_CHANGES_TO_DOCUMENT({ commit }, changeData) {
+      commit('MUTATION_DO_CHANGES_TO_DOCUMENT', changeData)
+    },
+
   },
   getters: {
     current: state => state.formattedDocument,

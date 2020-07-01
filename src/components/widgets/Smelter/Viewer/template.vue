@@ -86,11 +86,9 @@ export default {
       editMode: false,
       columns,
       pageData: [],
-      cacheData: {},
     }
   },
   created() {
-    this.cacheData = cloneDeep(this.filter)
     this.pageData = cloneDeep(this.filter)
   },
   props: {
@@ -106,7 +104,6 @@ export default {
   },
   watch: {
     filter: function () {
-      this.cacheData = cloneDeep(this.filter)
       this.pageData = cloneDeep(this.filter)
     },
   },
@@ -116,13 +113,12 @@ export default {
     },
     async saveVersion() {
       await this.$store.dispatch('SAVE_DOCUMENT', this.pageData)
-      this.cacheData = cloneDeep(this.pageData)
     },
     cancelChanges() {
-      this.pageData = cloneDeep(this.cacheData)
+      this.$store.dispatch('ACTION_UNDO_CHANGES_TO_DOCUMENT', this.pageData)
     },
     handleChange(value, itemIdx, column) {
-      this.pageData[itemIdx][column] = value
+      this.$store.dispatch('ACTION_DO_CHANGES_TO_DOCUMENT', { value, itemIdx, column })
     },
     async remove(record, itemIdx) {
       this.pageData.splice(itemIdx, 1)
