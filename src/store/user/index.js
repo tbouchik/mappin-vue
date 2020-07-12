@@ -15,9 +15,7 @@ export default {
     SET_USER_DATA(state, userData) {
       state.user = userData
       localStorage.setItem('user', JSON.stringify(userData))
-      axios.defaults.headers.common['Authorization'] = `Bearer ${
-        userData.tokens.access.token
-      }`
+      axios.defaults.headers.common['Authorization'] = `Bearer ${userData.tokens.access.token}`
     },
     SET_USER_COMPANY_NAME(state, companyName) {
       state.user.user.company = companyName
@@ -30,25 +28,36 @@ export default {
   },
   actions: {
     REGISTER({ commit }, credentials) {
-      return axios.post('http://localhost:3000/v1/auth/register', credentials)
-        .then(
-          ({ data }) => {
-            commit('SET_USER_DATA', data)
-            return axios.get(`http://localhost:3000/v1/companies/${data.user.company}`, credentials)
-          })
+      return axios
+        .post('http://localhost:3000/v1/auth/register', credentials)
+        .then(({ data }) => {
+          commit('SET_USER_DATA', data)
+          return axios.get(
+            `http://localhost:3000/v1/companies/${data.user.company}`,
+            credentials
+          )
+        })
         .then(({ data }) => {
           commit('SET_USER_COMPANY_NAME', data.name)
         })
     },
     LOGIN({ commit }, credentials) {
-      return axios.post('http://localhost:3000/v1/auth/login', credentials)
-        .then(
-          ({ data }) => {
-            commit('SET_USER_DATA', data)
-            return axios.get(`http://localhost:3000/v1/companies/${data.user.company}`, credentials)
-          })
+      return axios
+        .post('http://localhost:3000/v1/auth/login', credentials)
         .then(({ data }) => {
-          commit('SET_USER_COMPANY_NAME', data.name)
+          commit('SET_USER_DATA', data)
+          if (!data.user.isClient) {
+            return axios
+              .get(
+                `http://localhost:3000/v1/companies/${data.user.company}`,
+                credentials
+              )
+              .then(({ data }) => {
+                commit('SET_USER_COMPANY_NAME', data.name)
+              })
+          } else {
+            commit('SET_USER_COMPANY_NAME', data.user.company)
+          }
         })
     },
     LOGOUT({ commit }) {

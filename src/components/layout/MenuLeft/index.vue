@@ -196,8 +196,8 @@ export default {
         return key
       })
 
-      this.activeItem = activeItem.key
-      this.activeSubmenu = activeSubmenu.key
+      this.activeItem = activeItem ? activeItem.key : ''
+      this.activeSubmenu = activeSubmenu ? activeSubmenu.key : ''
     },
     handleFlyoutOver(event, key, items) {
       if (this.flyoutActive) {

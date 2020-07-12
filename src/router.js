@@ -38,6 +38,15 @@ const router = new Router({
           props: true,
           component: () => import('./views/dashboard/documents/documents.vue'),
         },
+        {
+          path: '/dashboard/clients',
+          name: 'clients',
+          meta: {
+            title: 'Dashboard Clients',
+          },
+          props: true,
+          component: () => import('./views/dashboard/clients/clients.vue'),
+        },
         // 404
         {
           path: '/404',

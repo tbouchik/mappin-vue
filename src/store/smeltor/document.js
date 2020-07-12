@@ -98,7 +98,7 @@ export default {
       }
       let tempDoc = cloneDeep(state.formattedDocument)
       if (state.currentIdx !== null) {
-        tempDoc.stdFilter.splice(state.currentIdx, 0, newElement)
+        tempDoc.stdFilter.splice(state.currentIdx + 1, 0, newElement)
       } else {
         tempDoc.stdFilter.push(newElement)
       }
