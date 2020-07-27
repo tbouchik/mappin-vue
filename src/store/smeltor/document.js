@@ -27,25 +27,25 @@ export default {
   mutations: {
     UPDATE_DOCUMENT_DATA(state, document) {
       state.formattedDocument = document
-      state.formattedDocument.stdFilter = state.formattedDocument.stdFilter.map((item, index) => {
+      state.formattedDocument.osmium = state.formattedDocument.osmium.map((item, index) => {
         item.key = index // This is to avoid ant design spitting on your face for
-        return item // inserting items from stdFilter in ant table <a-table> without a unique key
+        return item // inserting items from osmium in ant table <a-table> without a unique key
       })
       state.formattedDocumentCache = cloneDeep(state.formattedDocument)
     },
     async SAVE_CURRENT_DOCUMENT(state, filter) {
-      Object.assign(state.formattedDocument.stdFilter, filter)
-      Object.assign(state.formattedDocumentCache.stdFilter, filter)
+      Object.assign(state.formattedDocument.osmium, filter)
+      Object.assign(state.formattedDocumentCache.osmium, filter)
       const updatedDocument = {
         name: document.name,
-        stdFilter: omitKeyFromFilter(filter),
+        osmium: omitKeyFromFilter(filter),
         status: 'validated',
       }
       await DocumentService.updateDocument(
         updatedDocument,
         state.formattedDocument.id
       )
-      state.documentsList[state.documentsList.findIndex(x => x.id === state.formattedDocument.id)].stdFilter = filter
+      state.documentsList[state.documentsList.findIndex(x => x.id === state.formattedDocument.id)].osmium = filter
     },
     CLEAR_DOCUMENT_DATA(state) {
       state.formattedDocument = null
@@ -78,7 +78,7 @@ export default {
     },
     MUTATION_UPDATE_ACTIVE_VALUE(state, value) {
       let updateFormattedDoc = cloneDeep(state.formattedDocument)
-      updateFormattedDoc.stdFilter[state.currentIdx].Value = value
+      updateFormattedDoc.osmium[state.currentIdx].Value = value
       state.formattedDocument = updateFormattedDoc
     },
     MUTATION_UNDO_CHANGES_TO_DOCUMENT(state) {
@@ -87,7 +87,7 @@ export default {
     MUTATION_DO_CHANGES_TO_DOCUMENT(state, changeData) {
       let { value, itemIdx, column } = changeData
       let tempDoc = cloneDeep(state.formattedDocument)
-      tempDoc.stdFilter[itemIdx][column] = value
+      tempDoc.osmium[itemIdx][column] = value
       state.formattedDocument = tempDoc
     },
     MUTATION_ADD_RECORD_AFTER_INDEX(state) {
@@ -98,9 +98,9 @@ export default {
       }
       let tempDoc = cloneDeep(state.formattedDocument)
       if (state.currentIdx !== null) {
-        tempDoc.stdFilter.splice(state.currentIdx + 1, 0, newElement)
+        tempDoc.osmium.splice(state.currentIdx + 1, 0, newElement)
       } else {
-        tempDoc.stdFilter.push(newElement)
+        tempDoc.osmium.push(newElement)
       }
       state.formattedDocument = cloneDeep(tempDoc)
     },

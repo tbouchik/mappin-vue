@@ -28,6 +28,15 @@ const router = new Router({
           props: true,
           component: () => import('./views/smelter/viewer.vue'),
         },
+        {
+          path: '/smelter/upload',
+          name: 'upload',
+          meta: {
+            title: 'Smelter Uploader',
+          },
+          props: true,
+          component: () => import('./views/uploader/uploader.vue'),
+        },
         // Dashboards
         {
           path: '/dashboard/documents',
@@ -46,6 +55,15 @@ const router = new Router({
           },
           props: true,
           component: () => import('./views/dashboard/clients/clients.vue'),
+        },
+        {
+          path: '/dashboard/filters',
+          name: 'filters',
+          meta: {
+            title: 'Dashboard Filters',
+          },
+          props: true,
+          component: () => import('./views/dashboard/filters/filters.vue'),
         },
         // 404
         {

@@ -1,14 +1,14 @@
 <template>
     <form>
-        <div class="row">
-            <div class="col-2"></div>
-                <div class="card col-8">
+        <!-- <div class="row"> -->
+            <!-- <div class="col-2"></div> -->
+                <div class="card">
                     <div class="card-body">
-                        <div ref="dashboardContainer"></div>
+                        <div ref="dashboardContainer" ></div>
                     </div>
                 </div>
-            <div class="col-2"></div>
-        </div>
+            <!-- <div class="col-2"></div> -->
+        <!-- </div> -->
     </form>
 </template>
 
@@ -118,9 +118,8 @@ export default {
 
 <style scoped>
     .image-container {
-        height: 150px;
-        width: 150px;
-        border-radius: 50%;
+        height: 100%;
+        width: 82%;
         overflow: hidden;
         margin-right: auto;
         margin-left: auto;

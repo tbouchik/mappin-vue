@@ -83,7 +83,7 @@ export default {
     csvExport() {
       let csvContent = 'data:text/csv;charset=utf-8,'
       let arrData = ['Key;Value']
-      this.current.stdFilter.map(item => {
+      this.current.osmium.map(item => {
         arrData.push(Object.values(pick(item, ['Key', 'Value'])).join(';'))
       })
       csvContent += arrData.join('\n')

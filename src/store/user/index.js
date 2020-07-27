@@ -67,5 +67,6 @@ export default {
   getters: {
     user: state => state.user.user,
     loggedIn: state => !!state.user,
+    userIsClient: state => !!state.user.user.isClient,
   },
 }

@@ -1,6 +1,10 @@
 export const getMenuData = [
   {
-    title: 'Processed Documents',
+    category: true,
+    title: 'Dashboards',
+  },
+  {
+    title: 'Documents',
     key: 'processedDocuments',
     icon: 'fe fe-file-text',
     url: '/dashboard/documents',
@@ -10,5 +14,27 @@ export const getMenuData = [
     key: 'clients',
     icon: 'fe fe-users',
     url: '/dashboard/clients',
+  },
+  {
+    title: 'Filters',
+    key: 'filters',
+    icon: 'fe fe-filter',
+    url: '/dashboard/filters',
+  },
+  {
+    category: true,
+    title: 'Actions',
+  },
+  {
+    title: 'Upload',
+    key: 'upload',
+    icon: 'fe fe-upload',
+    url: '/smelter/upload',
+  },
+  {
+    title: 'Validate',
+    key: 'validate',
+    icon: 'fe fe-check-circle',
+    url: '/dashboard/filters',
   },
 ]

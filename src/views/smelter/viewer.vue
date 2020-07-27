@@ -59,7 +59,7 @@ export default {
   created() {
     DocumentService.fetchDocument(this.documentId).then(doc => {
       this.$store.dispatch('UPDATE_DOCUMENT', doc.data)
-      this.currentFilter = this.current.stdFilter
+      this.currentFilter = this.current.osmium
     })
     this.$store.dispatch('FETCH_DOCUMENTS')
   },
@@ -70,7 +70,7 @@ export default {
       })
     },
     current: function() {
-      this.currentFilter = this.current.stdFilter
+      this.currentFilter = this.current.osmium
     },
   },
   computed: {
