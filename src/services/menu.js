@@ -16,9 +16,9 @@ export const getMenuData = [
     url: '/dashboard/clients',
   },
   {
-    title: 'Filters',
+    title: 'Templates',
     key: 'filters',
-    icon: 'fe fe-filter',
+    icon: 'fe fe-layers',
     url: '/dashboard/filters',
   },
   {

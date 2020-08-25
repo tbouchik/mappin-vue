@@ -65,6 +65,15 @@ const router = new Router({
           props: true,
           component: () => import('./views/dashboard/filters/filters.vue'),
         },
+        // Templates: Add New
+        {
+          path: '/dashboard/filters/add',
+          name: 'addNewFilter',
+          meta: {
+            title: 'Add New Template',
+          },
+          component: () => import('./views/dashboard/filters/components/filterAdd.vue'),
+        },
         // 404
         {
           path: '/404',
