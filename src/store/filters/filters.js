@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 import { cloneDeep } from 'lodash'
+import FilterService from '../../services/filterService.js'
 
 Vue.use(Vuex)
 
@@ -13,15 +14,16 @@ export default {
     MUTATION_SET_FILTERS(state, data) {
       state.filtersList = data
     },
-    MUTATION_UPDATE_FILTER(state, payload) {
-      return axios.patch(`http://localhost:3000/v1/filters/${payload.id}`,
-        ...payload.body)
-        .then(() => {
-          let filterIdx = state.findIdex(item => payload.id === item.id)
-          let newFilter = cloneDeep(state.filtersList[filterIdx])
-          Object.assign(newFilter, payload.body)
-          state.filtersList[filterIdx] = newFilter
-        })
+    async MUTATION_UPDATE_FILTER(state, payload) {
+      FilterService.updateFilter(
+        payload.body,
+        payload.id
+      ).then(() => {
+        let filterIdx = state.filtersList.findIndex(item => payload.id === item.id)
+        let newFilter = cloneDeep(state.filtersList[filterIdx])
+        Object.assign(newFilter, payload.body)
+        state.filtersList[filterIdx] = newFilter
+      })
     },
     MUTATION_ADD_FILTER(state, payload) {
       return axios.post(`http://localhost:3000/v1/filters/`,

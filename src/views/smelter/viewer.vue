@@ -25,7 +25,6 @@
   </div>
 </template>
 <script>
-// import SmelterViewer from '@/components/widgets/Smelter/Viewer/viewer.vue'
 import TemplateViewer from '@/components/widgets/Smelter/Viewer/template.vue'
 import SmelterPdfWindow from '@/components/widgets/Smelter/Window/pdfwindow.vue'
 import SmelterImageWindow from '@/components/widgets/Smelter/Window/imgwindow.vue'

@@ -17,6 +17,7 @@
             </span>
             Add New Template
           </button>
+
         </b-col>
       </b-row>
     </div>
@@ -25,7 +26,7 @@
         <div v-for="(filter, index) in filters" :key="index"  class="col-xl-6 col-lg-12">
           <div class="card">
             <div class="card-body">
-              <filter-card :name="filter.name"  :description="filter.description"/>
+              <filter-card :template="filter"/>
             </div>
           </div>
         </div>
@@ -35,6 +36,7 @@
 </template>
 
 <script>
+
 import FilterCard from '@/views/dashboard/filters/components/filterCard.vue'
 import { mapGetters } from 'vuex'
 
@@ -48,10 +50,11 @@ export default {
   },
   data() {
     return {
+      visible: false,
     }
   },
   created() {
-    this.$store.dispatch('ACTION_FETCH_CLIENTS')
+    this.$store.dispatch('ACTION_FETCH_FILTERS')
   },
   computed: {
     ...mapGetters(['filters']),

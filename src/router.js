@@ -65,6 +65,15 @@ const router = new Router({
           props: true,
           component: () => import('./views/dashboard/filters/filters.vue'),
         },
+        {
+          path: '/dashboard/filter/:filterId',
+          name: 'filter',
+          meta: {
+            title: 'Dashboard Filters',
+          },
+          props: true,
+          component: () => import('./views/dashboard/filters/components/filterDetail.vue'),
+        },
         // Templates: Add New
         {
           path: '/dashboard/filters/add',
@@ -72,6 +81,7 @@ const router = new Router({
           meta: {
             title: 'Add New Template',
           },
+          props: true,
           component: () => import('./views/dashboard/filters/components/filterAdd.vue'),
         },
         // 404

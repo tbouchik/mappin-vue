@@ -6,54 +6,43 @@
         <b-col md="3" class="my-1">
           <h5>Add New Template</h5>
         </b-col>
-
       </b-row>
     </div>
         <div class="card">
           <div class="card-body">
-      <a-form :form="form" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }" @submit="handleSubmit">
-        <a-form-item label="Name">
-        <a-input
-            v-decorator="['name', { rules: [{ required: true, message: 'Please input your template name' }] }]"
-        />
-        </a-form-item>
-        <a-form-item label="Description">
-        <a-input
-            v-decorator="['description', { rules: [{ required: false, message: 'Input here your template description' }] }]"
-        />
-        </a-form-item>
-        <a-form-item
-        v-for="(k, index) in form.getFieldValue('keys')"
-        :key="k"
-        v-bind="index === 0 ? formItemLayout : formItemLayoutWithOutLabel"
-        :label="index === 0 ? 'Keys' : ''"
-        :required="false"
-        >
-        <a-input
-            v-decorator="[
-            `names[${k}]`,
-            {
-                validateTrigger: ['change', 'blur'],
-                rules: [
-                {
-                    required: true,
-                    whitespace: true,
-                    message: 'Please input key\'s name or delete this field.',
-                },
-                ],
-            },
-            ]"
-            placeholder="key name"
-            style="width: 60%; margin-right: 8px"
-        />
-        <a-icon
-            v-if="form.getFieldValue('keys').length > 1"
-            class="dynamic-delete-button"
-            type="minus-circle-o"
-            :disabled="form.getFieldValue('keys').length === 1"
-            @click="() => remove(k)"
-        />
-        </a-form-item>
+            <a-form :form="form" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }" @submit="handleSubmit">
+              <a-form-item label="Name">
+              <a-input
+                  v-decorator="['name', { rules: [{ required: true, message: 'Please input your template name' }] }]"
+              />
+              </a-form-item>
+              <a-form-item label="Description">
+              <a-input
+                  v-decorator="['description', { rules: [{ required: false, message: 'Input here your template description' }] }]"
+              />
+              </a-form-item>
+              <a-form-item
+                v-for="(k, index) in names"
+                :key="index"
+                v-bind="index === 0 ? formItemLayout : formItemLayoutWithOutLabel"
+                :label="index === 0 ? 'Keys' : ''"
+                :required="true"
+                >
+                  <a-input
+                      :value= k
+                      placeholder="key name"
+                      style="width: 60%; margin-right: 8px"
+                      @change="e => handleChange(e, index)"
+
+                  />
+                  <a-icon
+                      v-if="names.length > 1"
+                      class="dynamic-delete-button"
+                      type="minus-circle-o"
+                      :disabled="form.getFieldValue('keys').length === 1"
+                      @click="() => remove(index)"
+                  />
+              </a-form-item>
         <a-form-item v-bind="formItemLayoutWithOutLabel">
         <a-button type="dashed" style="width: 60%" @click="add">
             <a-icon type="plus" /> Add field
@@ -64,7 +53,7 @@
             Submit
         </a-button>
         </a-form-item>
-    </a-form>
+          </a-form>
         </div>
           </div>
       </div>
@@ -72,7 +61,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { cloneDeep } from 'lodash'
+// eslint-disable-next-line
 let id = 0
 
 export default {
@@ -80,11 +70,25 @@ export default {
   },
   name: 'FiltersComponent',
   props: {
-
+    name: {
+      type: String,
+    },
+    description: {
+      type: String,
+    },
+    keys: {
+      type: Array,
+      default: function () {
+        return []
+      },
+    },
   },
   beforeCreate() {
     this.form = this.$form.createForm(this, { name: 'dynamic_form_item' })
     this.form.getFieldDecorator('keys', { initialValue: [], preserve: true })
+    this.form.getFieldDecorator('names', { initialValue: [], preserve: true })
+    this.form.getFieldDecorator('description', { initialValue: '', preserve: true })
+    this.form.getFieldDecorator('name', { initialValue: '', preserve: true })
   },
   data() {
     return {
@@ -104,58 +108,52 @@ export default {
           sm: { span: 20, offset: 4 },
         },
       },
+      names: [],
     }
   },
   created() {
-
-  },
-  computed: {
-    ...mapGetters(['filters']),
-  },
-  mounted() {
+    this.form.setFieldsValue({
+      name: this.name,
+      description: this.description,
+      keys: this.keys,
+      names: this.keys,
+    })
+    this.names = this.keys
+    id = this.keys.length || 0
   },
   methods: {
-    remove(k) {
-      const { form } = this
-      // can use data-binding to get
-      const keys = form.getFieldValue('keys')
-      // We need at least one key
-      if (keys.length === 1) {
-        return
-      }
-
-      // can use data-binding to set
-      form.setFieldsValue({
-        keys: keys.filter(key => key !== k),
-      })
+    remove(index) {
+      this.names.splice(index, 1)
     },
 
     add() {
-      const { form } = this
-      // can use data-binding to get
-      const keys = form.getFieldValue('keys')
-      const nextKeys = keys.concat(id++)
-      // can use data-binding to set
-      // important! notify form to detect changes
-      form.setFieldsValue({
-        keys: nextKeys,
-      })
+      this.names.push('')
     },
 
     handleSubmit(e) {
       e.preventDefault()
       this.form.validateFields((err, values) => {
         if (!err) {
-          const { names, description, name } = values
-          console.log('Received values of form: ', values)
-
+          const { description, name } = values
           this.$store.dispatch('ACTION_ADD_FILTER', {
             name,
             description,
-            keys: names,
+            keys: this.names,
           })
         }
       })
+      this.$router.push({ name: 'filters' })
+    },
+
+    handleChange(e, index) {
+      e.preventDefault()
+      let newNames = cloneDeep(this.names)
+      newNames[index] = e.target.value
+      this.names = newNames
+    },
+
+    goToFilterDashboard() {
+      this.$router.push({ name: 'filters' })
     },
   },
 }

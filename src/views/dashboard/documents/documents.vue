@@ -1,6 +1,5 @@
 <template>
   <div>
-    <smelter-uppy-loader :maxFileSizeInBytes=10000000></smelter-uppy-loader>
     <div class="card">
       <div class="card-header card-header-flex">
         <div class="d-flex flex-column justify-content-center mr-auto">
@@ -97,7 +96,6 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
-import SmelterUppyLoader from '@/components/widgets/Smelter/Uploader/uppyloader.vue'
 
 const columns = [
   {
@@ -211,9 +209,6 @@ const columns = [
   },
 ]
 export default {
-  components: {
-    SmelterUppyLoader,
-  },
   data: function() {
     return {
       searchText: '',

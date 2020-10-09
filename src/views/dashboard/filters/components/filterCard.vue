@@ -1,27 +1,23 @@
 <template>
   <div class="text-center">
     <p class="text-dark font-size-48 font-weight-bold mb-2">
-      {{name}}
+      {{template.name}}
     </p>
     <p class="text-uppercase text-muted mb-3">
     </p>
     <p class="mb-4">
-      {{description}}
+      {{template.description}}
     </p>
-    <a href="javascript: void(0);" class="btn btn-outline-primary mb-1">View Filter</a>
+    <a-button class="mr-2 mb-2" type="primary" @click="goEditFilter" >View Filter</a-button>
   </div>
 </template>
 <script>
+
 export default {
   name: 'FilterCard',
   props: {
-    name: {
-      type: String,
-      required: true,
-    },
-    description: {
-      type: String,
-      required: true,
+    template: {
+      type: Object,
     },
   },
   data() {
@@ -31,12 +27,17 @@ export default {
   created() {
   },
   computed: {
-
-  },
-  mounted() {
   },
   methods: {
-
+    goEditFilter() {
+      const params = {
+        filterId: this.template.id,
+        name: this.template.name,
+        description: this.template.description,
+        keys: this.template.keys,
+      }
+      this.$router.push({ name: 'filter', params })
+    },
   },
 }
 </script>
