@@ -27,12 +27,14 @@
             <a-form :form="form" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }" @submit="handleSubmit">
               <a-form-item label="Name">
               <a-input
-                  v-decorator="['name', { rules: [{ required: true, message: 'Please input your template name' }] }]"
+                :disabled="isSmartTemplate"
+                v-decorator="['name', { rules: [{ required: true, message: 'Please input your template name' }] }]"
               />
               </a-form-item>
               <a-form-item label="Description">
               <a-input
-                  v-decorator="['description', { rules: [{ required: false, message: 'Input here your template description' }] }]"
+                :disabled="isSmartTemplate"
+                v-decorator="['description', { rules: [{ required: false, message: 'Input here your template description' }] }]"
               />
               </a-form-item>
               <a-form-item
@@ -43,14 +45,32 @@
                 :required="true"
                 >
                   <a-input
-                      :value= k
+                      :value= k.value
                       placeholder="key name"
-                      style="width: 60%; margin-right: 8px"
+                      style="width: 50%; margin-right: 8px"
+                      :disabled="isSmartTemplate"
                       @change="e => handleChange(e, index)"
 
                   />
+                  <a-select
+                    :value=k.type
+                    style="width: 10%; margin-right: 4px"
+                    placeholder="Select a type for this key"
+                    :disabled="isSmartTemplate"
+                    @change="e => handleTypeChange(e, index)"
+                  >
+                    <a-select-option value="TEXT">
+                      TEXT
+                    </a-select-option>
+                    <a-select-option value="NUMBER">
+                      NUMBER
+                    </a-select-option>
+                    <a-select-option value="DATE">
+                      DATE
+                    </a-select-option>
+                  </a-select>
                   <a-icon
-                      v-if="names.length > 1"
+                      v-if="names.length > 1 && !isSmartTemplate"
                       class="dynamic-delete-button"
                       type="minus-circle-o"
                       :disabled="form.getFieldValue('keys').length === 1"
@@ -58,12 +78,12 @@
                   />
               </a-form-item>
         <a-form-item v-bind="formItemLayoutWithOutLabel">
-        <a-button type="dashed" style="width: 60%" @click="add">
+        <a-button v-if="!isSmartTemplate" type="dashed" style="width: 60%" @click="add">
             <a-icon type="plus" /> Add field
         </a-button>
         </a-form-item>
         <a-form-item v-bind="formItemLayoutWithOutLabel">
-        <a-button type="primary" html-type="submit">
+        <a-button v-if="!isSmartTemplate" type="primary" html-type="submit">
             Save Changes
         </a-button>
         </a-form-item>
@@ -185,7 +205,13 @@ export default {
     handleChange(e, index) {
       e.preventDefault()
       let newNames = cloneDeep(this.names)
-      newNames[index] = e.target.value
+      newNames[index].value = e.target.value
+      this.names = newNames
+    },
+
+    handleTypeChange(e, index) {
+      let newNames = cloneDeep(this.names)
+      newNames[index].type = e
       this.names = newNames
     },
 

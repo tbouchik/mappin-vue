@@ -29,12 +29,28 @@
                 :required="true"
                 >
                   <a-input
-                      :value= k
+                      :value= k.value
                       placeholder="key name"
-                      style="width: 60%; margin-right: 8px"
+                      style="width: 50%; margin-right: 8px"
                       @change="e => handleChange(e, index)"
 
                   />
+                  <a-select
+                    :value=k.type
+                    style="width: 10%; margin-right: 4px"
+                    placeholder="Select a type for this key"
+                    @change="e => handleTypeChange(e, index)"
+                  >
+                    <a-select-option value="TEXT">
+                      TEXT
+                    </a-select-option>
+                    <a-select-option value="NUMBER">
+                      NUMBER
+                    </a-select-option>
+                    <a-select-option value="DATE">
+                      DATE
+                    </a-select-option>
+                  </a-select>
                   <a-icon
                       v-if="names.length > 1"
                       class="dynamic-delete-button"
@@ -127,7 +143,7 @@ export default {
     },
 
     add() {
-      this.names.push('')
+      this.names.push({})
     },
 
     handleSubmit(e) {
@@ -148,7 +164,13 @@ export default {
     handleChange(e, index) {
       e.preventDefault()
       let newNames = cloneDeep(this.names)
-      newNames[index] = e.target.value
+      newNames[index].value = e.target.value
+      this.names = newNames
+    },
+
+    handleTypeChange(e, index) {
+      let newNames = cloneDeep(this.names)
+      newNames[index].type = e
       this.names = newNames
     },
 
