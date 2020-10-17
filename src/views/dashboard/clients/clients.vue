@@ -119,10 +119,6 @@
         ></b-pagination>
       </b-col>
     </b-row>
-
-    <div>
-    selected: {{ selected }}
-    </div>
     <!-- Info modal -->
     <b-modal :id="infoModal.id" :title="infoModal.title" ok-only @hide="resetInfoModal">
       <pre>{{ infoModal.content }}</pre>
@@ -206,7 +202,10 @@ export default {
       this.currentPage = 1
     },
     rowSelected(items, i) {
-      this.selected = items
+      if (this.readOnlyMode) {
+        this.$store.dispatch('ACTION_SELECT_UPLOADER_CLIENT', items[0])
+        this.$store.dispatch('ACTION_INCREMENT_UPLOADER_INDEX')
+      }
     },
     handleSubmit(e) {
       e.preventDefault()

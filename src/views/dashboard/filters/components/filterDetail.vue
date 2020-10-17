@@ -145,12 +145,6 @@ export default {
         type: String,
       },
       isSmartTemplate: true,
-    //   keys: {
-    //     type: Array,
-    //     default: function () {
-    //       return []
-    //     },
-    // },
     }
   },
   beforeMount() {
@@ -232,9 +226,6 @@ export default {
           FilterService.deleteFilter(id)
           router.push({ name: 'filters' })
         },
-        // onCancel() {
-        //   console.log('Cancel');
-        // },
       })
     },
   },
