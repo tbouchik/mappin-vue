@@ -55,8 +55,8 @@ export default {
       state.nextIsEnabled = false
     },
     MUTATION_RESET_STEPS(state) {
-      state.selectedClient = undefined
-      state.selectedFilter = undefined
+      state.selectedClient = {}
+      state.selectedFilter = {}
       state.nextIsEnabled = false
       state.currentStep = 0
     },

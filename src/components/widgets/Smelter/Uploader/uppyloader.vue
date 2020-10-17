@@ -20,6 +20,7 @@ import uuidv4 from 'uuid/v4'
 import '@uppy/core/dist/style.css'
 import '@uppy/dashboard/dist/style.css'
 import SmelterService from '../../../../services/smelterService'
+import { mapGetters } from 'vuex'
 
 export default {
   props: {
@@ -37,6 +38,9 @@ export default {
   mounted() {
     this.files = []
     this.instantiateUppy()
+  },
+  computed: {
+    ...mapGetters(['uploaderClient', 'uploaderFilter']),
   },
   methods: {
     instantiateUppy() {
@@ -67,6 +71,8 @@ export default {
               businessPurpose: files[fileID].meta.businessReason ? files[fileID].meta.businessReason : 'Not specified',
               extractionType: 'FORMS',
               metadata: {},
+              client: this.uploaderClient.id,
+              filter: this.uploaderFilter._id,
             })
           })
           return updatedFiles

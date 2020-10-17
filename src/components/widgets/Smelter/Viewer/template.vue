@@ -57,7 +57,6 @@
   </div>
 </template>
 <script>
-import { cloneDeep } from 'lodash'
 import { mapGetters } from 'vuex'
 const columns = [
   {
@@ -88,7 +87,7 @@ export default {
     }
   },
   created() {
-    this.pageData = cloneDeep(this.filter)
+    this.pageData = this.filter.map(x => { return { Key: x.Key, Value: x.Value } })
   },
   props: {
     insideUploaderView: {
@@ -103,7 +102,7 @@ export default {
   },
   watch: {
     filter: function () {
-      this.pageData = cloneDeep(this.filter)
+      this.pageData = this.filter.map(x => { return { Key: x.Key, Value: x.Value } })
     },
   },
   methods: {
