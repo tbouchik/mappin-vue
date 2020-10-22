@@ -4,7 +4,7 @@
     <div class="air__utils__heading">
       <b-row>
         <b-col md="3" class="my-1">
-          <h5>Templates Dashboard</h5>
+          <h5>Templates </h5>
         </b-col>
         <b-col md="6" class="my-1">
           <button
