@@ -14,7 +14,7 @@ export default {
       state.clientsList = data
     },
     MUTATION_UPDATE_CLIENT(state, payload) {
-      return axios.patch(`http://localhost:3000/v1/clients/${payload.id}`,
+      return axios.patch(`/v1/clients/${payload.id}`,
         ...payload.body)
         .then(() => {
           let clientIdx = state.findIdex(item => payload.id === item.id)
@@ -24,7 +24,7 @@ export default {
         })
     },
     MUTATION_ADD_CLIENT(state, payload) {
-      return axios.post(`http://localhost:3000/v1/clients/`,
+      return axios.post(`/v1/clients/`,
         payload)
         .then((response) => {
           let newlist = cloneDeep(state.clientsList)
@@ -33,7 +33,7 @@ export default {
         })
     },
     MUTATION_REMOVE_CLIENT(state, id) {
-      return axios.delete(`http://localhost:3000/v1/clients/${id}`)
+      return axios.delete(`/v1/clients/${id}`)
         .then(() => {
           state.clientsList.filter(item => item.id !== id)
         })
@@ -41,7 +41,7 @@ export default {
   },
   actions: {
     ACTION_FETCH_CLIENTS({ commit }) {
-      return axios.get('http://localhost:3000/v1/clients',)
+      return axios.get(`/v1/clients`,)
         .then(({ data }) => {
           commit('MUTATION_SET_CLIENTS', data)
         })

@@ -81,7 +81,7 @@ export default {
         .use(
           AwsS3Multipart, {
             limit: 0,
-            companionUrl: 'http://localhost:3000',
+            companionUrl: '',
           }
         )
         .use(Dashboard, {

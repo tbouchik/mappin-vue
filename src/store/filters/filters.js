@@ -26,7 +26,7 @@ export default {
       })
     },
     MUTATION_ADD_FILTER(state, payload) {
-      return axios.post(`http://localhost:3000/v1/filters/`,
+      return axios.post(`/v1/filters/`,
         payload)
         .then((response) => {
           let newlist = cloneDeep(state.filtersList)
@@ -35,7 +35,7 @@ export default {
         })
     },
     MUTATION_REMOVE_FILTER(state, id) {
-      return axios.delete(`http://localhost:3000/v1/filters/${id}`)
+      return axios.delete(`/v1/filters/${id}`)
         .then(() => {
           state.filtersList.filter(item => item.id !== id)
         })
@@ -43,7 +43,7 @@ export default {
   },
   actions: {
     ACTION_FETCH_FILTERS({ commit }) {
-      return axios.get('http://localhost:3000/v1/filters',)
+      return axios.get(`/v1/filters`,)
         .then(({ data }) => {
           commit('MUTATION_SET_FILTERS', data)
         })

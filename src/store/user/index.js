@@ -29,11 +29,11 @@ export default {
   actions: {
     REGISTER({ commit }, credentials) {
       return axios
-        .post('http://localhost:3000/v1/auth/register', credentials)
+        .post(`/v1/auth/register`, credentials)
         .then(({ data }) => {
           commit('SET_USER_DATA', data)
           return axios.get(
-            `http://localhost:3000/v1/companies/${data.user.company}`,
+            `/v1/companies/${data.user.company}`,
             credentials
           )
         })
@@ -43,13 +43,13 @@ export default {
     },
     LOGIN({ commit }, credentials) {
       return axios
-        .post('http://localhost:3000/v1/auth/login', credentials)
+        .post(`/v1/auth/login`, credentials)
         .then(({ data }) => {
           commit('SET_USER_DATA', data)
           if (!data.user.isClient) {
             return axios
               .get(
-                `http://localhost:3000/v1/companies/${data.user.company}`,
+                `/v1/companies/${data.user.company}`,
                 credentials
               )
               .then(({ data }) => {

@@ -69,7 +69,7 @@ export default {
   },
   computed: {
     src: function() {
-      return `http://localhost:3000/media/${this.name}`
+      return `/media/${this.name}`
     },
     ...mapGetters(['current']),
   },
@@ -172,7 +172,7 @@ export default {
 
       // Get Document
       pdfjsLib
-        .getDocument(`http://localhost:3000/media/${this.name}`)
+        .getDocument(`/media/${this.name}`)
         .promise.then(pdfDoc_ => {
           pdfDoc = pdfDoc_
           document.querySelector('#page-count').textContent = pdfDoc.numPages

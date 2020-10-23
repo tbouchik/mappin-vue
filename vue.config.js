@@ -32,12 +32,6 @@ module.exports = {
       '^/dev_test': {
         target: 'https://qcz9i1r3jj.execute-api.us-east-1.amazonaws.com/',
       },
-    //   '/v1/**': {
-    //     target: 'http://localhost:9596/',
-      // pathRewrite: { '^/api': '' },
-      // secure: false,
-      // logLevel: 'debug'
-    //  }
     },
   },
 }

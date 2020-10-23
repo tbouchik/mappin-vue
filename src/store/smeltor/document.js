@@ -116,13 +116,13 @@ export default {
       commit('CLEAR_DOCUMENT_DATA')
     },
     FETCH_DOCUMENTS({ commit }) {
-      return axios.get('http://localhost:3000/v1/documents',)
+      return axios.get(`/v1/documents`,)
         .then(({ data }) => {
           commit('SET_DOCUMENTS_LIST', data)
         })
     },
     REMOVE_DOCUMENT({ commit }, id) {
-      return axios.delete(`http://localhost:3000/v1/documents/${id}`,)
+      return axios.delete(`/v1/documents/${id}`,)
         .then(() => {
           commit('REMOVE_DOC_FROM_LIST', id)
         })

@@ -45,7 +45,7 @@ export default {
   },
   computed: {
     src: function() {
-      return `http://localhost:3000/media/${this.name}`
+      return `/media/${this.name}`
     },
   },
   props: {
