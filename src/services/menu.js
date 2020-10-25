@@ -31,10 +31,4 @@ export const getMenuData = [
     icon: 'fe fe-upload',
     url: '/smelter/upload',
   },
-  {
-    title: 'Validate',
-    key: 'validate',
-    icon: 'fe fe-check-circle',
-    url: '/dashboard/filters',
-  },
 ]
