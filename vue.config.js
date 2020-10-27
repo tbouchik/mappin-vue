@@ -20,11 +20,11 @@ module.exports = {
   },
   devServer: {
     proxy: {
-      '^/v1/**': {
+      '/v1': {
         target: 'http://localhost:3000/',
-        pathRewrite: { '^/api': '' },
-        secure: false,
-        logLevel: 'debug',
+      },
+      '/': {
+        target: 'http://localhost:3000/',
       },
       '^/mappin-test': {
         target: 'https://ltm03gutjl.execute-api.us-east-1.amazonaws.com/',
