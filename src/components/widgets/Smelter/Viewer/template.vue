@@ -1,37 +1,27 @@
 <template>
   <div>
-      <div :class="$style.chat">
-      <button
-        type="button"
-        :class="$style.toggleButton"
-        class="btn btn-rounded btn-light text-nowrap text-dark font-weight-bold font-size-18"
-        @click="saveVersion"
-      >
-        <i :class="$style.icon" class="fe fe-check-circle text-blue mr-md-2" />
-        <span class="d-none d-md-inline">Validate Changes</span>
-      </button>
-      <button
-        type="button"
-        :class="$style.toggleButton"
-        class="btn btn-rounded btn-light text-nowrap text-dark font-weight-bold font-size-18"
-        @click="cancelChanges"
-      >
-        <i :class="$style.icon" class="fe fe-rotate-ccw text-blue mr-md-2" />
-        <span class="d-none d-md-inline">Cancel Changes</span>
-      </button>
-    </div>
 
+  <br>
       <div :class="$style.subbar">
-        <p class="color-gray-4 text-uppercase font-size-18 mb-0 mr-4 d-none d-xl-block">PAGE: {{currentPage}}</p>
         <button
           type="button"
           class="btn btn-primary btn-with-addon mr-auto text-nowrap d-none d-md-block"
-          @click="addRecord"
+          @click="saveVersion"
         >
           <span class="btn-addon">
-            <i class="btn-addon-icon fe fe-plus-circle" />
+            <i class="btn-addon-icon fe fe-check-circle" />
           </span>
-          New Record
+          Validate Changes
+        </button>
+        <button
+          type="button"
+          class="btn btn-warning btn-with-addon mr-auto text-nowrap d-none d-md-block"
+          @click="cancelChanges"
+        >
+          <span class="btn-addon">
+            <i class="btn-addon-icon fe fe-x-circle" />
+          </span>
+          Cancel Changes
         </button>
       </div>
       <a-table :columns="columns" :data-source="pageData" :pagination=false bordered>
@@ -54,6 +44,7 @@
           </div>
         </template>
       </a-table>
+      <br><br>
   </div>
 </template>
 <script>
