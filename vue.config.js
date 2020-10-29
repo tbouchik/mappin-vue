@@ -22,15 +22,19 @@ module.exports = {
     proxy: {
       '/v1': {
         target: 'http://localhost:3000/',
+        secure: false,
       },
       '/': {
         target: 'http://localhost:3000/',
+        secure: false,
       },
       '^/mappin-test': {
         target: 'https://ltm03gutjl.execute-api.us-east-1.amazonaws.com/',
+        secure: false,
       },
       '^/dev_test': {
         target: 'https://qcz9i1r3jj.execute-api.us-east-1.amazonaws.com/',
+        secure: false,
       },
     },
   },
