@@ -91,7 +91,7 @@ export default {
             this.$router.push({ name: 'documents' })
             this.$notification['success']({
               message: 'Logged In',
-              description: 'You have successfully logged in to Air UI Vue Admin Template!',
+              description: 'You have successfully logged in to Smeltor!',
             })
           }).catch((error) => {
             this.$nprogress.done()

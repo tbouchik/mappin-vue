@@ -85,7 +85,7 @@ Vue.prototype.$message = message
 
 Vue.use(NProgress)
 Vue.use(VuePageTitle, {
-  prefix: 'Air UI Vue | ',
+  prefix: 'Smeltor | ',
   router,
 })
 
