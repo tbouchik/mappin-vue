@@ -1,7 +1,7 @@
 <template>
   <div :class="$style.auth">
     <div class="pt-5 pb-5 d-flex align-items-end mt-auto">
-      <img src="resources/images/air-logo.png" alt="AIR UI Logo" />
+      <img src="resources/images/air-logo.png" alt="Smeltor" />
       <div class="air__utils__logo__text">
         <div class="air__utils__logo__name text-uppercase text-dark font-size-21">Smeltor</div>
         <div class="air__utils__logo__descr text-uppercase font-size-12 text-gray-6">Data Extraction</div>
