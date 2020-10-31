@@ -74,6 +74,23 @@
               </span>
               <template v-else>{{ text }}</template>
             </template>
+            <template slot="customRenderComposed" slot-scope="text, record, index, column">
+              <span v-if="searchText && searchedColumn === column.dataIndex">
+                <template
+                  v-for="(fragment, i) in text
+            .toString()
+            .split(new RegExp(`(?<=${searchText})|(?=${searchText})`, 'i'))"
+                >
+                  <mark
+                    v-if="fragment.toLowerCase() === searchText.toLowerCase()"
+                    :key="i"
+                    class="highlight"
+                  >{{ fragment.name }}</mark>
+                  <template v-else>{{ fragment.name }}</template>
+                </template>
+              </span>
+              <template v-else>{{ text.name }}</template>
+            </template>
             <span slot="date" slot-scope="text">{{text | timestamp}}</span>
             <span slot="status" slot-scope="text">
               <a-tag
@@ -132,18 +149,18 @@ const columns = [
     },
   },
   {
-    title: 'Type',
-    dataIndex: 'businessPurpose',
+    title: 'Template',
+    dataIndex: 'filter',
     scopedSlots: {
       filterDropdown: 'filterDropdown',
       filterIcon: 'filterIcon',
-      customRender: 'customRender',
+      customRender: 'customRenderComposed',
     },
     sorter: (a, b) => {
       return a.name.localeCompare(b.name)
     },
     onFilter: (value, record) =>
-      record.type
+      record.filter.name
         .toString()
         .toLowerCase()
         .includes(value.toLowerCase()),
@@ -156,18 +173,18 @@ const columns = [
     },
   },
   {
-    title: 'Extraction',
-    dataIndex: 'extractionType',
+    title: 'Client',
+    dataIndex: 'client',
     scopedSlots: {
       filterDropdown: 'filterDropdown',
       filterIcon: 'filterIcon',
-      customRender: 'customRender',
+      customRender: 'customRenderComposed',
     },
     sorter: (a, b) => {
       return a.name.localeCompare(b.name)
     },
     onFilter: (value, record) =>
-      record.extraction
+      record.client.name
         .toString()
         .toLowerCase()
         .includes(value.toLowerCase()),

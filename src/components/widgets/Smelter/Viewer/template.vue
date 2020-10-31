@@ -2,8 +2,10 @@
   <div>
   <br>
       <div :class="$style.subbar">
+        <div class="btn-group">
         <button
           type="button"
+          style="margin-right: 5px"
           class="btn btn-primary btn-with-addon mr-auto text-nowrap d-none d-md-block"
           @click="saveVersion"
         >
@@ -14,6 +16,7 @@
         </button>
         <button
           type="button"
+          style="margin-left: 10px"
           class="btn btn-warning btn-with-addon mr-auto text-nowrap d-none d-md-block"
           @click="cancelChanges"
         >
@@ -22,6 +25,7 @@
           </span>
           Cancel Changes
         </button>
+        </div>
       </div>
       <a-table :columns="columns" :data-source="pageData" :pagination=false bordered>
         <template v-for="col in ['Key', 'Value']" :slot="col" slot-scope="text, record, dataIndex" >
