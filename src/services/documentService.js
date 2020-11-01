@@ -6,9 +6,11 @@ class DocumentService {
       ...body,
     })
   }
+
   static fetchDocument(documentId) {
     return axios.get(`/v1/documents/${documentId}`)
   }
+
   static downloadMedia(url) {
     return axios({
       method: 'get',
@@ -16,6 +18,14 @@ class DocumentService {
       responseType: 'arraybuffer',
     })
   }
+
+  static fetchDocumentsByClient(clienId) {
+    return axios.get(`/v1/documents/client/${clienId}`)
+      .then(res => {
+        return res.data
+      })
+  }
+
   static downloadPDF(url) {
     return axios({
       method: 'get',

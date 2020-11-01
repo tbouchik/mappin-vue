@@ -234,6 +234,7 @@ const columns = [
   },
 ]
 export default {
+  name: 'Documents',
   data: function() {
     return {
       searchText: '',
@@ -241,7 +242,14 @@ export default {
       searchedColumn: '',
       timeInterval: null,
       columns,
+
     }
+  },
+  props: {
+    clientId: {
+      type: String,
+      required: false,
+    },
   },
   computed: {
     ...mapGetters(['documentsList', 'smeltedIdList']),
@@ -250,13 +258,21 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch('FETCH_DOCUMENTS')
-    this.timeInterval = setInterval(() => {
+    if (this.clientId) {
+      console.log('with client Id')
+      this.$store.dispatch('ACTION_FETCH_CLIENT_DOCUMENTS', this.clientId)
+    } else {
+      console.log('no client Id')
       this.$store.dispatch('FETCH_DOCUMENTS')
-    }, 10000)
+      this.timeInterval = setInterval(() => {
+        this.$store.dispatch('FETCH_DOCUMENTS')
+      }, 10000)
+    }
   },
   destroyed() {
-    clearInterval(this.timeInterval)
+    if (!this.clientId) {
+      clearInterval(this.timeInterval)
+    }
   },
   methods: {
     handleSearch(selectedKeys, confirm, dataIndex) {

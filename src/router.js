@@ -54,7 +54,16 @@ const router = new Router({
             title: 'Dashboard Clients',
           },
           props: true,
-          component: () => import('./views/dashboard/clients/clients.vue'),
+          component: () => import('./views/dashboard/clients/clients-new.vue'),
+        },
+        {
+          path: '/dashboard/client/:clientId',
+          name: 'client',
+          meta: {
+            title: 'Client Detail',
+          },
+          props: true,
+          component: () => import('./views/dashboard/clients/components/clientDetail.vue'),
         },
         {
           path: '/dashboard/filters',

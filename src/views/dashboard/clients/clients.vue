@@ -93,21 +93,10 @@
       @filtered="onFiltered"
       @row-selected="rowSelected"
     >
-      <template slot="name" slot-scope="row">
-        {{ row.value.first }} {{ row.value.last }}
-      </template>
-
-      <template slot="isActive" slot-scope="row">
-        {{ row.value ? 'Yes :)' : 'No :(' }}
-      </template>
-
-      <template slot="actions" slot-scope="row">
-        <b-button size="sm" @click="info(row.item, row.index, $event.target)" class="mr-1">
-          Info modal
-        </b-button>
-        <b-button size="sm" @click="row.toggleDetails">
-          {{ row.detailsShowing ? 'Hide' : 'Show' }} Details
-        </b-button>
+      <template slot="action" >
+       <a-button type="primary" html-type="submit">
+        Submit
+      </a-button>
       </template>
 
       <template slot="row-details" slot-scope="row">
@@ -158,6 +147,7 @@ export default {
         { key: 'name', label: 'Full name', sortable: true, sortDirection: 'desc' },
         { key: 'email', label: 'Email address', sortable: true, class: 'text-center' },
         { key: 'company', label: 'Client Company', sortable: true, class: 'text-center' },
+        { key: 'action', label: 'Action', sortable: true, class: 'text-center' },
       ],
       items: [],
       totalRows: 1,
@@ -223,7 +213,6 @@ export default {
         if (!err) {
           this.$store.dispatch('ACTION_ADD_CLIENT', values)
           this.closeAddMode()
-          console.log('Received values of form: ', values)
         }
       })
     },
