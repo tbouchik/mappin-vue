@@ -14,11 +14,24 @@
       <br>
       <div>
           <div v-if="steps[uploaderStep].title == 'Client'">
-            <clients-dashboard
+            <!-- <clients-dashboard
               class="card-body steps-content"
               :readOnlyMode="clientsComponentReadMode"
               :perPage="perPage">
-            </clients-dashboard>
+            </clients-dashboard> -->
+            <div class="demo-infinite-container ">
+              <a-list :data-source="clients">
+                <a-list-item  slot="renderItem" slot-scope="item">
+                  <a-list-item-meta :description="item.email">
+                    <a slot="title">{{ item.name }}</a> -
+                    <a slot="title">{{ item.company }}</a>
+                  </a-list-item-meta>
+                  <a-button type="primary" @click="selectClient(item)" ghost>
+                    select
+                  </a-button>
+                </a-list-item>
+              </a-list>
+            </div>
           </div>
           <div v-if="steps[uploaderStep].title == 'Template'">
             <div class="demo-infinite-container ">
@@ -48,13 +61,11 @@
 </template>
 <script>
 import SmelterUppyLoader from '@/components/widgets/Smelter/Uploader/uppyloader.vue'
-import ClientsDashboard from '@/views/dashboard/clients/clients.vue'
 import { mapGetters } from 'vuex'
 
 export default {
   components: {
     SmelterUppyLoader,
-    ClientsDashboard,
   },
   data: function() {
     return {
@@ -75,7 +86,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['uploaderStep', 'uploaderClient', 'uploaderFilter', 'uploaderNextIsEnabled', 'filters']),
+    ...mapGetters(['uploaderStep', 'uploaderClient', 'uploaderFilter', 'uploaderNextIsEnabled', 'filters', 'clients']),
   },
   created() {
     this.$store.dispatch('ACTION_FETCH_FILTERS')
@@ -90,6 +101,10 @@ export default {
     },
     prev() {
       this.$store.dispatch('ACTION_DECREMENT_UPLOADER_INDEX')
+    },
+    selectClient(item) {
+      this.$store.dispatch('ACTION_SELECT_UPLOADER_CLIENT', item)
+      this.$store.dispatch('ACTION_INCREMENT_UPLOADER_INDEX')
     },
   },
 }

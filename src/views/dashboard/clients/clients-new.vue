@@ -220,6 +220,7 @@ const columns = [
   },
 ]
 export default {
+  name: 'ClientsNewDashboard',
   data: function() {
     return {
       searchText: '',
