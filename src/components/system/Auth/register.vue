@@ -109,7 +109,7 @@ export default {
             this.$router.push({ name: 'documents' })
             this.$notification['success']({
               message: 'Signed Up',
-              description: 'You have successfully signed up to Mappin!',
+              description: 'You have successfully signed up to Smeltor!',
             })
           }).catch((error) => {
             this.$nprogress.done()

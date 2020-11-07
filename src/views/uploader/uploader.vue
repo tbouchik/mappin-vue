@@ -89,6 +89,7 @@ export default {
     ...mapGetters(['uploaderStep', 'uploaderClient', 'uploaderFilter', 'uploaderNextIsEnabled', 'filters', 'clients']),
   },
   created() {
+    this.$store.dispatch('ACTION_FETCH_CLIENTS')
     this.$store.dispatch('ACTION_FETCH_FILTERS')
   },
   destroyed() {
