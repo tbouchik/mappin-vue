@@ -24,6 +24,14 @@ class ClientService {
     return axios.patch(`/v1/clients/${clientId}`, {
       ...body,
     })
+      .then(res => res.data)
+      .catch((error) => {
+        return {
+          error: true,
+          message: error.response.statusText,
+          description: error.response.data.message,
+        }
+      })
   }
 }
 

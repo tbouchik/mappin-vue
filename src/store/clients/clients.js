@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 import { cloneDeep } from 'lodash'
-import ClientService from '@/services/clientService.js'
 
 Vue.use(Vuex)
 
@@ -15,15 +14,10 @@ export default {
       state.clientsList = data
     },
     async MUTATION_UPDATE_CLIENT(state, payload) {
-      ClientService.updateClient(
-        payload.body,
-        payload.id
-      ).then(() => {
-        let clientIdx = state.clientsList.findIdex(item => payload.id === item.id)
-        let newClient = cloneDeep(state.clientsList[clientIdx])
-        Object.assign(newClient, payload.body)
-        state.clientsList[clientIdx] = newClient
-      })
+      let clientIdx = state.clientsList.findIndex(item => payload.id === item.id)
+      let newClient = cloneDeep(state.clientsList[clientIdx])
+      Object.assign(newClient, payload.body)
+      state.clientsList[clientIdx] = newClient
     },
     MUTATION_ADD_CLIENT(state, response) {
       let newlist = cloneDeep(state.clientsList)

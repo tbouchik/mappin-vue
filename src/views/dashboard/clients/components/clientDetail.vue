@@ -94,6 +94,23 @@ export default {
             company,
             email,
           }
+          ClientService.updateClient(
+            payloadBody,
+            this.clientId,
+          ).then((response) => {
+            if (!response.error) {
+              const payload = {
+                body: payloadBody,
+                id: this.clientId,
+              }
+              this.$store.dispatch('ACTION_UPDATE_CLIENT', payload)
+            } else {
+              this.$notification['warning']({
+                message: response.message,
+                description: response.description,
+              })
+            }
+          })
           this.$store.dispatch('ACTION_UPDATE_CLIENT', {
             id: this.clientId,
             body: payloadBody,
