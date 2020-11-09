@@ -62,7 +62,7 @@
           <span />
         </a>
         <a  :class="$style.air__menuLeft__logo">
-          <img src="resources/images/air-logo.png" alt="Smeltor" />
+          <!-- <img src="resources/images/air-logo.png" alt="Smeltor" /> -->
           <div :class="$style.air__menuLeft__logo__name">Smeltor</div>
           <div :class="$style.air__menuLeft__logo__descr">Data extraction</div>
         </a>

@@ -276,16 +276,17 @@ export default {
             .then((response) => {
               if (!response.error) {
                 this.$store.dispatch('ACTION_ADD_CLIENT', response)
+                this.closeAddMode()
               } else {
                 this.$notification['warning']({
                   message: response.message,
                   description: response.description,
                 })
               }
+            }).finally(() => {
+              this.$nprogress.done()
             })
-          this.closeAddMode()
         }
-        this.$nprogress.done()
       })
     },
     generatePassword() {

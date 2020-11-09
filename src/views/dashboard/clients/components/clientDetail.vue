@@ -88,6 +88,7 @@ export default {
       e.preventDefault()
       this.form.validateFields((err, values) => {
         if (!err) {
+          this.$nprogress.start()
           const { name, company, email } = values
           const payloadBody = {
             name,
@@ -110,10 +111,8 @@ export default {
                 description: response.description,
               })
             }
-          })
-          this.$store.dispatch('ACTION_UPDATE_CLIENT', {
-            id: this.clientId,
-            body: payloadBody,
+          }).finally(() => {
+            this.$nprogress.done()
           })
         }
       })
