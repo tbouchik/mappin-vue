@@ -104,7 +104,13 @@ export default {
       this.editMode = !this.editMode
     },
     async saveVersion() {
+      this.$nprogress.start()
       await this.$store.dispatch('SAVE_DOCUMENT', this.pageData)
+      this.$nprogress.done()
+      this.$notification['success']({
+        message: 'Saved!',
+        description: 'Changes were successfully saved',
+      })
     },
     cancelChanges() {
       this.$store.dispatch('ACTION_UNDO_CHANGES_TO_DOCUMENT', this.pageData)
@@ -115,9 +121,6 @@ export default {
     async remove(record, itemIdx) {
       this.pageData.splice(itemIdx, 1)
       await this.$store.dispatch('SAVE_DOCUMENT', this.pageData)
-    },
-    addRecord() {
-      this.$store.dispatch('ACTION_ADD_RECORD_AFTER_INDEX')
     },
     activateIndex(idx) {
       this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', idx)
