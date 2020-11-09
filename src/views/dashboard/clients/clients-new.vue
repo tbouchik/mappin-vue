@@ -30,7 +30,7 @@
       </div>
       <div class="card" v-if="addMode">
           <div class="card-body">
-      <a-form :form="form" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }" @submit="handleSubmit">
+      <a-form :form="form" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }" @submit.prevent="handleSubmit">
     <a-form-item label="Full Name">
       <a-input
         v-decorator="['name', { rules: [{ required: true, message: 'Please input your client full name' }] }]"
@@ -139,7 +139,7 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
-
+import ClientService from '../../../services/clientService'
 const columns = [
   {
     title: 'Full Name',
@@ -265,10 +265,22 @@ export default {
     handleSubmit(e) {
       e.preventDefault()
       this.form.validateFields((err, values) => {
+        this.$nprogress.start()
         if (!err) {
-          this.$store.dispatch('ACTION_ADD_CLIENT', values)
+          ClientService.addClient(values)
+            .then((response) => {
+              if (!response.error) {
+                this.$store.dispatch('ACTION_ADD_CLIENT', response)
+              } else {
+                this.$notification['warning']({
+                  message: response.message,
+                  description: response.description,
+                })
+              }
+            })
           this.closeAddMode()
         }
+        this.$nprogress.done()
       })
     },
     generatePassword() {

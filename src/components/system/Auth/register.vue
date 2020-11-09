@@ -114,8 +114,8 @@ export default {
           }).catch((error) => {
             this.$nprogress.done()
             this.$notification['warning']({
-              message: error.code,
-              description: error.message,
+              message: error.response.statusText,
+              description: error.response.data.message,
             })
           })
         }

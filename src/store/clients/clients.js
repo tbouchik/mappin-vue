@@ -25,14 +25,10 @@ export default {
         state.clientsList[clientIdx] = newClient
       })
     },
-    MUTATION_ADD_CLIENT(state, payload) {
-      return axios.post(`/v1/clients/`,
-        payload)
-        .then((response) => {
-          let newlist = cloneDeep(state.clientsList)
-          newlist.push(response.data)
-          state.clientsList = newlist
-        })
+    MUTATION_ADD_CLIENT(state, response) {
+      let newlist = cloneDeep(state.clientsList)
+      newlist.push(response)
+      state.clientsList = newlist
     },
     MUTATION_REMOVE_CLIENT(state, id) {
       return axios.delete(`/v1/clients/${id}`)

@@ -65,7 +65,11 @@ export default {
     },
   },
   getters: {
-    user: state => state.user.user,
+    user: state => {
+      if (state.user) {
+        return state.user.user
+      }
+    },
     loggedIn: state => !!state.user,
     userIsClient: state => !!state.user.user.isClient,
   },

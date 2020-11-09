@@ -1,7 +1,7 @@
 <template>
   <div :class="$style.auth">
     <div class="pt-5 pb-5 d-flex align-items-end mt-auto">
-      <img src="resources/images/air-logo.png" alt="Smeltor" />
+      <img src="resources/images/favicon.png" alt="Smeltor" />
       <div class="air__utils__logo__text">
         <div class="air__utils__logo__name text-uppercase text-dark font-size-21">SMELTOR</div>
         <div class="air__utils__logo__descr text-uppercase font-size-12 text-gray-6">DATA EXTRACTION</div>
@@ -9,7 +9,7 @@
     </div>
     <div class="pl-5 pr-5 pt-5 pb-5 bg-white text-center" :class="$style.container">
       <div class="text-dark font-size-30 mb-2 text-center">Log In</div>
-      <a-form class="mb-4" :form="form" @submit.prevent="handleSubmit">
+      <a-form class="mb-4" :form="form" @submit.prevent="login">
         <a-form-item>
           <a-input
             size="large"
@@ -27,12 +27,12 @@
             v-decorator="['password', {initialValue: '', rules: [{ required: true, message: 'Please input your Password!' }]}]"
           />
         </a-form-item>
-        <a-button
-          type="primary"
-          htmlType="submit"
+        <button
+          type="submit"
+          name="button"
           size="large"
           class="text-center btn btn-success w-100 font-weight-bold font-size-18"
-        >Log in</a-button>
+        >Log in</button>
       </a-form>
 
       <router-link
@@ -79,7 +79,7 @@ export default {
     }
   },
   methods: {
-    handleSubmit() {
+    login() {
       this.form.validateFields((err, values) => {
         if (!err) {
           this.$nprogress.start()
@@ -89,15 +89,11 @@ export default {
           }).then((data) => {
             this.$nprogress.done()
             this.$router.push({ name: 'documents' })
-            this.$notification['success']({
-              message: 'Logged In',
-              description: 'You have successfully logged in to Smeltor!',
-            })
           }).catch((error) => {
             this.$nprogress.done()
             this.$notification['warning']({
-              message: error.code,
-              description: error.message,
+              message: error.response.statusText,
+              description: error.response.data.message,
             })
           })
         }

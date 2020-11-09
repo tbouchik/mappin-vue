@@ -5,6 +5,17 @@ class ClientService {
     return axios.get(`/v1/clients/${clientId}`)
       .then(res => res.data)
   }
+  static addClient(payload) {
+    return axios.post(`/v1/clients/`, payload)
+      .then(res => res.data)
+      .catch((error) => {
+        return {
+          error: true,
+          message: error.response.statusText,
+          description: error.response.data.message,
+        }
+      })
+  }
   static deleteClient(clientId) {
     return axios.delete(`/v1/clients/${clientId}`)
       .then(res => res.data)
