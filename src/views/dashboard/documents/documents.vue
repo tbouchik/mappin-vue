@@ -9,17 +9,41 @@
       </b-row>
     </div>
     <div class="card">
-      <div class="card-header card-header-flex">
-        <div class="d-flex flex-column justify-content-center mr-auto">
+      <div class="card-header card-header-flex row">
+        <div class="d-flex flex-column justify-content-center mr-auto col-4">
           <h5 class="mb-0">Your extractions</h5>
         </div>
-        <div class="d-flex flex-column justify-content-center">
-          <button class="btn btn-primary"
+        <div class="d-flex flex-column justify-content-center col-2"
+        style="float: right">
+          <button
+            type="button"
+            class="btn btn-primary btn-with-addon mr-auto text-nowrap d-none d-md-block"
+            @click="goToUpload"
+          >
+            <span class="btn-addon">
+              <i class="btn-addon-icon fe fe-upload" />
+            </span>
+            Upload Documents
+          </button>
+          </div>
+        <div class="d-flex flex-column justify-content-center col-2">
+        <button
+            type="button"
+            class="btn btn-success btn-with-addon mr-auto text-nowrap d-none d-md-block"
+            :disabled="everythingIsValidated"
+            @click="() => goToValidation()"
+          >
+            <span class="btn-addon">
+              <i class="btn-addon-icon fe fe-edit" />
+            </span>
+            Validate Smelted
+          </button>
+          <!-- <button class="btn btn-primary"
                 :disabled="everythingIsValidated"
                 @click="() => goToValidation()"
           >
             Validate Smelted
-          </button>
+          </button> -->
         </div>
       </div>
       <div class="card-body">
@@ -294,6 +318,9 @@ export default {
     },
     goToValidation() {
       this.$router.push({ name: 'viewer', params: { documentId: this.smeltedIdList[0], smeltedValidation: true } })
+    },
+    goToUpload() {
+      this.$router.push({ name: 'upload' })
     },
   },
 }
