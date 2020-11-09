@@ -19,6 +19,13 @@ class ClientService {
   static deleteClient(clientId) {
     return axios.delete(`/v1/clients/${clientId}`)
       .then(res => res.data)
+      .catch((error) => {
+        return {
+          error: true,
+          message: error.response.statusText,
+          description: error.response.data.message,
+        }
+      })
   }
   static updateClient(body, clientId) {
     return axios.patch(`/v1/clients/${clientId}`, {

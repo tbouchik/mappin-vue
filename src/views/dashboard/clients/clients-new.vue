@@ -253,8 +253,13 @@ export default {
     },
     remove(record) {
       this.$nprogress.start()
-      this.$store.dispatch('ACTION_REMOVE_CLIENT', record.id)
-      this.$nprogress.done()
+      ClientService.deleteClient(record.id)
+        .then(() => {
+          this.$store.dispatch('ACTION_REMOVE_CLIENT', record.id)
+        })
+        .finally(() => {
+          this.$nprogress.done()
+        })
     },
     openAddMode() {
       this.addMode = true

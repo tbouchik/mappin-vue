@@ -25,10 +25,7 @@ export default {
       state.clientsList = newlist
     },
     MUTATION_REMOVE_CLIENT(state, id) {
-      return axios.delete(`/v1/clients/${id}`)
-        .then(() => {
-          state.clientsList.filter(item => item.id !== id)
-        })
+      state.clientsList = state.clientsList.filter(item => item.id !== id)
     },
   },
   actions: {
