@@ -102,7 +102,14 @@ export default {
         })
       this.uppy.on('complete', (event) => {
         SmelterService.postBulkSmelter(this.files).then(
-          () => { this.$store.dispatch('FETCH_DOCUMENTS') }
+          () => {
+            this.$store.dispatch('FETCH_DOCUMENTS')
+            this.$notification['success']({
+              message: 'Upload',
+              description: 'Files were uploaded successfully',
+            })
+            this.$router.push({ name: 'documents' })
+          }
         )
         this.files = []
       })
