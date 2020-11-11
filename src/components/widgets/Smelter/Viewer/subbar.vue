@@ -14,7 +14,7 @@
             </a-tag>
             <a-button-group>
         <a-tooltip placement="topLeft" title="Export CSV" arrowPointAtCenter>
-          <a-button type="primary" icon="cloud-download" @click="csvExport" />
+          <a-button type="primary" icon="cloud-download" @click="csvExport" ghost/>
         </a-tooltip>
     </a-button-group>
         </div>

@@ -23,7 +23,7 @@
       </div>
       <div class="col-md-2">
         <a-button-group>
-          <a-button type="primary" icon="download" >
+          <a-button type="primary" icon="download" ghost>
             <a
             @click.prevent="downloadItem">Download PDF
             </a>

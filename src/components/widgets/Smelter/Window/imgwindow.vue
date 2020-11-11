@@ -5,7 +5,7 @@
     <div class="col-9"></div>
     <div class="col-3">
     <a-button-group>
-      <a-button type="primary" icon="download" style="padding-right:10px">
+      <a-button type="primary" icon="download" style="padding-right:10px" ghost>
       <a
       @click.prevent="downloadItem">Download Image</a>
     </a-button>
