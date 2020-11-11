@@ -29,7 +29,10 @@
       </div>
       <a-table :columns="columns" :data-source="pageData" :pagination=false bordered>
         <template v-for="col in ['Key', 'Value']" :slot="col" slot-scope="text, record, dataIndex" >
-          <div :key="col" @click="activateIndex(dataIndex)">
+          <div :key="col"  v-if="col==='Key'" @click="activateIndex(dataIndex)">
+            {{text}}
+          </div>
+          <div :key="col"  v-if="col==='Value'" @click="activateIndex(dataIndex)">
             <a-input
               style="margin: -5px 0"
               :value="text"
