@@ -9,7 +9,7 @@
       </b-row>
     </div>
     <div class="card">
-      <div class="card-header card-header-flex row">
+      <div v-if="!clientViz" class="card-header card-header-flex row">
         <div class="d-flex flex-column justify-content-center mr-auto col-4">
           <h5 class="mb-0">Your extractions</h5>
         </div>
@@ -38,12 +38,21 @@
             </span>
             Validate Smelted
           </button>
-          <!-- <button class="btn btn-primary"
-                :disabled="everythingIsValidated"
-                @click="() => goToValidation()"
+        </div>
+      </div>
+      <div v-if="clientViz" class="card-header card-header-flex row">
+        <div class="d-flex flex-column justify-content-center col-2">
+        <button
+            type="button"
+            class="btn btn-success btn-with-addon mr-auto text-nowrap d-none d-md-block"
+            :disabled="!documentsList.length"
+            @click="() => bulkExportToCSV()"
           >
+            <span class="btn-addon">
+              <i class="btn-addon-icon fe fe-edit" />
+            </span>
             Validate Smelted
-          </button> -->
+          </button>
         </div>
       </div>
       <div class="card-body">
@@ -145,6 +154,8 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
+import JSZip from 'jszip'
+import { pick } from 'lodash'
 
 const columns = [
   {
@@ -280,13 +291,14 @@ export default {
     everythingIsValidated: function () {
       return this.smeltedIdList.length === 0
     },
+    clientViz: function () {
+      return this.clientId !== undefined && this.clientId !== null
+    },
   },
   created() {
     if (this.clientId) {
-      console.log('with client Id')
       this.$store.dispatch('ACTION_FETCH_CLIENT_DOCUMENTS', this.clientId)
     } else {
-      console.log('no client Id')
       this.$store.dispatch('FETCH_DOCUMENTS')
       this.timeInterval = setInterval(() => {
         this.$store.dispatch('FETCH_DOCUMENTS')
@@ -321,6 +333,27 @@ export default {
     },
     goToUpload() {
       this.$router.push({ name: 'upload' })
+    },
+    bulkExportToCSV() {
+      const zip = JSZip()
+      this.documentsList.map((document) => {
+        let csvContent = ''
+        let arrData = ['Key;Value']
+        this.current.osmium.map(item => {
+          arrData.push(Object.values(pick(item, ['Key', 'Value'])).join(';'))
+        })
+        csvContent += arrData.join('\n')
+          .replace(/(^\[)|(\]$)/gm, '')
+        const blobs = [csvContent]
+        blobs.forEach((blob, i) => {
+          zip.file(`file-${i}.csv`, blob)
+        })
+      })
+      zip.generateAsync({
+        type: 'base64',
+      }).then(function(content) {
+        window.location.href = 'data:application/zip;base64,' + content
+      })
     },
   },
 }

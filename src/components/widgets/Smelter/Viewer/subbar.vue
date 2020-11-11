@@ -80,6 +80,7 @@ export default {
         this.$router.push({ name: 'viewer', params: { documentId: this.documentsIdList[this.currentIndex - 1], smeltedValidation: this.smeltedValidation } })
       }
     },
+
     csvExport() {
       let csvContent = 'data:text/csv;charset=utf-8,'
       let arrData = ['Key;Value']

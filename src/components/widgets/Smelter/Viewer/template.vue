@@ -10,7 +10,7 @@
           @click="saveVersion"
         >
           <span class="btn-addon">
-            <i class="btn-addon-icon fe fe-check-circle" />
+            <i class="btn-addon-icon fe fe-check-circle"/>
           </span>
           Validate Changes
         </button>
@@ -37,15 +37,6 @@
             />
           </div>
         </template>
-        <template slot="operation" slot-scope="text, record, dataIndex">
-          <div class="editable-row-operations">
-            <span>
-              <a-popconfirm title="Sure to delete?" @confirm="() => remove(record, dataIndex)">
-                <a style="color:#b793c3">Delete</a>
-              </a-popconfirm>
-            </span>
-          </div>
-        </template>
       </a-table>
       <br><br>
   </div>
@@ -64,11 +55,6 @@ const columns = [
     dataIndex: 'Value',
     width: '45%',
     scopedSlots: { customRender: 'Value' },
-  },
-  {
-    title: 'operation',
-    dataIndex: 'operation',
-    scopedSlots: { customRender: 'operation' },
   },
 ]
 export default {
