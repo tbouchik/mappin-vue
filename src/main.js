@@ -79,6 +79,7 @@ Vue.use(AutoComplete)
 Vue.use(Collapse)
 Vue.use(BackTop)
 Vue.use(ConfigProvider)
+Vue.use(require('vue-shortkey'))
 
 Vue.prototype.$notification = notification
 Vue.prototype.$message = message

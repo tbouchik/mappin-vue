@@ -23,6 +23,7 @@ export default {
     documentsList: [],
     viewerIdList: [],
     currentIdx: 0,
+    catMode: false,
   },
   mutations: {
     UPDATE_DOCUMENT_DATA(state, document) {
@@ -78,7 +79,13 @@ export default {
     },
     MUTATION_UPDATE_ACTIVE_VALUE(state, value) {
       let updateFormattedDoc = cloneDeep(state.formattedDocument)
-      updateFormattedDoc.osmium[state.currentIdx].Value = value
+      console.log(value)
+      if (state.catMode) {
+        let appendix = ' '.concat(value)
+        updateFormattedDoc.osmium[state.currentIdx].Value = updateFormattedDoc.osmium[state.currentIdx].Value.concat(appendix)
+      } else {
+        updateFormattedDoc.osmium[state.currentIdx].Value = value
+      }
       state.formattedDocument = updateFormattedDoc
     },
     MUTATION_UNDO_CHANGES_TO_DOCUMENT(state) {
@@ -116,6 +123,9 @@ export default {
             return -(new Date(a.date) - new Date(b.date))
           },)
         })
+    },
+    MUTATION_TOGGLE_CATMODE(state) {
+      state.catMode = !state.catMode
     },
   },
   actions: {
@@ -167,6 +177,9 @@ export default {
     ACTION_FETCH_CLIENT_DOCUMENTS({ commit }, clientId) {
       commit('MUTATION_FETCH_CLIENT_DOCUMENTS', clientId)
     },
+    ACTION_TOGGLE_CATMODE({ commit }) {
+      commit('MUTATION_TOGGLE_CATMODE')
+    },
   },
   getters: {
     current: state => state.formattedDocument,
@@ -178,5 +191,6 @@ export default {
       return x.status === 'smelted'
     }).map(x => x.id),
     currentActiveIndex: state => state.currentIdx,
+    catMode: state => state.catMode,
   },
 }

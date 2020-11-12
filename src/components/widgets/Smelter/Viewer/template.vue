@@ -2,7 +2,7 @@
   <div>
   <br>
       <div :class="$style.subbar">
-        <div class="btn-group">
+        <!-- <div class="btn-group">
         <button
           type="button"
           style="margin-right: 5px"
@@ -25,6 +25,13 @@
           </span>
           Cancel Changes
         </button>
+        </div> -->
+        <div>
+          Concatenation Mode:
+          <a-switch
+          :checked="catMode"
+          @change="toggleCatMode"
+           />
         </div>
       </div>
       <a-table  :columns="columns"
@@ -82,6 +89,7 @@ export default {
   },
   created() {
     this.pageData = this.filter.map(x => { return { Key: x.Key, Value: x.Value } })
+    this.activateIndex(0)
   },
   props: {
     insideUploaderView: {
@@ -92,7 +100,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['currentPage', 'currentActiveIndex']),
+    ...mapGetters(['currentPage', 'currentActiveIndex', 'catMode']),
   },
   watch: {
     filter: function () {
@@ -128,7 +136,9 @@ export default {
     isActive(dataIndex) {
       return dataIndex === this.currentActiveIndex
     },
-
+    toggleCatMode() {
+      this.$store.dispatch('ACTION_TOGGLE_CATMODE')
+    },
   },
   destroyed() {
     this.$store.dispatch('CLEAR_DOCUMENT')

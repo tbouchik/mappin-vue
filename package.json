@@ -45,6 +45,7 @@
     "vue-peity": "^0.5.0",
     "vue-quill-editor": "^3.0.6",
     "vue-router": "^3.0.6",
+    "vue-shortkey": "^3.1.7",
     "vue-sticky": "^3.3.4",
     "vuedraggable": "^2.23.0",
     "vuelayers": "^0.11.4",

@@ -1,10 +1,12 @@
 <template>
-  <div v-if="current">
+  <div v-if="current" v-shortkey.push="['alt']" @shortkey="theAction">
     <a-layout-header>
       <smelter-subbar :smeltedValidation="smeltedValidation" :current="current"/>
     </a-layout-header>
     <a-layout-content>
-      <div class="container-fluid">
+      <div  class="container-fluid"
+            v-shortkey="{up: ['tab'], down: ['shift', 'tab']}"
+            @shortkey="updateActiveIndex">
         <div class="row">
           <div class="col-md-4">
             <div class="sticky">
@@ -74,12 +76,41 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['current', 'documentsIdList', 'currentPageData']),
+    ...mapGetters(['current', 'documentsIdList', 'currentPageData', 'currentActiveIndex']),
     documentName: function() {
       return get(this.current, 'alias')
     },
     documentIsPdf: function() {
       return get(this.current, 'mimeType') === 'application/pdf'
+    },
+  },
+  methods: {
+    incrementActiveIndex() {
+      if (this.currentActiveIndex < this.currentFilter.length - 1) {
+        this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', this.currentActiveIndex + 1)
+      } else {
+        this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', 0)
+      }
+    },
+    decrementActiveIndex() {
+      if (this.currentActiveIndex > 0) {
+        this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', this.currentActiveIndex - 1)
+      } else {
+        this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', this.currentFilter.length - 1)
+      }
+    },
+    updateActiveIndex(event) {
+      switch (event.srcKey) {
+        case 'up':
+          this.incrementActiveIndex()
+          break
+        case 'down':
+          this.decrementActiveIndex()
+          break
+      }
+    },
+    theAction() {
+      this.$store.dispatch('ACTION_TOGGLE_CATMODE')
     },
   },
 }
