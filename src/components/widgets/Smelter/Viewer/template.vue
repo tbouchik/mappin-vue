@@ -2,30 +2,6 @@
   <div>
   <br>
       <div :class="$style.subbar">
-        <!-- <div class="btn-group">
-        <button
-          type="button"
-          style="margin-right: 5px"
-          class="btn btn-primary btn-with-addon mr-auto text-nowrap d-none d-md-block"
-          @click="saveVersion"
-        >
-          <span class="btn-addon">
-            <i class="btn-addon-icon fe fe-check-circle"/>
-          </span>
-          Validate Changes
-        </button>
-        <button
-          type="button"
-          style="margin-left: 10px"
-          class="btn btn-warning btn-with-addon mr-auto text-nowrap d-none d-md-block"
-          @click="cancelChanges"
-        >
-          <span class="btn-addon">
-            <i class="btn-addon-icon fe fe-x-circle" />
-          </span>
-          Cancel Changes
-        </button>
-        </div> -->
         <div>
           Concatenation Mode:
           <a-switch
