@@ -49,9 +49,9 @@
             @click="() => bulkExportToCSV()"
           >
             <span class="btn-addon">
-              <i class="btn-addon-icon fe fe-edit" />
+              <i class="btn-addon-icon fe fe-download-cloud" />
             </span>
-            Validate Smelted
+            Bulk Download
           </button>
         </div>
       </div>
@@ -335,19 +335,16 @@ export default {
       this.$router.push({ name: 'upload' })
     },
     bulkExportToCSV() {
-      const zip = JSZip()
-      this.documentsList.map((document) => {
-        let csvContent = ''
+      let zip = JSZip()
+      console.log(this.documentsList.length)
+      this.documentsList.map((document, idx) => {
+        let documentCsvContent = ''
         let arrData = ['Key;Value']
-        this.current.osmium.map(item => {
+        document.osmium.map(item => {
           arrData.push(Object.values(pick(item, ['Key', 'Value'])).join(';'))
         })
-        csvContent += arrData.join('\n')
-          .replace(/(^\[)|(\]$)/gm, '')
-        const blobs = [csvContent]
-        blobs.forEach((blob, i) => {
-          zip.file(`file-${i}.csv`, blob)
-        })
+        documentCsvContent += arrData.join('\n').replace(/(^\[)|(\]$)/gm, '')
+        zip.file(`${document.name}-${idx}.csv`, documentCsvContent)
       })
       zip.generateAsync({
         type: 'base64',
