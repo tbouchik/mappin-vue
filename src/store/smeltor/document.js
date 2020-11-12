@@ -15,10 +15,29 @@ function omitKeyFromFilter(filter) {
   return formattedCopy
 }
 
+let cancelToken
+function saveDocToAPI(osmium, id) {
+  const updatedDocument = {
+    osmium: osmium,
+    status: 'validated',
+  }
+  if (typeof cancelToken !== typeof undefined) {
+    cancelToken.cancel('Operation canceled due to new request.')
+  }
+  // Save the cancel token for the current request
+  cancelToken = axios.CancelToken.source()
+  try {
+    return axios.patch(`/v1/documents/${id}`, {
+      ...updatedDocument,
+    }, { cancelToken: cancelToken.token }) // Pass the cancel token to the current request)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export default {
   state: {
     formattedDocument: {},
-    formattedDocumentCache: {},
     page: 1,
     documentsList: [],
     viewerIdList: [],
@@ -32,25 +51,22 @@ export default {
         item.key = index // This is to avoid ant design spitting on your face for
         return item // inserting items from osmium in ant table <a-table> without a unique key
       })
-      state.formattedDocumentCache = cloneDeep(state.formattedDocument)
     },
-    async SAVE_CURRENT_DOCUMENT(state, filter) {
+    SAVE_CURRENT_DOCUMENT(state, filter) {
       Object.assign(state.formattedDocument.osmium, filter)
-      Object.assign(state.formattedDocumentCache.osmium, filter)
       const updatedDocument = {
         name: document.name,
         osmium: omitKeyFromFilter(filter),
         status: 'validated',
       }
-      await DocumentService.updateDocument(
+      state.documentsList[state.documentsList.findIndex(x => x.id === state.formattedDocument.id)].osmium = filter
+      DocumentService.updateDocument(
         updatedDocument,
         state.formattedDocument.id
       )
-      state.documentsList[state.documentsList.findIndex(x => x.id === state.formattedDocument.id)].osmium = filter
     },
     CLEAR_DOCUMENT_DATA(state) {
       state.formattedDocument = null
-      state.formattedDocumentCache = null
     },
     SET_DOCUMENTS_LIST(state, documentsList) {
       documentsList.map((item, index) => { // TODO: Implement these properties in DB
@@ -79,23 +95,22 @@ export default {
     },
     MUTATION_UPDATE_ACTIVE_VALUE(state, value) {
       let updateFormattedDoc = cloneDeep(state.formattedDocument)
-      console.log(value)
       if (state.catMode) {
         let appendix = ' '.concat(value)
-        updateFormattedDoc.osmium[state.currentIdx].Value = updateFormattedDoc.osmium[state.currentIdx].Value.concat(appendix)
+        let currentValue = updateFormattedDoc.osmium[state.currentIdx].Value
+        updateFormattedDoc.osmium[state.currentIdx].Value = currentValue ? currentValue.concat(appendix) : appendix.trim()
       } else {
         updateFormattedDoc.osmium[state.currentIdx].Value = value
       }
       state.formattedDocument = updateFormattedDoc
-    },
-    MUTATION_UNDO_CHANGES_TO_DOCUMENT(state) {
-      state.formattedDocument = cloneDeep(state.formattedDocumentCache)
+      saveDocToAPI(updateFormattedDoc.osmium, state.formattedDocument.id)
     },
     MUTATION_DO_CHANGES_TO_DOCUMENT(state, changeData) {
       let { value, itemIdx, column } = changeData
       let tempDoc = cloneDeep(state.formattedDocument)
       tempDoc.osmium[itemIdx][column] = value
       state.formattedDocument = tempDoc
+      saveDocToAPI(state.formattedDocument.osmium, state.formattedDocument.id)
     },
     MUTATION_ADD_RECORD_AFTER_INDEX(state) {
       const newElement = {
@@ -164,9 +179,6 @@ export default {
     },
     ACTION_UPDATE_ACTIVE_VALUE({ commit }, idx) {
       commit('MUTATION_UPDATE_ACTIVE_VALUE', idx)
-    },
-    ACTION_UNDO_CHANGES_TO_DOCUMENT({ commit }) {
-      commit('MUTATION_UNDO_CHANGES_TO_DOCUMENT')
     },
     ACTION_DO_CHANGES_TO_DOCUMENT({ commit }, changeData) {
       commit('MUTATION_DO_CHANGES_TO_DOCUMENT', changeData)

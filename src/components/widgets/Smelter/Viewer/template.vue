@@ -111,18 +111,9 @@ export default {
     switchEditMode() {
       this.editMode = !this.editMode
     },
-    async saveVersion() {
-      this.$nprogress.start()
-      await this.$store.dispatch('SAVE_DOCUMENT', this.pageData)
-      this.$nprogress.done()
-      this.$notification['success']({
-        message: 'Saved!',
-        description: 'Changes were successfully saved',
-      })
-    },
-    cancelChanges() {
-      this.$store.dispatch('ACTION_UNDO_CHANGES_TO_DOCUMENT', this.pageData)
-    },
+    // async saveVersion() {
+    //   await this.$store.dispatch('SAVE_DOCUMENT', this.pageData)
+    // },
     handleChange(value, itemIdx, column) {
       this.$store.dispatch('ACTION_DO_CHANGES_TO_DOCUMENT', { value, itemIdx, column })
     },
