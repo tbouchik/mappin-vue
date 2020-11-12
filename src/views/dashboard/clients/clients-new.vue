@@ -62,7 +62,7 @@
       <div class="card-body">
         <div class="air__utils__scrollTable">
           <a-table :data-source="clients" :columns="columns">
-            <div
+            <!-- <div
               slot="filterDropdown"
               slot-scope="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }"
               style="padding: 8px"
@@ -93,7 +93,7 @@
               slot-scope="filtered"
               type="search"
               :style="{ color: filtered ? '#108ee9' : undefined }"
-            />
+            /> -->
             <template slot="customRender" slot-scope="text, record, index, column">
               <span v-if="searchText && searchedColumn === column.dataIndex">
                 <template
@@ -142,22 +142,22 @@ const columns = [
       filterIcon: 'filterIcon',
       customRender: 'customRender',
     },
-    sorter: (a, b) => {
-      return a.name.localeCompare(b.name)
-    },
-    sortDirections: ['descend', 'ascend'],
-    onFilter: (value, record) =>
-      record.name
-        .toString()
-        .toLowerCase()
-        .includes(value.toLowerCase()),
-    onFilterDropdownVisibleChange: visible => {
-      if (visible) {
-        setTimeout(() => {
-          this.searchInput.focus()
-        }, 0)
-      }
-    },
+    // sorter: (a, b) => {
+    //   return a.name.localeCompare(b.name)
+    // },
+    // sortDirections: ['descend', 'ascend'],
+    // onFilter: (value, record) =>
+    //   record.name
+    //     .toString()
+    //     .toLowerCase()
+    //     .includes(value.toLowerCase()),
+    // onFilterDropdownVisibleChange: visible => {
+    //   if (visible) {
+    //     setTimeout(() => {
+    //       this.searchInput.focus()
+    //     }, 0)
+    //   }
+    // },
   },
   {
     title: 'Email Address',
@@ -167,21 +167,21 @@ const columns = [
       filterIcon: 'filterIcon',
       customRender: 'customRenderComposed',
     },
-    sorter: (a, b) => {
-      return a.name.localeCompare(b.name)
-    },
-    onFilter: (value, record) =>
-      record.filter.name
-        .toString()
-        .toLowerCase()
-        .includes(value.toLowerCase()),
-    onFilterDropdownVisibleChange: visible => {
-      if (visible) {
-        setTimeout(() => {
-          this.searchInput.focus()
-        }, 0)
-      }
-    },
+    // sorter: (a, b) => {
+    //   return a.name.localeCompare(b.name)
+    // },
+    // onFilter: (value, record) =>
+    //   record.filter.name
+    //     .toString()
+    //     .toLowerCase()
+    //     .includes(value.toLowerCase()),
+    // onFilterDropdownVisibleChange: visible => {
+    //   if (visible) {
+    //     setTimeout(() => {
+    //       this.searchInput.focus()
+    //     }, 0)
+    //   }
+    // },
   },
   {
     title: 'Company',
@@ -191,21 +191,21 @@ const columns = [
       filterIcon: 'filterIcon',
       customRender: 'customRenderComposed',
     },
-    sorter: (a, b) => {
-      return a.name.localeCompare(b.name)
-    },
-    onFilter: (value, record) =>
-      record.client.name
-        .toString()
-        .toLowerCase()
-        .includes(value.toLowerCase()),
-    onFilterDropdownVisibleChange: visible => {
-      if (visible) {
-        setTimeout(() => {
-          this.searchInput.focus()
-        }, 0)
-      }
-    },
+    // sorter: (a, b) => {
+    //   return a.name.localeCompare(b.name)
+    // },
+    // onFilter: (value, record) =>
+    //   record.client.name
+    //     .toString()
+    //     .toLowerCase()
+    //     .includes(value.toLowerCase()),
+    // onFilterDropdownVisibleChange: visible => {
+    //   if (visible) {
+    //     setTimeout(() => {
+    //       this.searchInput.focus()
+    //     }, 0)
+    //   }
+    // },
   },
   {
     title: 'Phone Number',
@@ -215,21 +215,21 @@ const columns = [
       filterIcon: 'filterIcon',
       customRender: 'customRenderComposed',
     },
-    sorter: (a, b) => {
-      return a.name.localeCompare(b.name)
-    },
-    onFilter: (value, record) =>
-      record.client.name
-        .toString()
-        .toLowerCase()
-        .includes(value.toLowerCase()),
-    onFilterDropdownVisibleChange: visible => {
-      if (visible) {
-        setTimeout(() => {
-          this.searchInput.focus()
-        }, 0)
-      }
-    },
+    // sorter: (a, b) => {
+    //   return a.name.localeCompare(b.name)
+    // },
+    // onFilter: (value, record) =>
+    //   record.client.name
+    //     .toString()
+    //     .toLowerCase()
+    //     .includes(value.toLowerCase()),
+    // onFilterDropdownVisibleChange: visible => {
+    //   if (visible) {
+    //     setTimeout(() => {
+    //       this.searchInput.focus()
+    //     }, 0)
+    //   }
+    // },
   },
   {
     title: 'Action',
