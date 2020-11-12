@@ -27,6 +27,11 @@
                     v-decorator="['company', { rules: [{ required: true, message: 'Please input your client company name' }] }]"
                 />
                 </a-form-item>
+                <a-form-item label="Phone Number">
+                <a-input
+                    v-decorator="['number', { rules: [{ required: false, message: 'Please input your client company name' }] }]"
+                />
+                </a-form-item>
                 <a-form-item :wrapper-col="{ span: 12, offset: 5 }">
                 <a-button type="primary" html-type="submit">
                     Apply Changes
@@ -68,6 +73,7 @@ export default {
       name: '',
       email: '',
       company: '',
+      number: '',
     }
   },
   beforeMount() {
@@ -76,10 +82,12 @@ export default {
         this.name = client.name
         this.email = client.email
         this.company = client.company
+        this.number = client.number
         this.form.setFieldsValue({
           name: this.name,
           email: this.email,
           company: this.company,
+          number: this.number,
         })
       })
   },

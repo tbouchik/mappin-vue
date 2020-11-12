@@ -46,19 +46,12 @@
         v-decorator="['company', { rules: [{ required: true, message: 'Please input your client company name' }] }]"
       />
     </a-form-item>
-    <a-form-item label="Password" style="margin-bottom:0;">
-      <a-input :style="{ display: 'inline-block', width: 'calc(75% - 6px)' }"
-        v-decorator="['password', { rules: [{ required: true, message: 'Please input or generate a password' }] }]"
+    <a-form-item label="Phone Number">
+      <a-input
+        v-decorator="['number', { rules: [{ required: false, message: 'Please input your client phone number' }] }]"
       />
-      <span :style="{ display: 'inline-block', width: '12px', textAlign: 'center' }">
-
-      </span>
-      <a-form-item :style="{ display: 'inline-block', width: 'calc(25% - 6px)' }">
-       <a-button type="primary" icon="thunderbolt" style="width: 100%" @click="generatePassword">
-        Generate
-      </a-button>
-      </a-form-item>
     </a-form-item>
+
     <a-form-item :wrapper-col="{ span: 12, offset: 5 }">
       <a-button type="primary" html-type="submit">
         Submit
@@ -215,6 +208,30 @@ const columns = [
     },
   },
   {
+    title: 'Phone Number',
+    dataIndex: 'number',
+    scopedSlots: {
+      filterDropdown: 'filterDropdown',
+      filterIcon: 'filterIcon',
+      customRender: 'customRenderComposed',
+    },
+    sorter: (a, b) => {
+      return a.name.localeCompare(b.name)
+    },
+    onFilter: (value, record) =>
+      record.client.name
+        .toString()
+        .toLowerCase()
+        .includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: visible => {
+      if (visible) {
+        setTimeout(() => {
+          this.searchInput.focus()
+        }, 0)
+      }
+    },
+  },
+  {
     title: 'Action',
     scopedSlots: { customRender: 'action' },
   },
@@ -287,11 +304,6 @@ export default {
               this.$nprogress.done()
             })
         }
-      })
-    },
-    generatePassword() {
-      this.form.setFieldsValue({
-        password: 'Generate1',
       })
     },
   },
