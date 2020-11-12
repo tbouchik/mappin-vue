@@ -27,12 +27,22 @@
         </button>
         </div>
       </div>
-      <a-table :columns="columns" :data-source="pageData" :pagination=false bordered>
-        <template v-for="col in ['Key', 'Value']" :slot="col" slot-scope="text, record, dataIndex" >
-          <div :key="col"  v-if="col==='Key'" @click="activateIndex(dataIndex)">
+      <a-table  :columns="columns"
+                :data-source="pageData"
+                :pagination=false
+                bordered>
+        <template v-for="col in ['Key', 'Value']" :slot="col"   slot-scope="text, record, dataIndex" style="background:blue">
+          <div :key="col"  v-if="col==='Key'" @click="activateIndex(dataIndex)" >
             {{text}}
           </div>
-          <div :key="col"  v-if="col==='Value'" @click="activateIndex(dataIndex)">
+          <div :key="col"  v-if="col==='Value' && isActive(dataIndex)" @click="activateIndex(dataIndex)">
+            <a-input
+              style="margin: -5px 0; background:#CCCCFF"
+              :value="text"
+              @change="e => handleChange(e.target.value, dataIndex, col)"
+            />
+          </div>
+          <div :key="col"  v-if="col==='Value' && !isActive(dataIndex)" @click="activateIndex(dataIndex)">
             <a-input
               style="margin: -5px 0"
               :value="text"
@@ -41,7 +51,8 @@
           </div>
         </template>
       </a-table>
-      <br><br>
+      <br>
+    <br>
   </div>
 </template>
 <script>
@@ -81,7 +92,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['currentPage']),
+    ...mapGetters(['currentPage', 'currentActiveIndex']),
   },
   watch: {
     filter: function () {
@@ -114,6 +125,10 @@ export default {
     activateIndex(idx) {
       this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', idx)
     },
+    isActive(dataIndex) {
+      return dataIndex === this.currentActiveIndex
+    },
+
   },
   destroyed() {
     this.$store.dispatch('CLEAR_DOCUMENT')
@@ -122,5 +137,5 @@ export default {
 </script>
 
 <style lang="scss" module>
-@import "./style.module.scss"
+@import "./style.module.scss";
 </style>

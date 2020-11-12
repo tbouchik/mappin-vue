@@ -22,7 +22,7 @@ export default {
     page: 1,
     documentsList: [],
     viewerIdList: [],
-    currentIdx: null,
+    currentIdx: 0,
   },
   mutations: {
     UPDATE_DOCUMENT_DATA(state, document) {
@@ -97,7 +97,7 @@ export default {
         'key': uuidv4(),
       }
       let tempDoc = cloneDeep(state.formattedDocument)
-      if (state.currentIdx !== null) {
+      if (state.currentIdx !== null) { // TODO Since currenIdx is no longer null as default, This condition is probably deprecated
         tempDoc.osmium.splice(state.currentIdx + 1, 0, newElement)
       } else {
         tempDoc.osmium.push(newElement)
@@ -177,6 +177,6 @@ export default {
     smeltedIdList: state => state.documentsList.filter(x => {
       return x.status === 'smelted'
     }).map(x => x.id),
-
+    currentActiveIndex: state => state.currentIdx,
   },
 }

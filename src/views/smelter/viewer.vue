@@ -66,6 +66,7 @@ export default {
     documentId: function() {
       return DocumentService.fetchDocument(this.documentId).then(doc => {
         this.$store.dispatch('UPDATE_DOCUMENT', doc.data)
+        this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', 0)
       })
     },
     current: function() {
