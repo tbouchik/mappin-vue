@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
-import { cloneDeep, omit, get } from 'lodash'
+import { cloneDeep, omit, get, pick } from 'lodash'
 import DocumentService from '../../services/documentService.js'
 import uuidv4 from 'uuid/v4'
 
@@ -16,6 +16,7 @@ function omitKeyFromFilter(filter) {
 }
 
 let cancelToken
+
 function saveDocToAPI(osmium, id) {
   const updatedDocument = {
     osmium: osmium,
@@ -35,6 +36,30 @@ function saveDocToAPI(osmium, id) {
   }
 }
 
+function fetchDocuments(queryParams) {
+  console.log(queryParams)
+  const { client, page, limit, sort } = queryParams
+  return axios.get(`/v1/documents`, { params: {
+    client,
+    limit,
+    sort,
+    page: page - 1,
+  } })
+    .then(
+      ({ data }) => data
+    )
+}
+
+function fetchDocumentsCount(queryParams) {
+  const { client } = queryParams
+  return axios.get('/v1/documents/count', { params: {
+    client,
+  } })
+    .then(
+      ({ data }) => data
+    )
+}
+
 export default {
   state: {
     formattedDocument: {},
@@ -43,6 +68,11 @@ export default {
     viewerIdList: [],
     currentIdx: 0,
     catMode: false,
+    pagination: {
+      limit: 10,
+      page: 1,
+    },
+    loading: false,
   },
   mutations: {
     UPDATE_DOCUMENT_DATA(state, document) {
@@ -142,6 +172,31 @@ export default {
     MUTATION_TOGGLE_CATMODE(state) {
       state.catMode = !state.catMode
     },
+    MUTATION_FETCH_DOCUMENTS_WITH_PARAMS(state, payload) {
+      Object.assign(state.pagination, pick(payload, ['limit', 'page']))
+      const queryParams = omit(payload, ['loading'])
+      state.loading = !!payload.loading
+      fetchDocuments(queryParams)
+        .then(documentsList => {
+          documentsList.map((item, index) => { // TODO: Implement these properties in DB
+            item.date = item.createdAt
+            item.key = index
+            return item
+          })
+          state.documentsList = documentsList.sort((a, b) => {
+            return -(new Date(a.date) - new Date(b.date))
+          },)
+          state.loading = false
+        })
+    },
+    MUTATION_FETCH_COUNT_DOCUMENTS(state, filters) {
+      fetchDocumentsCount(filters)
+        .then(data => {
+          const newPagination = Object.assign({}, state.pagination)
+          newPagination.total = data.count
+          state.pagination = newPagination
+        })
+    },
   },
   actions: {
     UPDATE_DOCUMENT({ commit }, document) {
@@ -158,6 +213,9 @@ export default {
         .then(({ data }) => {
           commit('SET_DOCUMENTS_LIST', data)
         })
+    },
+    ACTION_FETCH_DOCUMENTS_WITH_PARAMS({ commit }, payload) {
+      commit('MUTATION_FETCH_DOCUMENTS_WITH_PARAMS', payload)
     },
     REMOVE_DOCUMENT({ commit }, id) {
       return axios.delete(`/v1/documents/${id}`,)
@@ -192,6 +250,9 @@ export default {
     ACTION_TOGGLE_CATMODE({ commit }) {
       commit('MUTATION_TOGGLE_CATMODE')
     },
+    ACTION_FETCH_COUNT_DOCUMENTS({ commit }, filters) {
+      commit('MUTATION_FETCH_COUNT_DOCUMENTS', filters)
+    },
   },
   getters: {
     current: state => state.formattedDocument,
@@ -204,5 +265,7 @@ export default {
     }).map(x => x.id),
     currentActiveIndex: state => state.currentIdx,
     catMode: state => state.catMode,
+    docTableLoading: state => state.loading,
+    docTablePagination: state => state.pagination,
   },
 }

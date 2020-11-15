@@ -57,7 +57,11 @@
       </div>
       <div class="card-body">
         <div class="air__utils__scrollTable">
-          <a-table :data-source="documentsList" :columns="columns">
+          <a-table  :data-source="documentsList"
+                    :columns="columns"
+                    :pagination="docTablePagination"
+                    :loading="docTableLoading"
+                    @change="handleTableChange">
             <!-- <div
               slot="filterDropdown"
               slot-scope="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }"
@@ -90,7 +94,7 @@
               type="search"
               :style="{ color: filtered ? '#108ee9' : undefined }"
             /> -->
-            <template slot="customRender" slot-scope="text, record, index, column">
+            <!-- <template slot="customRender" slot-scope="text, record, index, column">
               <span v-if="searchText && searchedColumn === column.dataIndex">
                 <template
                   v-for="(fragment, i) in text
@@ -106,7 +110,7 @@
                 </template>
               </span>
               <template v-else>{{ text }}</template>
-            </template>
+            </template> -->
             <template slot="customRenderComposed" slot-scope="text, record, index, column">
               <span v-if="searchText && searchedColumn === column.dataIndex">
                 <template
@@ -272,9 +276,9 @@ export default {
   name: 'Documents',
   data: function() {
     return {
-      searchText: '',
-      searchInput: null,
-      searchedColumn: '',
+      // searchText: '',
+      // searchInput: null,
+      // searchedColumn: '',
       timeInterval: null,
       columns,
 
@@ -287,7 +291,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['documentsList', 'smeltedIdList']),
+    ...mapGetters(['documentsList', 'smeltedIdList', 'docTablePagination', 'docTableLoading']),
     everythingIsValidated: function () {
       return this.smeltedIdList.length === 0
     },
@@ -298,10 +302,22 @@ export default {
   created() {
     if (this.clientId) {
       this.$store.dispatch('ACTION_FETCH_CLIENT_DOCUMENTS', this.clientId)
+      this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', { client: this.clientId,
+      })
     } else {
-      this.$store.dispatch('FETCH_DOCUMENTS')
+      this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
+        limit: this.docTablePagination.limit,
+        page: this.docTablePagination.page,
+        loading: true,
+      })
+      this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
+      })
       this.timeInterval = setInterval(() => {
-        this.$store.dispatch('FETCH_DOCUMENTS')
+        this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
+          limit: this.docTablePagination.limit,
+          page: this.docTablePagination.page,
+          loading: false,
+        })
       }, 10000)
     }
   },
@@ -311,15 +327,15 @@ export default {
     }
   },
   methods: {
-    handleSearch(selectedKeys, confirm, dataIndex) {
-      confirm()
-      this.searchText = selectedKeys[0]
-      this.searchedColumn = dataIndex
-    },
-    handleReset(clearFilters) {
-      clearFilters()
-      this.searchText = ''
-    },
+    // handleSearch(selectedKeys, confirm, dataIndex) {
+    //   confirm()
+    //   this.searchText = selectedKeys[0]
+    //   this.searchedColumn = dataIndex
+    // },
+    // handleReset(clearFilters) {
+    //   clearFilters()
+    //   this.searchText = ''
+    // },
     view(record) {
       this.$router.push({ name: 'viewer', params: { documentId: record.id } })
     },
@@ -350,6 +366,26 @@ export default {
         type: 'base64',
       }).then(function(content) {
         window.location.href = 'data:application/zip;base64,' + content
+      })
+    },
+    handleTableChange(pagination, filters, sorter) {
+      console.log(pagination, filters, sorter)
+      const pager = { ...this.pagination }
+      pager.current = pagination.current
+      this.pagination = pager
+      // this.$store.({
+      //   limit: pagination.pageSize,
+      //   page: pagination.current,
+      //   // sortField: sorter.field,
+      //   // sortOrder: sorter.order,
+      //   // ...filters,
+      // });
+      this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
+        limit: pagination.pageSize,
+        page: pagination.current,
+        loading: true,
+      })
+      this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
       })
     },
   },
