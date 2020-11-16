@@ -61,7 +61,11 @@
           </div></div>
       <div class="card-body">
         <div class="air__utils__scrollTable">
-          <a-table :data-source="clients" :columns="columns">
+          <a-table :data-source="clients"
+                    :columns="columns"
+                    :pagination="clientTablePagination"
+                    :loading="clientTableLoading"
+                    @change="handleTableChange">
             <!-- <div
               slot="filterDropdown"
               slot-scope="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }"
@@ -250,10 +254,14 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['clients']),
+    ...mapGetters(['clients', 'clientTableLoading', 'clientTablePagination']),
   },
   created() {
-    this.$store.dispatch('ACTION_FETCH_CLIENTS')
+    this.$store.dispatch('ACTION_FETCH_CLIENTS', {
+      limit: this.clientTablePagination.limit,
+      page: this.clientTablePagination.page,
+    })
+    this.$store.dispatch('ACTION_FETCH_COUNT_CLIENTS', {})
   },
   methods: {
     handleSearch(selectedKeys, confirm, dataIndex) {
@@ -304,6 +312,18 @@ export default {
               this.$nprogress.done()
             })
         }
+      })
+    },
+    handleTableChange(pagination, filters, sorter) {
+      console.log(pagination, filters, sorter)
+      const pager = { ...this.clientTablePagination }
+      pager.current = pagination.current
+      this.clientTablePagination = pager
+      this.$store.dispatch('ACTION_FETCH_CLIENTS', {
+        limit: pagination.pageSize,
+        page: pagination.current,
+      })
+      this.$store.dispatch('ACTION_FETCH_COUNT_CLIENTS', {
       })
     },
   },

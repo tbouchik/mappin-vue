@@ -370,16 +370,9 @@ export default {
     },
     handleTableChange(pagination, filters, sorter) {
       console.log(pagination, filters, sorter)
-      const pager = { ...this.pagination }
+      const pager = { ...this.docTablePagination }
       pager.current = pagination.current
-      this.pagination = pager
-      // this.$store.({
-      //   limit: pagination.pageSize,
-      //   page: pagination.current,
-      //   // sortField: sorter.field,
-      //   // sortOrder: sorter.order,
-      //   // ...filters,
-      // });
+      this.docTablePagination = pager
       this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
         limit: pagination.pageSize,
         page: pagination.current,

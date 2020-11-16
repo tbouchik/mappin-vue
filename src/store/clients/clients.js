@@ -1,17 +1,48 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, pick } from 'lodash'
 
 Vue.use(Vuex)
+
+function fetchClients(queryParams) {
+  console.log(queryParams)
+  const { page, limit, sort } = queryParams
+  return axios.get(`/v1/clients`, { params: {
+    limit,
+    sort,
+    page: page - 1,
+  } })
+    .then(
+      ({ data }) => data
+    )
+}
+
+function fetchClientsCount() {
+  return axios.get('/v1/clients/count')
+    .then(
+      ({ data }) => data
+    )
+}
 
 export default {
   state: {
     clientsList: [],
+    pagination: {
+      limit: 10,
+      page: 1,
+    },
+    loading: false,
   },
   mutations: {
-    MUTATION_SET_CLIENTS(state, data) {
-      state.clientsList = data
+    MUTATION_SET_CLIENTS(state, payload) {
+      state.loading = true
+      Object.assign(state.pagination, pick(payload, ['limit', 'page']))
+      fetchClients(payload)
+        .then(data => {
+          state.clientsList = data
+          state.loading = false
+        })
     },
     async MUTATION_UPDATE_CLIENT(state, payload) {
       let clientIdx = state.clientsList.findIndex(item => payload.id === item.id)
@@ -27,13 +58,18 @@ export default {
     MUTATION_REMOVE_CLIENT(state, id) {
       state.clientsList = state.clientsList.filter(item => item.id !== id)
     },
+    MUTATION_FETCH_COUNT_CLIENTS(state) {
+      fetchClientsCount()
+        .then(data => {
+          const newPagination = Object.assign({}, state.pagination)
+          newPagination.total = data.count
+          state.pagination = newPagination
+        })
+    },
   },
   actions: {
-    ACTION_FETCH_CLIENTS({ commit }) {
-      return axios.get(`/v1/clients`,)
-        .then(({ data }) => {
-          commit('MUTATION_SET_CLIENTS', data)
-        })
+    ACTION_FETCH_CLIENTS({ commit }, payload) {
+      commit('MUTATION_SET_CLIENTS', payload)
     },
     ACTION_UPDATE_CLIENT({ commit }, payload) {
       commit('MUTATION_UPDATE_CLIENT', payload)
@@ -44,8 +80,13 @@ export default {
     ACTION_REMOVE_CLIENT({ commit }, payload) {
       commit('MUTATION_REMOVE_CLIENT', payload)
     },
+    ACTION_FETCH_COUNT_CLIENTS({ commit }, filters) {
+      commit('MUTATION_FETCH_COUNT_CLIENTS', filters)
+    },
   },
   getters: {
     clients: state => state.clientsList,
+    clientTableLoading: state => state.loading,
+    clientTablePagination: state => state.pagination,
   },
 }
