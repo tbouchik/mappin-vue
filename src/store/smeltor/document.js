@@ -184,19 +184,6 @@ export default {
       }
       state.formattedDocument = cloneDeep(tempDoc)
     },
-    MUTATION_FETCH_CLIENT_DOCUMENTS(state, id) {
-      DocumentService.fetchDocumentsByClient(id)
-        .then(documentsList => {
-          documentsList = documentsList.map((item, index) => { // TODO: Implement these properties in DB
-            item.date = item.createdAt
-            item.key = index
-            return item
-          })
-          state.documentsList = documentsList.sort((a, b) => {
-            return -(new Date(a.date) - new Date(b.date))
-          },)
-        })
-    },
     MUTATION_TOGGLE_CATMODE(state) {
       state.catMode = !state.catMode
     },
@@ -271,9 +258,6 @@ export default {
     },
     ACTION_ADD_RECORD_AFTER_INDEX({ commit }) {
       commit('MUTATION_ADD_RECORD_AFTER_INDEX')
-    },
-    ACTION_FETCH_CLIENT_DOCUMENTS({ commit }, clientId) {
-      commit('MUTATION_FETCH_CLIENT_DOCUMENTS', clientId)
     },
     ACTION_TOGGLE_CATMODE({ commit }) {
       commit('MUTATION_TOGGLE_CATMODE')

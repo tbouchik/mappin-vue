@@ -58,7 +58,7 @@
         </div>
       </div>
       <br />
-      <div class="card-body">
+      <div v-if="!clientViz" class="card-body">
         <a-collapse expand-icon-position="right" style="background: #eef3fc">
           <a-collapse-panel key="1" header="Filter Settings">
             <br>
@@ -208,7 +208,7 @@ export default {
   data: function () {
     return {
       timeInterval: null,
-      searchedName: '',
+      searchedName: null,
       searchedStatus: null,
       searchedTemplate: null,
       form: this.$form.createForm(this, { name: 'filter_form' }),
@@ -223,9 +223,8 @@ export default {
   },
   watch: {
     searchedName: function() {
-      console.log(this.docTablePagination.limit)
-
       this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
+        client: this.clientId,
         limit: this.docTablePagination.limit,
         page: this.docTablePagination.page,
         name: this.searchedName,
@@ -241,6 +240,7 @@ export default {
     },
     searchedStatus: function() {
       this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
+        client: this.clientId,
         limit: this.docTablePagination.limit,
         page: this.docTablePagination.page,
         name: this.searchedName,
@@ -256,6 +256,7 @@ export default {
     },
     searchedTemplate: function() {
       this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
+        client: this.clientId,
         limit: this.docTablePagination.limit,
         page: this.docTablePagination.page,
         name: this.searchedName,
@@ -287,12 +288,18 @@ export default {
   },
   created() {
     if (this.clientId) {
-      this.$store.dispatch('ACTION_FETCH_CLIENT_DOCUMENTS', this.clientId)
+      this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
+        client: this.clientId,
+        limit: this.docTablePagination.limit,
+        page: this.docTablePagination.page,
+        loading: true,
+      })
       this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
         client: this.clientId,
       })
     } else {
       this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
+        client: this.clientId,
         limit: this.docTablePagination.limit,
         page: this.docTablePagination.page,
         loading: true,
@@ -300,6 +307,7 @@ export default {
       this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {})
       this.timeInterval = setInterval(() => {
         this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
+          client: this.clientId,
           limit: this.docTablePagination.limit,
           page: this.docTablePagination.page,
           name: this.searchedName,
@@ -365,6 +373,7 @@ export default {
     handleTableChange(pagination, filters, sorter) {
       console.log(pagination, filters, sorter)
       this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
+        client: this.clientId,
         limit: pagination.pageSize,
         page: pagination.current,
         name: this.searchedName,
@@ -373,6 +382,7 @@ export default {
         loading: true,
       })
       this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
+        client: this.clientId,
         name: this.searchedName,
         filter: this.searchedTemplate,
         status: this.searchedStatus,

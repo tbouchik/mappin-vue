@@ -28,8 +28,34 @@
           </button>
         </div>
       </div>
+      <br/>
+        <div class="card-body">
+        <a-collapse expand-icon-position="right" style="background: #eef3fc">
+          <a-collapse-panel key="1" header="Filter Settings">
+            <br>
+            <a-form
+              :form="form"
+              :label-col="{ span: 5 }"
+              :wrapper-col="{ span: 12 }"
+            >
+              <a-form-item label="Name">
+                <a-input
+                  placeholder="Type the Client's name"
+                  v-model="searchedName"
+                />
+              </a-form-item>
+
+              <a-form-item :wrapper-col="{ span: 12, offset: 5 }">
+                <a-button type="primary" @click="resetFilterSettings" ghost> Reset Settings </a-button>
+              </a-form-item>
+            </a-form>
+            <a-icon slot="extra" type="filter" />
+          </a-collapse-panel>
+        </a-collapse>
+      </div>
       <div class="card" v-if="addMode">
           <div class="card-body">
+            <br/>
       <a-form :form="form" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }" @submit.prevent="handleSubmit">
     <a-form-item label="Full Name">
       <a-input
@@ -66,54 +92,8 @@
                     :pagination="clientTablePagination"
                     :loading="clientTableLoading"
                     @change="handleTableChange">
-            <!-- <div
-              slot="filterDropdown"
-              slot-scope="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }"
-              style="padding: 8px"
-            >
-              <a-input
-                v-ant-ref="c => (searchInput = c)"
-                :placeholder="`Search ${column.dataIndex}`"
-                :value="selectedKeys[0]"
-                style="width: 188px; margin-bottom: 8px; display: block;"
-                @change="e => setSelectedKeys(e.target.value ? [e.target.value] : [])"
-                @pressEnter="() => handleSearch(selectedKeys, confirm, column.dataIndex)"
-              />
-              <a-button
-                type="primary"
-                icon="search"
-                size="small"
-                style="width: 90px; margin-right: 8px"
-                @click="() => handleSearch(selectedKeys, confirm, column.dataIndex)"
-              >Search</a-button>
-              <a-button
-                size="small"
-                style="width: 90px"
-                @click="() => handleReset(clearFilters)"
-              >Reset</a-button>
-            </div>
-            <a-icon
-              slot="filterIcon"
-              slot-scope="filtered"
-              type="search"
-              :style="{ color: filtered ? '#108ee9' : undefined }"
-            /> -->
-            <template slot="customRender" slot-scope="text, record, index, column">
-              <span v-if="searchText && searchedColumn === column.dataIndex">
-                <template
-                  v-for="(fragment, i) in text
-            .toString()
-            .split(new RegExp(`(?<=${searchText})|(?=${searchText})`, 'i'))"
-                >
-                  <mark
-                    v-if="fragment.toLowerCase() === searchText.toLowerCase()"
-                    :key="i"
-                    class="highlight"
-                  >{{ fragment }}</mark>
-                  <template v-else>{{ fragment }}</template>
-                </template>
-              </span>
-              <template v-else>{{ text }}</template>
+            <template slot="customRender" slot-scope="text">
+              <template >{{ text }}</template>
             </template>
             <!-- <span slot="status" slot-scope="text" >{{text}}</span> -->
             <span slot="action" slot-scope="record">
@@ -146,22 +126,6 @@ const columns = [
       filterIcon: 'filterIcon',
       customRender: 'customRender',
     },
-    // sorter: (a, b) => {
-    //   return a.name.localeCompare(b.name)
-    // },
-    // sortDirections: ['descend', 'ascend'],
-    // onFilter: (value, record) =>
-    //   record.name
-    //     .toString()
-    //     .toLowerCase()
-    //     .includes(value.toLowerCase()),
-    // onFilterDropdownVisibleChange: visible => {
-    //   if (visible) {
-    //     setTimeout(() => {
-    //       this.searchInput.focus()
-    //     }, 0)
-    //   }
-    // },
   },
   {
     title: 'Email Address',
@@ -171,21 +135,6 @@ const columns = [
       filterIcon: 'filterIcon',
       customRender: 'customRenderComposed',
     },
-    // sorter: (a, b) => {
-    //   return a.name.localeCompare(b.name)
-    // },
-    // onFilter: (value, record) =>
-    //   record.filter.name
-    //     .toString()
-    //     .toLowerCase()
-    //     .includes(value.toLowerCase()),
-    // onFilterDropdownVisibleChange: visible => {
-    //   if (visible) {
-    //     setTimeout(() => {
-    //       this.searchInput.focus()
-    //     }, 0)
-    //   }
-    // },
   },
   {
     title: 'Company',
@@ -195,21 +144,6 @@ const columns = [
       filterIcon: 'filterIcon',
       customRender: 'customRenderComposed',
     },
-    // sorter: (a, b) => {
-    //   return a.name.localeCompare(b.name)
-    // },
-    // onFilter: (value, record) =>
-    //   record.client.name
-    //     .toString()
-    //     .toLowerCase()
-    //     .includes(value.toLowerCase()),
-    // onFilterDropdownVisibleChange: visible => {
-    //   if (visible) {
-    //     setTimeout(() => {
-    //       this.searchInput.focus()
-    //     }, 0)
-    //   }
-    // },
   },
   {
     title: 'Phone Number',
@@ -219,21 +153,6 @@ const columns = [
       filterIcon: 'filterIcon',
       customRender: 'customRenderComposed',
     },
-    // sorter: (a, b) => {
-    //   return a.name.localeCompare(b.name)
-    // },
-    // onFilter: (value, record) =>
-    //   record.client.name
-    //     .toString()
-    //     .toLowerCase()
-    //     .includes(value.toLowerCase()),
-    // onFilterDropdownVisibleChange: visible => {
-    //   if (visible) {
-    //     setTimeout(() => {
-    //       this.searchInput.focus()
-    //     }, 0)
-    //   }
-    // },
   },
   {
     title: 'Action',
@@ -244,14 +163,23 @@ export default {
   name: 'ClientsNewDashboard',
   data: function() {
     return {
-      searchText: '',
-      searchInput: null,
-      searchedColumn: '',
-      timeInterval: null,
-      columns,
+      searchedName: null,
       addMode: false,
       form: this.$form.createForm(this, { name: 'coordinated' }),
+      columns,
     }
+  },
+  watch: {
+    searchedName: function() {
+      this.$store.dispatch('ACTION_FETCH_CLIENTS', {
+        limit: this.clientTablePagination.limit,
+        page: this.clientTablePagination.page,
+        name: this.searchedName,
+      })
+      this.$store.dispatch('ACTION_FETCH_COUNT_CLIENTS', {
+        name: this.searchedName,
+      })
+    },
   },
   computed: {
     ...mapGetters(['clients', 'clientTableLoading', 'clientTablePagination']),
@@ -325,6 +253,9 @@ export default {
       })
       this.$store.dispatch('ACTION_FETCH_COUNT_CLIENTS', {
       })
+    },
+    resetFilterSettings() {
+      this.searchedName = null
     },
   },
 }

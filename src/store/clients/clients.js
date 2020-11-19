@@ -5,21 +5,39 @@ import { cloneDeep, pick } from 'lodash'
 
 Vue.use(Vuex)
 
+let cancelToken
+
 function fetchClients(queryParams) {
-  console.log(queryParams)
-  const { page, limit, sort } = queryParams
-  return axios.get(`/v1/clients`, { params: {
+  const { page, limit, name } = queryParams
+  if (typeof cancelToken !== typeof undefined) {
+    cancelToken.cancel('Operation canceled due to new request.')
+  }
+  // Save the cancel token for the current request
+  cancelToken = axios.CancelToken.source()
+  const params = {
     limit,
-    sort,
     page: page - 1,
-  } })
-    .then(
-      ({ data }) => data
-    )
+  }
+  if (name && name !== '') {
+    params.name = name
+  }
+  try {
+    return axios.get(`/v1/clients`, { params }, { cancelToken: cancelToken.token })
+      .then(
+        ({ data }) => data
+      )
+  } catch (error) {
+    console.log(error)
+  }
 }
 
-function fetchClientsCount() {
-  return axios.get('/v1/clients/count')
+function fetchClientsCount(queryParams) {
+  const { name } = queryParams
+  const params = {}
+  if (name && name !== '') {
+    params.name = name
+  }
+  return axios.get('/v1/clients/count', { params })
     .then(
       ({ data }) => data
     )
@@ -58,8 +76,8 @@ export default {
     MUTATION_REMOVE_CLIENT(state, id) {
       state.clientsList = state.clientsList.filter(item => item.id !== id)
     },
-    MUTATION_FETCH_COUNT_CLIENTS(state) {
-      fetchClientsCount()
+    MUTATION_FETCH_COUNT_CLIENTS(state, payload) {
+      fetchClientsCount(payload)
         .then(data => {
           const newPagination = Object.assign({}, state.pagination)
           newPagination.total = data.count
