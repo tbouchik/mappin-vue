@@ -13,6 +13,10 @@
       </a-steps>
       <br>
       <div>
+        <template v-if="steps[uploaderStep].title == 'Client'">
+        <a-input-search placeholder="Search Client" v-model="searchedClient" />
+        <br> <br> <br>
+        </template>
           <div v-if="steps[uploaderStep].title == 'Client'">
             <!-- <clients-dashboard
               class="card-body steps-content"
@@ -23,8 +27,8 @@
               <a-list :data-source="clients">
                 <a-list-item  slot="renderItem" slot-scope="item">
                   <a-list-item-meta :description="item.email">
-                    <a slot="title">{{ item.name }}</a> -
-                    <a slot="title">{{ item.company }}</a>
+                    <a slot="title">{{ item.name }} | </a>
+                    <a slot="title"> {{ item.company }}</a>
                   </a-list-item-meta>
                   <a-button type="primary" @click="selectClient(item)" ghost>
                     select
@@ -72,6 +76,7 @@ export default {
       clientsComponentReadMode: true,
       perPage: 5,
       nextIsEnabled: false,
+      searchedClient: null,
       steps: [
         {
           title: 'Client',
@@ -85,11 +90,25 @@ export default {
       ],
     }
   },
+  watch: {
+    searchedClient: function() {
+      console.log(this.searchedClient)
+      this.$store.dispatch('ACTION_FETCH_CLIENTS', {
+        limit: 100,
+        page: 1,
+        name: this.searchedClient,
+      })
+    },
+  },
   computed: {
     ...mapGetters(['uploaderStep', 'uploaderClient', 'uploaderFilter', 'uploaderNextIsEnabled', 'filters', 'clients']),
   },
   created() {
-    this.$store.dispatch('ACTION_FETCH_CLIENTS')
+    this.$store.dispatch('ACTION_FETCH_CLIENTS', {
+      limit: 100,
+      page: 1,
+      name: this.searchedClient,
+    })
     this.$store.dispatch('ACTION_FETCH_FILTERS')
   },
   destroyed() {
