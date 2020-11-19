@@ -78,9 +78,8 @@
                   v-model="searchedTemplate"
                   placeholder="Select a Template"
                 >
-                  <template>
-                    <a-select-option value="male"> male </a-select-option>
-                    <a-select-option value="female"> female </a-select-option>
+                  <template v-for="(template, index) in filters">
+                    <a-select-option :key="index" :value="template._id"> {{template.name}} </a-select-option>
                   </template>
                 </a-select>
               </a-form-item>
@@ -223,53 +222,53 @@ export default {
     },
   },
   watch: {
-    searchedName: async function() {
+    searchedName: function() {
       console.log(this.docTablePagination.limit)
 
       this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
         limit: this.docTablePagination.limit,
         page: this.docTablePagination.page,
         name: this.searchedName,
-        template: this.searchedTemplate,
+        filter: this.searchedTemplate,
         status: this.searchedStatus,
         loading: true,
       })
       this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
         name: this.searchedName,
-        template: this.searchedTemplate,
+        filter: this.searchedTemplate,
         status: this.searchedStatus,
       })
     },
-    searchedStatus: async function() {
+    searchedStatus: function() {
       this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
         limit: this.docTablePagination.limit,
         page: this.docTablePagination.page,
         name: this.searchedName,
-        template: this.searchedTemplate,
+        filter: this.searchedTemplate,
         status: this.searchedStatus,
         loading: true,
       })
       this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
         name: this.searchedName,
-        template: this.searchedTemplate,
+        filter: this.searchedTemplate,
         status: this.searchedStatus,
       })
     },
-    // searchedTemplate: async function() {
-    //   this.$store.dispatch("ACTION_FETCH_DOCUMENTS_WITH_PARAMS", {
-    //     limit: this.docTablePagination.limit,
-    //     page: this.docTablePagination.page,
-    //     name: this.searchedName,
-    //     template: this.searchedTemplate,
-    //     status: this.searchedStatus,
-    //     loading: true,
-    //   });
-    //   this.$store.dispatch("ACTION_FETCH_COUNT_DOCUMENTS", {
-    //     name: this.searchedName,
-    //     template: this.searchedTemplate,
-    //     status: this.searchedStatus,
-    //   });
-    // },
+    searchedTemplate: function() {
+      this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
+        limit: this.docTablePagination.limit,
+        page: this.docTablePagination.page,
+        name: this.searchedName,
+        filter: this.searchedTemplate,
+        status: this.searchedStatus,
+        loading: true,
+      })
+      this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
+        name: this.searchedName,
+        filter: this.searchedTemplate,
+        status: this.searchedStatus,
+      })
+    },
   },
   computed: {
     ...mapGetters([
@@ -277,6 +276,7 @@ export default {
       'smeltedIdList',
       'docTablePagination',
       'docTableLoading',
+      'filters',
     ]),
     everythingIsValidated: function () {
       return this.smeltedIdList.length === 0
@@ -303,11 +303,12 @@ export default {
           limit: this.docTablePagination.limit,
           page: this.docTablePagination.page,
           name: this.searchedName,
-          template: this.searchedTemplate,
+          filter: this.searchedTemplate,
           status: this.searchedStatus,
           loading: false,
         })
       }, 10000)
+      this.$store.dispatch('ACTION_FETCH_FILTERS')
     }
   },
   destroyed() {
@@ -367,13 +368,13 @@ export default {
         limit: pagination.pageSize,
         page: pagination.current,
         name: this.searchedName,
-        template: this.searchedTemplate,
+        filter: this.searchedTemplate,
         status: this.searchedStatus,
         loading: true,
       })
       this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
         name: this.searchedName,
-        template: this.searchedTemplate,
+        filter: this.searchedTemplate,
         status: this.searchedStatus,
       })
     },
