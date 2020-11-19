@@ -1,6 +1,6 @@
 <template>
   <div>
-    <br>
+    <br />
     <div class="air__utils__heading">
       <b-row>
         <b-col md="3" class="my-1">
@@ -13,8 +13,10 @@
         <div class="d-flex flex-column justify-content-center mr-auto col-4">
           <h5 class="mb-0">Your extractions</h5>
         </div>
-        <div class="d-flex flex-column justify-content-center col-2"
-        style="float: right">
+        <div
+          class="d-flex flex-column justify-content-center col-2"
+          style="float: right"
+        >
           <button
             type="button"
             class="btn btn-primary btn-with-addon mr-auto text-nowrap d-none d-md-block"
@@ -25,9 +27,9 @@
             </span>
             Upload Documents
           </button>
-          </div>
+        </div>
         <div class="d-flex flex-column justify-content-center col-2">
-        <button
+          <button
             type="button"
             class="btn btn-success btn-with-addon mr-auto text-nowrap d-none d-md-block"
             :disabled="everythingIsValidated"
@@ -42,7 +44,7 @@
       </div>
       <div v-if="clientViz" class="card-header card-header-flex row">
         <div class="d-flex flex-column justify-content-center col-2">
-        <button
+          <button
             type="button"
             class="btn btn-success btn-with-addon mr-auto text-nowrap d-none d-md-block"
             :disabled="!documentsList.length"
@@ -55,91 +57,92 @@
           </button>
         </div>
       </div>
+      <br />
+      <div class="card-body">
+        <a-collapse expand-icon-position="right" style="background: #eef3fc">
+          <a-collapse-panel key="1" header="Filter Settings">
+            <br>
+            <a-form
+              :form="form"
+              :label-col="{ span: 5 }"
+              :wrapper-col="{ span: 12 }"
+            >
+              <a-form-item label="Name">
+                <a-input
+                  placeholder="Type the Document's name"
+                  v-model="searchedName"
+                />
+              </a-form-item>
+              <a-form-item label="Template">
+                <a-select
+                  v-model="searchedTemplate"
+                  placeholder="Select a Template"
+                >
+                  <template>
+                    <a-select-option value="male"> male </a-select-option>
+                    <a-select-option value="female"> female </a-select-option>
+                  </template>
+                </a-select>
+              </a-form-item>
+              <a-form-item label="Status">
+                <a-select
+                  v-model="searchedStatus"
+                  placeholder="Select a Status"
+                >
+                  <template>
+                    <a-select-option value="pending"> Pending </a-select-option>
+                    <a-select-option value="smelted"> Smelted </a-select-option>
+                    <a-select-option value="validated"> Validated </a-select-option>
+                  </template>
+                </a-select>
+              </a-form-item>
+              <a-form-item :wrapper-col="{ span: 12, offset: 5 }">
+                <a-button type="primary" @click="resetFilterSettings" ghost> Reset Settings </a-button>
+              </a-form-item>
+            </a-form>
+            <a-icon slot="extra" type="filter" />
+          </a-collapse-panel>
+        </a-collapse>
+      </div>
       <div class="card-body">
         <div class="air__utils__scrollTable">
-          <a-table  :data-source="documentsList"
-                    :columns="columns"
-                    :pagination="docTablePagination"
-                    :loading="docTableLoading"
-                    @change="handleTableChange">
-            <!-- <div
-              slot="filterDropdown"
-              slot-scope="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }"
-              style="padding: 8px"
-            >
-              <a-input
-                v-ant-ref="c => (searchInput = c)"
-                :placeholder="`Search ${column.dataIndex}`"
-                :value="selectedKeys[0]"
-                style="width: 188px; margin-bottom: 8px; display: block;"
-                @change="e => setSelectedKeys(e.target.value ? [e.target.value] : [])"
-                @pressEnter="() => handleSearch(selectedKeys, confirm, column.dataIndex)"
-              />
-              <a-button
-                type="primary"
-                icon="search"
-                size="small"
-                style="width: 90px; margin-right: 8px"
-                @click="() => handleSearch(selectedKeys, confirm, column.dataIndex)"
-              >Search</a-button>
-              <a-button
-                size="small"
-                style="width: 90px"
-                @click="() => handleReset(clearFilters)"
-              >Reset</a-button>
-            </div>
+          <a-table
+            :data-source="documentsList"
+            :columns="columns"
+            :pagination="docTablePagination"
+            :loading="docTableLoading"
+            @change="handleTableChange"
+          >
             <a-icon
               slot="filterIcon"
               slot-scope="filtered"
               type="search"
               :style="{ color: filtered ? '#108ee9' : undefined }"
-            /> -->
-            <!-- <template slot="customRender" slot-scope="text, record, index, column">
-              <span v-if="searchText && searchedColumn === column.dataIndex">
-                <template
-                  v-for="(fragment, i) in text
-            .toString()
-            .split(new RegExp(`(?<=${searchText})|(?=${searchText})`, 'i'))"
-                >
-                  <mark
-                    v-if="fragment.toLowerCase() === searchText.toLowerCase()"
-                    :key="i"
-                    class="highlight"
-                  >{{ fragment }}</mark>
-                  <template v-else>{{ fragment }}</template>
-                </template>
-              </span>
-              <template v-else>{{ text }}</template>
-            </template> -->
-            <template slot="customRenderComposed" slot-scope="text, record, index, column">
-              <span v-if="searchText && searchedColumn === column.dataIndex">
-                <template
-                  v-for="(fragment, i) in text
-            .toString()
-            .split(new RegExp(`(?<=${searchText})|(?=${searchText})`, 'i'))"
-                >
-                  <mark
-                    v-if="fragment.toLowerCase() === searchText.toLowerCase()"
-                    :key="i"
-                    class="highlight"
-                  >{{ fragment.name }}</mark>
-                  <template v-else>{{ fragment.name }}</template>
-                </template>
-              </span>
-              <template v-else>{{ text.name }}</template>
+            />
+            <template slot="customRenderComposed" slot-scope="text">
+              <template>{{ text.name }}</template>
             </template>
-            <span slot="date" slot-scope="text">{{text | timestamp}}</span>
+            <span slot="date" slot-scope="text">{{ text | timestamp }}</span>
             <span slot="status" slot-scope="text">
               <a-tag
                 :key="text"
-                :color="text === 'pending' ? 'volcano' : text === 'smelted' ? 'geekblue' : 'green'"
+                :color="
+                  text === 'pending'
+                    ? 'volcano'
+                    : text === 'smelted'
+                    ? 'geekblue'
+                    : 'green'
+                "
               >
                 {{ text.toUpperCase() }}
               </a-tag>
             </span>
-            <!-- <span slot="status" slot-scope="text" >{{text}}</span> -->
             <span slot="action" slot-scope="record">
-              <button @click="view(record)" :disabled="record.status === 'pending'" class="btn btn-sm btn-light mr-2">
+              <button
+                @click="view(record)"
+                :disabled="record.status === 'pending'"
+                class="btn btn-sm btn-light mr-2"
+              >
                 <i class="fe fe-edit mr-2" />
                 View
               </button>
@@ -166,106 +169,35 @@ const columns = [
     title: 'Name',
     dataIndex: 'name',
     scopedSlots: {
-      filterDropdown: 'filterDropdown',
-      filterIcon: 'filterIcon',
       customRender: 'customRender',
     },
-    // sorter: (a, b) => {
-    //   return a.name.localeCompare(b.name)
-    // },
-    // sortDirections: ['descend', 'ascend'],
-    // onFilter: (value, record) =>
-    //   record.name
-    //     .toString()
-    //     .toLowerCase()
-    //     .includes(value.toLowerCase()),
-    // onFilterDropdownVisibleChange: visible => {
-    //   if (visible) {
-    //     setTimeout(() => {
-    //       this.searchInput.focus()
-    //     }, 0)
-    //   }
-    // },
   },
   {
     title: 'Template',
     dataIndex: 'filter',
     scopedSlots: {
-      filterDropdown: 'filterDropdown',
-      filterIcon: 'filterIcon',
       customRender: 'customRenderComposed',
     },
-    // sorter: (a, b) => {
-    //   return a.name.localeCompare(b.name)
-    // },
-    // onFilter: (value, record) =>
-    //   record.filter.name
-    //     .toString()
-    //     .toLowerCase()
-    //     .includes(value.toLowerCase()),
-    // onFilterDropdownVisibleChange: visible => {
-    //   if (visible) {
-    //     setTimeout(() => {
-    //       this.searchInput.focus()
-    //     }, 0)
-    //   }
-    // },
   },
   {
     title: 'Client',
     dataIndex: 'client',
     scopedSlots: {
-      filterDropdown: 'filterDropdown',
-      filterIcon: 'filterIcon',
       customRender: 'customRenderComposed',
     },
-    // sorter: (a, b) => {
-    //   return a.name.localeCompare(b.name)
-    // },
-    // onFilter: (value, record) =>
-    //   record.client.name
-    //     .toString()
-    //     .toLowerCase()
-    //     .includes(value.toLowerCase()),
-    // onFilterDropdownVisibleChange: visible => {
-    //   if (visible) {
-    //     setTimeout(() => {
-    //       this.searchInput.focus()
-    //     }, 0)
-    //   }
-    // },
   },
   {
     title: 'Status',
     dataIndex: 'status',
     scopedSlots: {
-      filterDropdown: 'filterDropdown',
-      filterIcon: 'filterIcon',
       customRender: 'status',
     },
-    // sorter: (a, b) => {
-    //   return a.name.localeCompare(b.name)
-    // },
-    // onFilter: (value, record) =>
-    //   record.status
-    //     .toString()
-    //     .toLowerCase()
-    //     .includes(value.toLowerCase()),
-    // onFilterDropdownVisibleChange: visible => {
-    //   if (visible) {
-    //     setTimeout(() => {
-    //       this.searchInput.focus()
-    //     }, 0)
-    //   }
-    // },
+    onFilter: (value, record) => console.log(value),
   },
   {
     title: 'Date Added',
     dataIndex: 'date',
     scopedSlots: { customRender: 'date' },
-    // sorter: (a, b) => {
-    //   return new Date(a.date) - new Date(b.date)
-    // },
   },
   {
     title: 'Action',
@@ -274,14 +206,14 @@ const columns = [
 ]
 export default {
   name: 'Documents',
-  data: function() {
+  data: function () {
     return {
-      // searchText: '',
-      // searchInput: null,
-      // searchedColumn: '',
       timeInterval: null,
+      searchedName: '',
+      searchedStatus: null,
+      searchedTemplate: null,
+      form: this.$form.createForm(this, { name: 'filter_form' }),
       columns,
-
     }
   },
   props: {
@@ -290,8 +222,62 @@ export default {
       required: false,
     },
   },
+  watch: {
+    searchedName: async function() {
+      console.log(this.docTablePagination.limit)
+
+      this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
+        limit: this.docTablePagination.limit,
+        page: this.docTablePagination.page,
+        name: this.searchedName,
+        template: this.searchedTemplate,
+        status: this.searchedStatus,
+        loading: true,
+      })
+      this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
+        name: this.searchedName,
+        template: this.searchedTemplate,
+        status: this.searchedStatus,
+      })
+    },
+    searchedStatus: async function() {
+      this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
+        limit: this.docTablePagination.limit,
+        page: this.docTablePagination.page,
+        name: this.searchedName,
+        template: this.searchedTemplate,
+        status: this.searchedStatus,
+        loading: true,
+      })
+      this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
+        name: this.searchedName,
+        template: this.searchedTemplate,
+        status: this.searchedStatus,
+      })
+    },
+    // searchedTemplate: async function() {
+    //   this.$store.dispatch("ACTION_FETCH_DOCUMENTS_WITH_PARAMS", {
+    //     limit: this.docTablePagination.limit,
+    //     page: this.docTablePagination.page,
+    //     name: this.searchedName,
+    //     template: this.searchedTemplate,
+    //     status: this.searchedStatus,
+    //     loading: true,
+    //   });
+    //   this.$store.dispatch("ACTION_FETCH_COUNT_DOCUMENTS", {
+    //     name: this.searchedName,
+    //     template: this.searchedTemplate,
+    //     status: this.searchedStatus,
+    //   });
+    // },
+  },
   computed: {
-    ...mapGetters(['documentsList', 'smeltedIdList', 'docTablePagination', 'docTableLoading']),
+    ...mapGetters([
+      'documentsList',
+      'smeltedIdList',
+      'docTablePagination',
+      'docTableLoading',
+    ]),
     everythingIsValidated: function () {
       return this.smeltedIdList.length === 0
     },
@@ -302,7 +288,8 @@ export default {
   created() {
     if (this.clientId) {
       this.$store.dispatch('ACTION_FETCH_CLIENT_DOCUMENTS', this.clientId)
-      this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', { client: this.clientId,
+      this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
+        client: this.clientId,
       })
     } else {
       this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
@@ -310,12 +297,14 @@ export default {
         page: this.docTablePagination.page,
         loading: true,
       })
-      this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
-      })
+      this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {})
       this.timeInterval = setInterval(() => {
         this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
           limit: this.docTablePagination.limit,
           page: this.docTablePagination.page,
+          name: this.searchedName,
+          template: this.searchedTemplate,
+          status: this.searchedStatus,
           loading: false,
         })
       }, 10000)
@@ -327,15 +316,15 @@ export default {
     }
   },
   methods: {
-    // handleSearch(selectedKeys, confirm, dataIndex) {
-    //   confirm()
-    //   this.searchText = selectedKeys[0]
-    //   this.searchedColumn = dataIndex
-    // },
-    // handleReset(clearFilters) {
-    //   clearFilters()
-    //   this.searchText = ''
-    // },
+    handleSearch(selectedKeys, confirm, dataIndex) {
+      confirm()
+      this.searchText = selectedKeys[0]
+      this.searchedTemplate = dataIndex
+    },
+    handleReset(clearFilters) {
+      clearFilters()
+      this.searchText = ''
+    },
     view(record) {
       this.$router.push({ name: 'viewer', params: { documentId: record.id } })
     },
@@ -345,41 +334,53 @@ export default {
       this.$nprogress.done()
     },
     goToValidation() {
-      this.$router.push({ name: 'viewer', params: { documentId: this.smeltedIdList[0], smeltedValidation: true } })
+      this.$router.push({
+        name: 'viewer',
+        params: { documentId: this.smeltedIdList[0], smeltedValidation: true },
+      })
     },
     goToUpload() {
       this.$router.push({ name: 'upload' })
     },
     bulkExportToCSV() {
       let zip = JSZip()
-      console.log(this.documentsList.length)
       this.documentsList.map((document, idx) => {
         let documentCsvContent = ''
         let arrData = ['Key;Value']
-        document.osmium.map(item => {
+        document.osmium.map((item) => {
           arrData.push(Object.values(pick(item, ['Key', 'Value'])).join(';'))
         })
         documentCsvContent += arrData.join('\n').replace(/(^\[)|(\]$)/gm, '')
         zip.file(`${document.name}-${idx}.csv`, documentCsvContent)
       })
-      zip.generateAsync({
-        type: 'base64',
-      }).then(function(content) {
-        window.location.href = 'data:application/zip;base64,' + content
-      })
+      zip
+        .generateAsync({
+          type: 'base64',
+        })
+        .then(function (content) {
+          window.location.href = 'data:application/zip;base64,' + content
+        })
     },
     handleTableChange(pagination, filters, sorter) {
       console.log(pagination, filters, sorter)
-      const pager = { ...this.docTablePagination }
-      pager.current = pagination.current
-      this.docTablePagination = pager
       this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
         limit: pagination.pageSize,
         page: pagination.current,
+        name: this.searchedName,
+        template: this.searchedTemplate,
+        status: this.searchedStatus,
         loading: true,
       })
       this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
+        name: this.searchedName,
+        template: this.searchedTemplate,
+        status: this.searchedStatus,
       })
+    },
+    resetFilterSettings() {
+      this.searchedName = ''
+      this.searchedStatus = null
+      this.searchedTemplate = null
     },
   },
 }

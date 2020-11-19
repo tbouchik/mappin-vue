@@ -37,24 +37,52 @@ function saveDocToAPI(osmium, id) {
 }
 
 function fetchDocuments(queryParams) {
-  console.log(queryParams)
-  const { client, page, limit, sort } = queryParams
-  return axios.get(`/v1/documents`, { params: {
+  const { client, page, limit, sort, name, template, status } = queryParams
+  if (typeof cancelToken !== typeof undefined) {
+    cancelToken.cancel('Operation canceled due to new request.')
+  }
+  // Save the cancel token for the current request
+  cancelToken = axios.CancelToken.source()
+  const params = {
     client,
     limit,
     sort,
     page: page - 1,
-  } })
-    .then(
-      ({ data }) => data
-    )
+  }
+  if (name && name !== '') {
+    params.name = name
+  }
+  if (status) {
+    params.status = status
+  }
+  if (template) {
+    params.template = template
+  }
+  try {
+    return axios.get(`/v1/documents`, { params }, { cancelToken: cancelToken.token })
+      .then(
+        ({ data }) => data
+      )
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 function fetchDocumentsCount(queryParams) {
-  const { client } = queryParams
-  return axios.get('/v1/documents/count', { params: {
+  const { client, name, status, template } = queryParams
+  const params = {
     client,
-  } })
+  }
+  if (name && name !== '') {
+    params.name = name
+  }
+  if (status) {
+    params.status = status
+  }
+  if (template) {
+    params.template = template
+  }
+  return axios.get('/v1/documents/count', { params })
     .then(
       ({ data }) => data
     )
