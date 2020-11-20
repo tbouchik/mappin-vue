@@ -24,7 +24,8 @@
               :perPage="perPage">
             </clients-dashboard> -->
             <div class="demo-infinite-container ">
-              <a-list :data-source="clients">
+              <a-list :data-source="clients"
+                      :loading="clientTableLoading">
                 <a-list-item  slot="renderItem" slot-scope="item">
                   <a-list-item-meta :description="item.email">
                     <a slot="title">{{ item.name }} | </a>
@@ -39,7 +40,8 @@
           </div>
           <div v-if="steps[uploaderStep].title == 'Template'">
             <div class="demo-infinite-container ">
-              <a-list :data-source="filters">
+              <a-list :data-source="filters"
+                      :loading="templateLoading">
                 <a-list-item  slot="renderItem" slot-scope="item">
                   <a-list-item-meta :description="item.description">
                     <a slot="title">{{ item.name }}</a>
@@ -101,7 +103,14 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['uploaderStep', 'uploaderClient', 'uploaderFilter', 'uploaderNextIsEnabled', 'filters', 'clients']),
+    ...mapGetters([ 'uploaderStep',
+      'uploaderClient',
+      'uploaderFilter',
+      'uploaderNextIsEnabled',
+      'filters',
+      'clients',
+      'clientTableLoading',
+      'templateLoading']),
   },
   created() {
     this.$store.dispatch('ACTION_FETCH_CLIENTS', {
