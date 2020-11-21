@@ -62,7 +62,7 @@ export default {
       this.$store.dispatch('UPDATE_DOCUMENT', doc.data)
       this.currentFilter = this.current.osmium
     })
-    this.$store.dispatch('FETCH_DOCUMENTS')
+    this.$store.dispatch('ACTION_RESET_VISITED_IDS_CACHE')
   },
   watch: {
     documentId: function() {
@@ -76,7 +76,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['current', 'documentsIdList', 'currentPageData', 'currentActiveIndex']),
+    ...mapGetters(['current', 'currentPageData', 'currentActiveIndex']),
     documentName: function() {
       return get(this.current, 'alias')
     },
@@ -112,6 +112,9 @@ export default {
     theAction() {
       this.$store.dispatch('ACTION_TOGGLE_CATMODE')
     },
+  },
+  destroyed() {
+    this.$store.dispatch('ACTION_RESET_VISITED_IDS_CACHE')
   },
 }
 </script>

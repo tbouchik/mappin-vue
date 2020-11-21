@@ -32,11 +32,18 @@
           <button
             type="button"
             class="btn btn-success btn-with-addon mr-auto text-nowrap d-none d-md-block"
-            :disabled="everythingIsValidated"
+            :disabled="!nextSmeltedButtonIsEnabled"
             @click="() => goToValidation()"
           >
-            <span class="btn-addon">
+            <span v-if="!nextSmeltedButtonIsLoader" class="btn-addon">
               <i class="btn-addon-icon fe fe-edit" />
+            </span>
+            <span v-if="nextSmeltedButtonIsLoader" class="btn-addon" style>
+              <i class="btn-addon-icon" >
+                <div class="spinner-grow spinner-grow-sm text-light" role="status">
+                <span class="sr-only">Loading...</span>
+                </div>
+              </i>
             </span>
             Validate Smelted
           </button>
@@ -222,7 +229,7 @@ export default {
     },
   },
   watch: {
-    searchedName: function() {
+    searchedName: function () {
       this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
         client: this.clientId,
         limit: this.docTablePagination.limit,
@@ -238,7 +245,7 @@ export default {
         status: this.searchedStatus,
       })
     },
-    searchedStatus: function() {
+    searchedStatus: function () {
       this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
         client: this.clientId,
         limit: this.docTablePagination.limit,
@@ -254,7 +261,7 @@ export default {
         status: this.searchedStatus,
       })
     },
-    searchedTemplate: function() {
+    searchedTemplate: function () {
       this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
         client: this.clientId,
         limit: this.docTablePagination.limit,
@@ -274,14 +281,13 @@ export default {
   computed: {
     ...mapGetters([
       'documentsList',
-      'smeltedIdList',
       'docTablePagination',
       'docTableLoading',
       'filters',
+      'nextSmeltedButtonIsLoader',
+      'nextSmeltedButtonIsEnabled',
+      'nextSmeltedId',
     ]),
-    everythingIsValidated: function () {
-      return this.smeltedIdList.length === 0
-    },
     clientViz: function () {
       return this.clientId !== undefined && this.clientId !== null
     },
@@ -297,19 +303,32 @@ export default {
       this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
         client: this.clientId,
       })
+      this.$store.dispatch('ACTION_FETCH_NEXT_SMELTED_ID', {
+        client: this.clientId,
+        loading: true,
+      })
     } else {
       this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
-        client: this.clientId,
         limit: this.docTablePagination.limit,
         page: this.docTablePagination.page,
         loading: true,
       })
       this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {})
+      this.$store.dispatch('ACTION_FETCH_NEXT_SMELTED_ID', {
+        loading: true,
+      })
       this.timeInterval = setInterval(() => {
         this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', {
           client: this.clientId,
           limit: this.docTablePagination.limit,
           page: this.docTablePagination.page,
+          name: this.searchedName,
+          filter: this.searchedTemplate,
+          status: this.searchedStatus,
+          loading: false,
+        })
+        this.$store.dispatch('ACTION_FETCH_NEXT_SMELTED_ID', {
+          client: this.clientId,
           name: this.searchedName,
           filter: this.searchedTemplate,
           status: this.searchedStatus,
@@ -345,7 +364,7 @@ export default {
     goToValidation() {
       this.$router.push({
         name: 'viewer',
-        params: { documentId: this.smeltedIdList[0], smeltedValidation: true },
+        params: { documentId: this.nextSmeltedId, smeltedValidation: true },
       })
     },
     goToUpload() {

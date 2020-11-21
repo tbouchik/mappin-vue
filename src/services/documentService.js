@@ -33,6 +33,29 @@ class DocumentService {
       responseType: 'blob',
     })
   }
+
+  static fetchDocumentsNext(queryParams) {
+    const { client, name, status, filter, current } = queryParams
+    const params = {
+      client,
+    }
+    if (name && name !== '') {
+      params.name = name
+    }
+    if (status) {
+      params.status = status
+    }
+    if (filter) {
+      params.filter = filter
+    }
+    if (current) {
+      params.current = current
+    }
+    return axios.get('/v1/documents/next', { params })
+      .then(
+        ({ data }) => data
+      )
+  }
 }
 
 export default DocumentService

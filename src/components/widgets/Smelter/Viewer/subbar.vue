@@ -46,12 +46,14 @@
       <a-button-group>
         <a-button
           type="link"
-          :disabled="currentIndexIsFirst"
+          :disabled="IdsCacheEmptied"
           @click="goPrevious"
         >
           <a-icon type="left" />Previous</a-button
         >
-        <a-button type="link" :disabled="currentIndexIsLast" @click="goNext">
+        <a-button type="link" :disabled="!nextSmeltedButtonIsEnabled"
+                              :loading="loading"
+                              @click="goNext">
           Next<a-icon type="right" />
         </a-button>
       </a-button-group>
@@ -62,11 +64,21 @@
 <script>
 import { mapGetters } from 'vuex'
 import { pick } from 'lodash'
-
+import DocumentService from '../../../../services/documentService'
 export default {
   name: 'SmelterSubbar',
+  data: function () {
+    return {
+      loading: false,
+    }
+  },
   computed: {
-    ...mapGetters(['smeltedIdList', 'documentsIdList']),
+    ...mapGetters([ 'smeltedIdList',
+      'documentsIdList',
+      'nextSmeltedId',
+      'nextSmeltedButtonIsEnabled',
+      'visitedIdsCache',
+    ]),
     currentIndex: function () {
       if (this.smeltedValidation) {
         return this.smeltedIdList.indexOf(this.current.id)
@@ -79,11 +91,9 @@ export default {
       }
       return this.documentsIdList.length - 1
     },
-    currentIndexIsLast: function () {
-      return this.currentIndex === this.lastIndex
-    },
-    currentIndexIsFirst: function () {
-      return this.currentIndex === 0
+    IdsCacheEmptied: function () {
+      const currentVisitedIndexInCache = this.visitedIdsCache.findIndex(x => x === this.current.id)
+      return ((this.visitedIdsCache.length === 0) || (currentVisitedIndexInCache !== undefined && currentVisitedIndexInCache === 0))
     },
   },
   props: {
@@ -96,44 +106,71 @@ export default {
       required: true,
     },
   },
+  created() {
+    this.$store.dispatch('ACTION_UPDATE_NEXT_ID_METADATA', {
+      id: this.current.id,
+      next: true,
+    })
+    this.$store.dispatch('ACTION_PUSH_VISITED_IDS_CACHE', this.current.id)
+  },
   methods: {
-    goNext() {
+    async goNext() {
       if (this.smeltedValidation) {
-        this.$router.push({
-          name: 'viewer',
-          params: {
-            documentId: this.smeltedIdList[this.currentIndex + 1],
-            smeltedValidation: this.smeltedValidation,
-          },
-        })
+        this.loading = true
+        const cacheLastIndex = this.visitedIdsCache.length - 1
+        const currentVisitedIndexInCache = this.visitedIdsCache.findIndex(x => x === this.current.id)
+        if (currentVisitedIndexInCache !== undefined &&
+            cacheLastIndex > 0 &&
+            currentVisitedIndexInCache < cacheLastIndex) {
+          this.$router.push({
+            name: 'viewer',
+            params: {
+              documentId: this.visitedIdsCache[currentVisitedIndexInCache + 1],
+              smeltedValidation: this.smeltedValidation,
+            },
+          })
+          this.loading = false
+        } else {
+          DocumentService.fetchDocumentsNext({
+            current: this.visitedIdsCache,
+          }).then((data) => {
+            if (data.id) {
+              this.$router.push({
+                name: 'viewer',
+                params: {
+                  documentId: data.id,
+                  smeltedValidation: this.smeltedValidation,
+                },
+              })
+              this.$store.dispatch('ACTION_UPDATE_NEXT_ID_METADATA', data)
+              this.$store.dispatch('ACTION_PUSH_VISITED_IDS_CACHE', data.id)
+            } else {
+              this.$router.push({ name: 'documents' })
+              this.$notification['success']({
+                message: 'Validation finished!',
+                description: 'All documents have been validated',
+              })
+            }
+            this.loading = false
+          })
+        }
       } else {
-        this.$router.push({
-          name: 'viewer',
-          params: {
-            documentId: this.documentsIdList[this.currentIndex + 1],
-            smeltedValidation: this.smeltedValidation,
-          },
-        })
+        console.log('wip')
       }
     },
     goPrevious() {
-      if (this.smeltedValidation) {
-        this.$router.push({
-          name: 'viewer',
-          params: {
-            documentId: this.smeltedIdList[this.currentIndex - 1],
-            smeltedValidation: this.smeltedValidation,
-          },
-        })
-      } else {
-        this.$router.push({
-          name: 'viewer',
-          params: {
-            documentId: this.documentsIdList[this.currentIndex - 1],
-            smeltedValidation: this.smeltedValidation,
-          },
-        })
-      }
+      const currentVisitedIndexInCache = this.visitedIdsCache.findIndex(x => x === this.current.id)
+      this.$router.push({
+        name: 'viewer',
+        params: {
+          documentId: this.visitedIdsCache[currentVisitedIndexInCache - 1],
+          smeltedValidation: this.smeltedValidation,
+        },
+      })
+      this.$store.dispatch('ACTION_UPDATE_NEXT_ID_METADATA', {
+        id: this.visitedIdsCache[currentVisitedIndexInCache - 1],
+        next: true,
+      })
     },
     csvExport() {
       let csvContent = 'data:text/csv;charset=utf-8,'

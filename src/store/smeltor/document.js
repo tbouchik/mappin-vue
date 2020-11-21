@@ -88,6 +88,29 @@ function fetchDocumentsCount(queryParams) {
     )
 }
 
+function fetchDocumentsNext(queryParams) {
+  const { client, name, status, filter, current } = queryParams
+  const params = {
+    client,
+  }
+  if (name && name !== '') {
+    params.name = name
+  }
+  if (status) {
+    params.status = status
+  }
+  if (filter) {
+    params.filter = filter
+  }
+  if (current) {
+    params.current = current
+  }
+  return axios.get('/v1/documents/next', { params })
+    .then(
+      ({ data }) => data
+    )
+}
+
 export default {
   state: {
     formattedDocument: {},
@@ -101,6 +124,10 @@ export default {
       page: 1,
     },
     loading: false,
+    nextSmeltedId: null,
+    nextSmeltedButtonIsEnabled: null,
+    nextSmeltedButtonIsLoader: false,
+    visitedIdsCache: [],
   },
   mutations: {
     UPDATE_DOCUMENT_DATA(state, document) {
@@ -212,6 +239,46 @@ export default {
           state.pagination = newPagination
         })
     },
+    MUTATION_FETCH_NEXT_SMELTED_ID(state, filters) {
+      state.nextSmeltedButtonIsLoader = !!filters.loading
+      if (filters.current) {
+        const cacheLastIndex = state.visitedIdsCache.length - 1
+        const currentVisitedIndexInCache = state.visitedIdsCache.findIndex(x => x === filters.current)
+        if (currentVisitedIndexInCache &&
+            cacheLastIndex > 0 &&
+            currentVisitedIndexInCache < cacheLastIndex) {
+          state.nextSmeltedId = state.visitedIdsCache[currentVisitedIndexInCache + 1]
+          state.nextSmeltedButtonIsEnabled = true
+        } else {
+          fetchDocumentsNext(filters)
+            .then(data => {
+              state.nextSmeltedId = data.id
+              state.nextSmeltedButtonIsEnabled = data.next
+              state.nextSmeltedButtonIsLoader = false
+            })
+        }
+      } else {
+        fetchDocumentsNext(filters)
+          .then(data => {
+            state.nextSmeltedId = data.id
+            state.nextSmeltedButtonIsEnabled = data.next
+            state.nextSmeltedButtonIsLoader = false
+          })
+      }
+    },
+    MUTATION_RESET_VISITED_IDS_CACHE(state) {
+      state.visitedIdsCache = []
+    },
+    MUTATION_PUSH_VISITED_IDS_CACHE(state, id) {
+      state.visitedIdsCache.push(id)
+    },
+    MUTATION_ENABLE_NEXT_ID_CACHE(state) {
+      state.nextSmeltedButtonIsEnabled = true
+    },
+    MUTATION_UPDATE_NEXT_ID_METADATA(state, payload) {
+      state.nextSmeltedId = payload.id
+      state.nextSmeltedButtonIsEnabled = payload.next
+    },
   },
   actions: {
     UPDATE_DOCUMENT({ commit }, document) {
@@ -265,6 +332,22 @@ export default {
     ACTION_FETCH_COUNT_DOCUMENTS({ commit }, filters) {
       commit('MUTATION_FETCH_COUNT_DOCUMENTS', filters)
     },
+    ACTION_FETCH_NEXT_SMELTED_ID({ commit }, filters) {
+      commit('MUTATION_FETCH_NEXT_SMELTED_ID', filters)
+    },
+    ACTION_RESET_VISITED_IDS_CACHE({ commit }) {
+      commit('MUTATION_RESET_VISITED_IDS_CACHE')
+    },
+    ACTION_PUSH_VISITED_IDS_CACHE({ commit }, id) {
+      commit('MUTATION_PUSH_VISITED_IDS_CACHE', id)
+    },
+    ACTION_ENABLE_NEXT_ID_CACHE({ commit }) {
+      commit('MUTATION_ENABLE_NEXT_ID_CACHE')
+    },
+    ACTION_UPDATE_NEXT_ID_METADATA({ commit }, payload) {
+      commit('MUTATION_UPDATE_NEXT_ID_METADATA', payload)
+    },
+
   },
   getters: {
     current: state => state.formattedDocument,
@@ -279,5 +362,9 @@ export default {
     catMode: state => state.catMode,
     docTableLoading: state => state.loading,
     docTablePagination: state => state.pagination,
+    nextSmeltedId: state => state.nextSmeltedId,
+    nextSmeltedButtonIsEnabled: state => state.nextSmeltedButtonIsEnabled,
+    nextSmeltedButtonIsLoader: state => state.nextSmeltedButtonIsLoader,
+    visitedIdsCache: state => state.visitedIdsCache,
   },
 }
