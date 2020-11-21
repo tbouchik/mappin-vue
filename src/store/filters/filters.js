@@ -20,7 +20,7 @@ export default {
           state.loading = false
         })
     },
-    MUTATION_UPDATE_FILTER(state, payload) {
+    async MUTATION_UPDATE_FILTER(state, payload) {
       FilterService.updateFilter(
         payload.body,
         payload.id
