@@ -1,5 +1,6 @@
 import axios from 'axios'
 
+let cancelToken
 class DocumentService {
   static updateDocument(body, documentId) {
     return axios.patch(`/v1/documents/${documentId}`, {
@@ -32,6 +33,35 @@ class DocumentService {
       url,
       responseType: 'blob',
     })
+  }
+
+  static fetchNextSmeltedDocuments(queryParams) {
+    const { client, name, filter, skip } = queryParams
+    if (typeof cancelToken !== typeof undefined) {
+      cancelToken.cancel('Operation canceled due to new request.')
+    }
+    // Save the cancel token for the current request
+    cancelToken = axios.CancelToken.source()
+    const params = {
+      client,
+    }
+    if (name && name !== '') {
+      params.name = name
+    }
+    if (filter) {
+      params.filter = filter
+    }
+    if (skip) {
+      params.skip = skip
+    }
+    try {
+      return axios.get(`/v1/documents/next`, { params }, { cancelToken: cancelToken.token })
+        .then(
+          ({ data }) => data
+        )
+    } catch (error) {
+      console.log(error)
+    }
   }
 }
 

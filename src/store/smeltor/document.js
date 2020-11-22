@@ -101,6 +101,8 @@ export default {
       page: 1,
     },
     loading: false,
+    queryParams: {},
+    smeltedCache: [],
   },
   mutations: {
     UPDATE_DOCUMENT_DATA(state, document) {
@@ -191,6 +193,7 @@ export default {
       Object.assign(state.pagination, pick(payload, ['limit', 'page']))
       const queryParams = omit(payload, ['loading'])
       state.loading = !!payload.loading
+      state.queryParams = queryParams
       fetchDocuments(queryParams)
         .then(documentsList => {
           documentsList.map((item, index) => { // TODO: Implement these properties in DB
@@ -211,6 +214,14 @@ export default {
           newPagination.total = data.count
           state.pagination = newPagination
         })
+    },
+    MUTATION_CACHE_SMELTED_IDS(state, idsArray) {
+      let newIdArray = []
+      idsArray.map(x => newIdArray.push(x.id))
+      state.smeltedCache = state.smeltedCache.concat(newIdArray)
+    },
+    MUTATION_RESET_SMELTED_IDS(state) {
+      state.smeltedCache = []
     },
   },
   actions: {
@@ -265,6 +276,12 @@ export default {
     ACTION_FETCH_COUNT_DOCUMENTS({ commit }, filters) {
       commit('MUTATION_FETCH_COUNT_DOCUMENTS', filters)
     },
+    ACTION_CACHE_SMELTED_IDS({ commit }, idsArray) {
+      commit('MUTATION_CACHE_SMELTED_IDS', idsArray)
+    },
+    ACTION_RESET_SMELTED_IDS({ commit }) {
+      commit('MUTATION_RESET_SMELTED_IDS')
+    },
   },
   getters: {
     current: state => state.formattedDocument,
@@ -279,5 +296,7 @@ export default {
     catMode: state => state.catMode,
     docTableLoading: state => state.loading,
     docTablePagination: state => state.pagination,
+    docQueryParams: state => state.queryParams,
+    docSmeltedCache: state => state.smeltedCache,
   },
 }

@@ -162,6 +162,7 @@
 import { mapGetters } from 'vuex'
 import JSZip from 'jszip'
 import { pick } from 'lodash'
+import DocumentService from '../../../services/documentService'
 
 const columns = [
   {
@@ -278,9 +279,10 @@ export default {
       'docTablePagination',
       'docTableLoading',
       'filters',
+      'docQueryParams',
     ]),
     everythingIsValidated: function () {
-      return this.smeltedIdList.length === 0
+      return this.docQueryParams.length === 0
     },
     clientViz: function () {
       return this.clientId !== undefined && this.clientId !== null
@@ -318,6 +320,11 @@ export default {
       }, 10000)
       this.$store.dispatch('ACTION_FETCH_FILTERS')
     }
+    DocumentService.fetchNextSmeltedDocuments(this.docQueryParams)
+      .then(idsArray => {
+        console.log(idsArray)
+        this.$store.dispatch('ACTION_CACHE_SMELTED_IDS', idsArray)
+      })
   },
   destroyed() {
     if (!this.clientId) {

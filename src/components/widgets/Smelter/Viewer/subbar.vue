@@ -51,7 +51,9 @@
         >
           <a-icon type="left" />Previous</a-button
         >
-        <a-button type="link" :disabled="currentIndexIsLast" @click="goNext">
+        <a-button type="link" :disabled="currentIndexIsLast"
+                              :loading="loading"
+                              @click="goNext">
           Next<a-icon type="right" />
         </a-button>
       </a-button-group>
@@ -62,27 +64,38 @@
 <script>
 import { mapGetters } from 'vuex'
 import { pick } from 'lodash'
+import DocumentService from '../../../../services/documentService'
 
 export default {
   name: 'SmelterSubbar',
+  data: function () {
+    return {
+      loading: false,
+      loadedAllSmelted: false,
+    }
+  },
   computed: {
-    ...mapGetters(['smeltedIdList', 'documentsIdList']),
+    ...mapGetters(['smeltedIdList', 'documentsIdList', 'docSmeltedCache', 'docQueryParams']),
     currentIndex: function () {
       if (this.smeltedValidation) {
-        return this.smeltedIdList.indexOf(this.current.id)
+        return this.docSmeltedCache.indexOf(this.current.id)
       }
       return this.documentsIdList.indexOf(this.current.id)
     },
     lastIndex: function () {
       if (this.smeltedValidation) {
-        return this.smeltedIdList.length - 1
+        return this.docSmeltedCache.length - 1
       }
       return this.documentsIdList.length - 1
     },
     currentIndexIsLast: function () {
+      if (this.currentIndex === this.lastIndex && !this.loadedAllSmelted) {
+        this.fetchNewIds()
+      }
       return this.currentIndex === this.lastIndex
     },
     currentIndexIsFirst: function () {
+      console.log('this is the first index')
       return this.currentIndex === 0
     },
   },
@@ -102,7 +115,7 @@ export default {
         this.$router.push({
           name: 'viewer',
           params: {
-            documentId: this.smeltedIdList[this.currentIndex + 1],
+            documentId: this.docSmeltedCache[this.currentIndex + 1],
             smeltedValidation: this.smeltedValidation,
           },
         })
@@ -121,7 +134,7 @@ export default {
         this.$router.push({
           name: 'viewer',
           params: {
-            documentId: this.smeltedIdList[this.currentIndex - 1],
+            documentId: this.docSmeltedCache[this.currentIndex - 1],
             smeltedValidation: this.smeltedValidation,
           },
         })
@@ -151,6 +164,29 @@ export default {
     goToClient() {
       this.$router.push({ name: 'client', params: { clientId: this.current.client._id } })
     },
+    fetchNewIds() {
+      this.loading = true
+      const cacheLength = this.docSmeltedCache.length
+      DocumentService.fetchNextSmeltedDocuments({
+        ...this.docQueryParams,
+        skip: cacheLength,
+      }).then((idsArray) => {
+        if (idsArray.length) {
+          this.$store.dispatch('ACTION_CACHE_SMELTED_IDS', idsArray)
+        } else {
+          this.loadedAllSmelted = true
+        }
+        this.loading = false
+      }).catch(error => {
+        console.log(error)
+        this.loading = false
+      })
+    },
+  },
+  destroyed() {
+    console.log('destory')
+    this.$store.dispatch('ACTION_RESET_SMELTED_IDS')
+    this.loadedAllSmelted = false
   },
 }
 </script>
