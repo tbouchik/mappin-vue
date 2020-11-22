@@ -36,38 +36,6 @@ function saveDocToAPI(osmium, id) {
   }
 }
 
-function fetchDocuments(queryParams) {
-  const { client, page, limit, sort, name, filter, status } = queryParams
-  if (typeof cancelToken !== typeof undefined) {
-    cancelToken.cancel('Operation canceled due to new request.')
-  }
-  // Save the cancel token for the current request
-  cancelToken = axios.CancelToken.source()
-  const params = {
-    client,
-    limit,
-    sort,
-    page: page - 1,
-  }
-  if (name && name !== '') {
-    params.name = name
-  }
-  if (status) {
-    params.status = status
-  }
-  if (filter) {
-    params.filter = filter
-  }
-  try {
-    return axios.get(`/v1/documents`, { params }, { cancelToken: cancelToken.token })
-      .then(
-        ({ data }) => data
-      )
-  } catch (error) {
-    console.log(error)
-  }
-}
-
 function fetchDocumentsCount(queryParams) {
   const { client, name, status, filter } = queryParams
   const params = {
@@ -190,22 +158,14 @@ export default {
       state.catMode = !state.catMode
     },
     MUTATION_FETCH_DOCUMENTS_WITH_PARAMS(state, payload) {
-      Object.assign(state.pagination, pick(payload, ['limit', 'page']))
-      const queryParams = omit(payload, ['loading'])
-      state.loading = !!payload.loading
-      state.queryParams = queryParams
-      fetchDocuments(queryParams)
-        .then(documentsList => {
-          documentsList.map((item, index) => { // TODO: Implement these properties in DB
-            item.date = item.createdAt
-            item.key = index
-            return item
-          })
-          state.documentsList = documentsList.sort((a, b) => {
-            return -(new Date(a.date) - new Date(b.date))
-          },)
-          state.loading = false
-        })
+      Object.assign(state.pagination, pick(payload.queryParams, ['limit', 'page']))
+      state.queryParams = payload.queryParams
+      DocumentService.fetchDocuments(payload.queryParams)
+      state.documentsList = payload.documentsList.map((item, index) => { // TODO: Implement these properties in DB
+        item.date = item.createdAt
+        item.key = index
+        return item
+      })
     },
     MUTATION_FETCH_COUNT_DOCUMENTS(state, filters) {
       fetchDocumentsCount(filters)
@@ -294,7 +254,7 @@ export default {
     }).map(x => x.id),
     currentActiveIndex: state => state.currentIdx,
     catMode: state => state.catMode,
-    docTableLoading: state => state.loading,
+    docTableLoading: state => state.loading, // TODO: eliminate
     docTablePagination: state => state.pagination,
     docQueryParams: state => state.queryParams,
     docSmeltedCache: state => state.smeltedCache,
