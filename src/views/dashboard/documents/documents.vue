@@ -35,12 +35,20 @@
             :disabled="everythingIsValidated"
             @click="() => goToValidation()"
           >
-            <span class="btn-addon">
+            <span v-if="!validatorIsLoading" class="btn-addon">
               <i class="btn-addon-icon fe fe-edit" />
+            </span>
+            <span v-if="validatorIsLoading" class="btn-addon" style>
+              <i class="btn-addon-icon" >
+                <div class="spinner-grow spinner-grow-sm text-light" role="status">
+                <span class="sr-only">Loading...</span>
+                </div>
+              </i>
             </span>
             Validate Smelted
           </button>
         </div>
+
       </div>
       <div v-if="clientViz" class="card-header card-header-flex row">
         <div class="d-flex flex-column justify-content-center col-2">
@@ -108,7 +116,7 @@
           <a-table
             :data-source="documentsList"
             :columns="columns"
-            :pagination="docTablePagination"
+            :pagination="tablePagination"
             :loading="loading"
             @change="handleTableChange"
           >
@@ -161,7 +169,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import JSZip from 'jszip'
-import { pick } from 'lodash'
+import { pick, isEqual } from 'lodash'
 import DocumentService from '../../../services/documentService'
 
 const columns = [
@@ -208,14 +216,18 @@ export default {
   name: 'Documents',
   data: function () {
     return {
+      documentsList: [],
+      form: this.$form.createForm(this, { name: 'filter_form' }),
+      columns: columns,
       timeInterval: null,
       searchedName: null,
       searchedStatus: null,
       searchedTemplate: null,
-      form: this.$form.createForm(this, { name: 'filter_form' }),
-      columns,
       loading: false,
-      documentsList: [],
+      validatorIsLoading: false,
+      limit: 10,
+      page: 1,
+      total: 10,
     }
   },
   props: {
@@ -227,81 +239,133 @@ export default {
   watch: {
     searchedName: function() {
       this.loading = true
-      const queryParams = {
-        client: this.clientId,
-        limit: this.docTablePagination.limit,
-        page: this.docTablePagination.page,
-        name: this.searchedName,
-        filter: this.searchedTemplate,
-        status: this.searchedStatus,
-      }
-      DocumentService.fetchDocuments(queryParams)
+      this.validatorIsLoading = true
+      // const queryParams = {
+      //   client: this.clientId,
+      //   limit: this.docTablePagination.limit,
+      //   page: this.docTablePagination.page,
+      //   name: this.searchedName,
+      //   filter: this.searchedTemplate,
+      //   status: this.searchedStatus,
+      // }
+      DocumentService.fetchDocuments(this.queryParams)
         .then(documentsList => {
+          console.log('number: searchedName')
+
+          this.page = 1
+
           this.documentsList = documentsList.map((item, index) => { // TODO: Implement these properties in DB
             item.date = item.createdAt
             item.key = index
             return item
           })
-          this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', { documentsList, queryParams })
+          this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', { documentsList, queryParams: this.queryParams })
           this.loading = false
         })
-      this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
+      DocumentService.fetchDocumentsCount({
         name: this.searchedName,
         filter: this.searchedTemplate,
         status: this.searchedStatus,
       })
+        .then(data => {
+          this.total = data.count
+        })
+      // this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
+      //   name: this.searchedName,
+      //   filter: this.searchedTemplate,
+      //   status: this.searchedStatus,
+      // })
+      DocumentService.fetchNextSmeltedDocuments(this.queryParams)
+        .then(idsArray => {
+          this.$store.dispatch('ACTION_CACHE_SMELTED_IDS', { idsArray,
+            concat: false })
+          this.validatorIsLoading = false
+        })
     },
     searchedStatus: function() {
       this.loading = true
-      const queryParams = {
-        client: this.clientId,
-        limit: this.docTablePagination.limit,
-        page: this.docTablePagination.page,
-        name: this.searchedName,
-        filter: this.searchedTemplate,
-        status: this.searchedStatus,
-      }
-      DocumentService.fetchDocuments(queryParams)
+      this.validatorIsLoading = true
+      // const queryParams = {
+      //   client: this.clientId,
+      //   limit: this.docTablePagination.limit,
+      //   page: this.docTablePagination.page,
+      //   name: this.searchedName,
+      //   filter: this.searchedTemplate,
+      //   status: this.searchedStatus,
+      // }
+      DocumentService.fetchDocuments(this.queryParams)
         .then(documentsList => {
+          console.log('number: searchedStatus')
+          this.page = 1
+
           this.documentsList = documentsList.map((item, index) => { // TODO: Implement these properties in DB
             item.date = item.createdAt
             item.key = index
             return item
           })
-          this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', { documentsList, queryParams })
+          this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', { documentsList, queryParams: this.queryParams })
           this.loading = false
         })
-      this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
+      DocumentService.fetchDocumentsCount({
         name: this.searchedName,
         filter: this.searchedTemplate,
         status: this.searchedStatus,
       })
+        .then(data => {
+          this.total = data.count
+        })
+      // this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
+      //   name: this.searchedName,
+      //   filter: this.searchedTemplate,
+      //   status: this.searchedStatus,
+      // })
+      DocumentService.fetchNextSmeltedDocuments(this.queryParams)
+        .then(idsArray => {
+          this.$store.dispatch('ACTION_CACHE_SMELTED_IDS', { idsArray,
+            concat: false })
+          this.validatorIsLoading = false
+        })
     },
     searchedTemplate: function() {
       this.loading = true
-      const queryParams = {
-        client: this.clientId,
-        limit: this.docTablePagination.limit,
-        page: this.docTablePagination.page,
-        name: this.searchedName,
-        filter: this.searchedTemplate,
-        status: this.searchedStatus,
-      }
-      DocumentService.fetchDocuments(queryParams)
+      this.validatorIsLoading = true
+      // const queryParams = {
+      //   client: this.clientId,
+      //   limit: this.docTablePagination.limit,
+      //   page: this.docTablePagination.page,
+      //   name: this.searchedName,
+      //   filter: this.searchedTemplate,
+      //   status: this.searchedStatus,
+      // }
+      DocumentService.fetchDocuments(this.queryParams)
         .then(documentsList => {
+          console.log('number: searchedTemplate',)
+          this.page = 1
           this.documentsList = documentsList.map((item, index) => { // TODO: Implement these properties in DB
             item.date = item.createdAt
             item.key = index
             return item
           })
-          this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', { documentsList, queryParams })
+          this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', { documentsList, queryParams: this.queryParams })
           this.loading = false
         })
-      this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
-        name: this.searchedName,
-        filter: this.searchedTemplate,
-        status: this.searchedStatus,
-      })
+      DocumentService.fetchDocumentsCount(pick(this.queryParams, ['name', 'filter', 'status']))
+        .then(data => {
+          this.total = data.count
+        })
+      // this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', pick(this.queryParams, ['name', 'filter', 'status'])
+      // {
+      //   name: this.searchedName,
+      //   filter: this.searchedTemplate,
+      //   status: this.searchedStatus,
+      // }
+
+      DocumentService.fetchNextSmeltedDocuments(this.queryParams)
+        .then(idsArray => {
+          this.$store.dispatch('ACTION_CACHE_SMELTED_IDS', { idsArray,
+            concat: false })
+          this.validatorIsLoading = false
+        })
     },
   },
   computed: {
@@ -309,25 +373,44 @@ export default {
       'smeltedIdList',
       'docTablePagination',
       'filters',
-      'docQueryParams',
+      'docSmeltedCache',
     ]),
     everythingIsValidated: function () {
-      return this.docQueryParams.length === 0
+      return this.docSmeltedCache.length === 0
     },
     clientViz: function () {
       return this.clientId !== undefined && this.clientId !== null
+    },
+    queryParams: function () {
+      return {
+        client: this.clientId,
+        limit: this.limit,
+        page: this.page,
+        name: this.searchedName,
+        filter: this.searchedTemplate,
+        status: this.searchedStatus,
+      }
+    },
+    tablePagination: function () {
+      return {
+        limit: this.limit,
+        page: this.page,
+        total: this.total,
+      }
     },
   },
   created() {
     if (this.clientId) {
       this.loading = true
-      const queryParams = {
-        client: this.clientId,
-        limit: this.docTablePagination.limit,
-        page: this.docTablePagination.page,
-      }
+      // const queryParams = {
+      //   client: this.clientId,
+      //   limit: this.docTablePagination.limit,
+      //   page: this.docTablePagination.page,
+      // }
+      const queryParams = pick(this.queryParams, ['client', 'limit', 'page'])
       DocumentService.fetchDocuments(queryParams)
         .then(documentsList => {
+          console.log('number: @created inside first "if"')
           this.documentsList = documentsList.map((item, index) => { // TODO: Implement these properties in DB
             item.date = item.createdAt
             item.key = index
@@ -336,18 +419,27 @@ export default {
           this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', { documentsList, queryParams })
           this.loading = false
         })
-      this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
+      DocumentService.fetchDocumentsCount({
         client: this.clientId,
       })
+        .then(data => {
+          this.total = data.count
+        })
+      // this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
+      //   client: this.clientId,
+      // })
     } else {
       this.loading = true
-      const queryParams = {
-        client: this.clientId,
-        limit: this.docTablePagination.limit,
-        page: this.docTablePagination.page,
-      }
+      this.validatorIsLoading = true
+      const queryParams = pick(this.queryParams, ['client', 'limit', 'page'])
+      // {
+      //   client: this.clientId,
+      //   limit: this.docTablePagination.limit,
+      //   page: this.docTablePagination.page,
+      // }
       DocumentService.fetchDocuments(queryParams)
         .then(documentsList => {
+          console.log('number: @created inside first "else" ',)
           this.documentsList = documentsList.map((item, index) => { // TODO: Implement these properties in DB
             item.date = item.createdAt
             item.key = index
@@ -356,32 +448,42 @@ export default {
           this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', { documentsList, queryParams })
           this.loading = false
         })
-      this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {})
+      DocumentService.fetchDocumentsCount({})
+        .then(data => {
+          this.total = data.count
+        })
+      // this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {})
       this.timeInterval = setInterval(() => {
-        const queryParams = {
-          client: this.clientId,
-          limit: this.docTablePagination.limit,
-          page: this.docTablePagination.page,
-          name: this.searchedName,
-          filter: this.searchedTemplate,
-          status: this.searchedStatus,
-        }
-        DocumentService.fetchDocuments(queryParams)
+        // const queryParams = {
+        //   client: this.clientId,
+        //   limit: this.docTablePagination.limit,
+        //   page: this.docTablePagination.page,
+        //   name: this.searchedName,
+        //   filter: this.searchedTemplate,
+        //   status: this.searchedStatus,
+        // }
+        const paramsUsedInQuery = Object.assign({}, this.queryParams)
+        DocumentService.fetchDocuments(paramsUsedInQuery)
           .then(documentsList => {
-            this.documentsList = documentsList.map((item, index) => { // TODO: Implement these properties in DB
-              item.date = item.createdAt
-              item.key = index
-              return item
-            })
-            this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', { documentsList, queryParams })
+            console.log('set Interval is goinnnnnn to ....')
+            if (isEqual(paramsUsedInQuery, this.queryParams)) {
+              console.log('DOOOONE: number: Time interval')
+              this.documentsList = documentsList.map((item, index) => { // TODO: Implement these properties in DB
+                item.date = item.createdAt
+                item.key = index
+                return item
+              })
+              this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', { documentsList, queryParams: paramsUsedInQuery })
+            }
           })
       }, 10000)
-      this.$store.dispatch('ACTION_FETCH_FILTERS') // TODO : Why is this here ?
+      this.$store.dispatch('ACTION_FETCH_FILTERS')
     }
-    DocumentService.fetchNextSmeltedDocuments(this.docQueryParams)
+    DocumentService.fetchNextSmeltedDocuments(this.queryParams)
       .then(idsArray => {
-        console.log(idsArray)
-        this.$store.dispatch('ACTION_CACHE_SMELTED_IDS', idsArray)
+        this.$store.dispatch('ACTION_CACHE_SMELTED_IDS', { idsArray,
+          concat: false })
+        this.validatorIsLoading = false
       })
   },
   destroyed() {
@@ -437,31 +539,34 @@ export default {
     },
     handleTableChange(pagination, filters, sorter) {
       console.log(pagination, filters, sorter)
+      this.limit = pagination.pageSize
+      this.page = pagination.current
       this.loading = true
-      const queryParams = {
-        client: this.clientId,
-        limit: pagination.pageSize,
-        page: pagination.current,
-        name: this.searchedName,
-        filter: this.searchedTemplate,
-        status: this.searchedStatus,
-      }
-      DocumentService.fetchDocuments(queryParams)
+      // const queryParams = {
+      //   client: this.clientId,
+      //   limit: pagination.pageSize,
+      //   page: pagination.current,
+      //   name: this.searchedName,
+      //   filter: this.searchedTemplate,
+      //   status: this.searchedStatus,
+      // }
+      DocumentService.fetchDocuments(this.queryParams)
         .then(documentsList => {
+          console.log('number: HANDLE TABLE CHANGE')
           this.documentsList = documentsList.map((item, index) => { // TODO: Implement these properties in DB
             item.date = item.createdAt
             item.key = index
             return item
           })
-          this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', { documentsList, queryParams })
+          this.$store.dispatch('ACTION_FETCH_DOCUMENTS_WITH_PARAMS', { documentsList, queryParams: this.queryParams })
           this.loading = false
         })
-      this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS', {
-        client: this.clientId,
-        name: this.searchedName,
-        filter: this.searchedTemplate,
-        status: this.searchedStatus,
-      })
+      // this.$store.dispatch('ACTION_FETCH_COUNT_DOCUMENTS',
+      // pick(this.queryParams, ['client', 'name', 'filter', 'status']))
+      DocumentService.fetchDocumentsCount(pick(this.queryParams, ['client', 'name', 'filter', 'status']))
+        .then(data => {
+          this.total = data.count
+        })
     },
     resetFilterSettings() {
       this.searchedName = ''

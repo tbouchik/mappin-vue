@@ -36,7 +36,7 @@ class DocumentService {
   }
 
   static fetchNextSmeltedDocuments(queryParams) {
-    const { client, name, filter, skip } = queryParams
+    const { client, name, filter, skip, status } = queryParams
     if (typeof cancelToken !== typeof undefined) {
       cancelToken.cancel('Operation canceled due to new request.')
     }
@@ -54,6 +54,9 @@ class DocumentService {
     if (skip) {
       params.skip = skip
     }
+    if (status) {
+      params.status = status
+    }
     try {
       return axios.get(`/v1/documents/next`, { params }, { cancelToken: cancelToken.token })
         .then(
@@ -65,7 +68,6 @@ class DocumentService {
   }
   static fetchDocuments(queryParams) {
     const { client, page, limit, sort, name, filter, status } = queryParams
-    console.log(page)
     if (typeof cancelToken !== typeof undefined) {
       cancelToken.cancel('Operation canceled due to new request.')
     }
@@ -94,6 +96,26 @@ class DocumentService {
     } catch (error) {
       console.log(error)
     }
+  }
+
+  static fetchDocumentsCount(queryParams) {
+    const { client, name, status, filter } = queryParams
+    const params = {
+      client,
+    }
+    if (name && name !== '') {
+      params.name = name
+    }
+    if (status) {
+      params.status = status
+    }
+    if (filter) {
+      params.filter = filter
+    }
+    return axios.get('/v1/documents/count', { params })
+      .then(
+        ({ data }) => data
+      )
   }
 }
 

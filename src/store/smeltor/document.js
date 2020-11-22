@@ -175,10 +175,14 @@ export default {
           state.pagination = newPagination
         })
     },
-    MUTATION_CACHE_SMELTED_IDS(state, idsArray) {
+    MUTATION_CACHE_SMELTED_IDS(state, payload) {
       let newIdArray = []
-      idsArray.map(x => newIdArray.push(x.id))
-      state.smeltedCache = state.smeltedCache.concat(newIdArray)
+      payload.idsArray.map(x => newIdArray.push(x.id))
+      if (payload.concat) {
+        state.smeltedCache = state.smeltedCache.concat(newIdArray)
+      } else {
+        state.smeltedCache = newIdArray
+      }
     },
     MUTATION_RESET_SMELTED_IDS(state) {
       state.smeltedCache = []
@@ -236,8 +240,8 @@ export default {
     ACTION_FETCH_COUNT_DOCUMENTS({ commit }, filters) {
       commit('MUTATION_FETCH_COUNT_DOCUMENTS', filters)
     },
-    ACTION_CACHE_SMELTED_IDS({ commit }, idsArray) {
-      commit('MUTATION_CACHE_SMELTED_IDS', idsArray)
+    ACTION_CACHE_SMELTED_IDS({ commit }, payload) {
+      commit('MUTATION_CACHE_SMELTED_IDS', payload)
     },
     ACTION_RESET_SMELTED_IDS({ commit }) {
       commit('MUTATION_RESET_SMELTED_IDS')

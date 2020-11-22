@@ -172,7 +172,8 @@ export default {
         skip: cacheLength,
       }).then((idsArray) => {
         if (idsArray.length) {
-          this.$store.dispatch('ACTION_CACHE_SMELTED_IDS', idsArray)
+          this.$store.dispatch('ACTION_CACHE_SMELTED_IDS', { idsArray,
+            concat: true })
         } else {
           this.loadedAllSmelted = true
         }
