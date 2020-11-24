@@ -153,17 +153,40 @@
                 <i class="fe fe-edit mr-2" />
                 View
               </button>
-              <button @click="remove(record)" class="btn btn-sm btn-light">
+              <button @click="showModal(record)"
+                       class="btn btn-sm btn-light">
                 <small>
                   <i class="fe fe-trash mr-2" />
                 </small>
                 Remove
               </button>
+
+              <!-- <a-popconfirm title="Are you sure？"
+                            :confirm="confirm(record)"
+                            :cancel="cancel(record)">
+                  <a-icon slot="icon" type="question-circle-o" style="color: red" />
+                  <button  class="btn btn-sm btn-light">
+                  <small>
+                    <i class="fe fe-trash mr-2" />
+                  </small>
+                  Remove
+                   </button>
+              </a-popconfirm> -->
+
             </span>
           </a-table>
         </div>
       </div>
     </div>
+    <a-modal
+      title="Delete Document"
+      :visible="deletionModalVisible"
+      :confirm-loading="confirmDeletionLoading"
+      okType="danger"
+      @ok="handleOk"
+    >
+      <p>{{ deletionMessage }}</p>
+    </a-modal>
   </div>
 </template>
 <script>
@@ -225,6 +248,10 @@ export default {
       searchedTemplate: null,
       loading: false,
       validatorIsLoading: false,
+      confirmDeletionLoading: false,
+      deletionModalVisible: false,
+      currentDeletableId: null,
+      deletionMessage: '',
       limit: 10,
       page: 1,
       total: 10,
@@ -504,7 +531,26 @@ export default {
       this.searchedStatus = null
       this.searchedTemplate = null
     },
+    showModal(e) {
+      this.currentDeletableId = e.id
+      this.deletionMessage = `Are you sure to delete : ${e.name}`
+      this.deletionModalVisible = true
+    },
+    handleOk() {
+      this.ModalText = 'Deleting the document... '
+      this.confirmDeletionLoading = true
+      DocumentService.deleteDocument(this.currentDeletableId)
+        .then(id => {
+          if (this.currentDeletableId) {
+            this.documentsList = this.documentsList.filter(item => item.id !== this.currentDeletableId)
+            this.$store.dispatch('REMOVE_DOCUMENT', id)
+          }
+          this.confirmDeletionLoading = false
+          this.deletionModalVisible = false
+        })
+    },
   },
+
 }
 </script>
 <style scoped>

@@ -144,6 +144,15 @@ class DocumentService {
         ({ data }) => data
       )
   }
+
+  static deleteDocument(id) {
+    try {
+      return axios.delete(`/v1/documents/${id}`,)
+        .then(() => id)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 }
 
 export default DocumentService

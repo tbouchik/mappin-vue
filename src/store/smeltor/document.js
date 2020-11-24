@@ -168,10 +168,7 @@ export default {
       commit('MUTATION_UPDATE_DOCUMENTS_LIST', payload)
     },
     REMOVE_DOCUMENT({ commit }, id) {
-      return axios.delete(`/v1/documents/${id}`,)
-        .then(() => {
-          commit('REMOVE_DOC_FROM_LIST', id)
-        })
+      commit('REMOVE_DOC_FROM_LIST', id)
     },
     ACTION_INCREMENT_PAGE({ commit }) {
       commit('MUTATION_INCREMENT_PAGE')
