@@ -1,5 +1,6 @@
 <template>
-  <div v-if="current" v-shortkey.push="['alt']" @shortkey="theAction">
+<div >
+  <div v-if="current" v-shortkey.push="['alt']" @shortkey="toggleCatMode">
     <a-layout-header>
       <smelter-subbar :smeltedValidation="smeltedValidation" :current="current"/>
     </a-layout-header>
@@ -25,6 +26,7 @@
       </div>
     </a-layout-content>
   </div>
+</div>
 </template>
 <script>
 import TemplateViewer from '@/components/widgets/Smelter/Viewer/template.vue'
@@ -108,8 +110,11 @@ export default {
           break
       }
     },
-    theAction() {
+    toggleCatMode() {
       this.$store.dispatch('ACTION_TOGGLE_CATMODE')
+    },
+    goNext() {
+      console.log('haha')
     },
   },
 }

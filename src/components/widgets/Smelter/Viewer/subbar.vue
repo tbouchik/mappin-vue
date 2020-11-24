@@ -1,5 +1,7 @@
 <template>
-  <div :class="$style.subbar">
+  <div :class="$style.subbar"
+        v-shortkey="['enter']"
+      @shortkey="goNext()">
     <ul :class="$style.breadcrumbs" class="mr-4">
       <b-nav @click="goToClient">
         <b-nav-item>{{ current.client.name }}</b-nav-item>
