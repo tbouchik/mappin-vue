@@ -36,26 +36,6 @@ function saveDocToAPI(osmium, id) {
   }
 }
 
-function fetchDocumentsCount(queryParams) {
-  const { client, name, status, filter } = queryParams
-  const params = {
-    client,
-  }
-  if (name && name !== '') {
-    params.name = name
-  }
-  if (status) {
-    params.status = status
-  }
-  if (filter) {
-    params.filter = filter
-  }
-  return axios.get('/v1/documents/count', { params })
-    .then(
-      ({ data }) => data
-    )
-}
-
 export default {
   state: {
     formattedDocument: {},
@@ -64,13 +44,11 @@ export default {
     viewerIdList: [],
     currentIdx: 0,
     catMode: false,
-    pagination: {
-      limit: 10,
-      page: 1,
-    },
     loading: false,
     queryParams: {},
     smeltedCache: [],
+    totalDocumentsCount: 0,
+    documentsIdList: [],
   },
   mutations: {
     UPDATE_DOCUMENT_DATA(state, document) {
@@ -96,18 +74,9 @@ export default {
     CLEAR_DOCUMENT_DATA(state) {
       state.formattedDocument = null
     },
-    SET_DOCUMENTS_LIST(state, documentsList) {
-      documentsList.map((item, index) => { // TODO: Implement these properties in DB
-        item.date = item.createdAt
-        item.key = index
-        return item
-      })
-      state.documentsList = documentsList.sort((a, b) => {
-        return -(new Date(a.date) - new Date(b.date))
-      },)
-    },
     REMOVE_DOC_FROM_LIST(state, id) {
       state.documentsList = state.documentsList.filter(item => item.id !== id)
+      state.documentsIdList = state.documentsList.map(x => x.id)
     },
     MUTATION_INCREMENT_PAGE(state) {
       state.page++
@@ -157,23 +126,10 @@ export default {
     MUTATION_TOGGLE_CATMODE(state) {
       state.catMode = !state.catMode
     },
-    MUTATION_FETCH_DOCUMENTS_WITH_PARAMS(state, payload) {
-      Object.assign(state.pagination, pick(payload.queryParams, ['limit', 'page']))
+    MUTATION_UPDATE_DOCUMENTS_LIST(state, payload) {
       state.queryParams = payload.queryParams
-      DocumentService.fetchDocuments(payload.queryParams)
-      state.documentsList = payload.documentsList.map((item, index) => { // TODO: Implement these properties in DB
-        item.date = item.createdAt
-        item.key = index
-        return item
-      })
-    },
-    MUTATION_FETCH_COUNT_DOCUMENTS(state, filters) {
-      fetchDocumentsCount(filters)
-        .then(data => {
-          const newPagination = Object.assign({}, state.pagination)
-          newPagination.total = data.count
-          state.pagination = newPagination
-        })
+      state.documentsList = payload.documentsList
+      state.documentsIdList = state.documentsList.map(x => x.id)
     },
     MUTATION_CACHE_SMELTED_IDS(state, payload) {
       let newIdArray = []
@@ -187,6 +143,16 @@ export default {
     MUTATION_RESET_SMELTED_IDS(state) {
       state.smeltedCache = []
     },
+    MUTATION_UPDATE_TOTAL_DOC_COUNT(state, count) {
+      state.totalDocumentsCount = count
+    },
+    MUTATION_CACHE_IDS(state, payload) {
+      if (payload.right && payload.idsArray.length) {
+        state.documentsIdList = state.documentsIdList.concat(payload.idsArray.map(x => x.id))
+      } else if (payload.left && payload.idsArray.length) {
+        state.documentsIdList = payload.idsArray.map(x => x.id).concat(state.documentsIdList)
+      }
+    },
   },
   actions: {
     UPDATE_DOCUMENT({ commit }, document) {
@@ -198,14 +164,8 @@ export default {
     CLEAR_DOCUMENT({ commit }) {
       commit('CLEAR_DOCUMENT_DATA')
     },
-    FETCH_DOCUMENTS({ commit }) {
-      return axios.get(`/v1/documents`,)
-        .then(({ data }) => {
-          commit('SET_DOCUMENTS_LIST', data)
-        })
-    },
-    ACTION_FETCH_DOCUMENTS_WITH_PARAMS({ commit }, payload) {
-      commit('MUTATION_FETCH_DOCUMENTS_WITH_PARAMS', payload)
+    ACTION_UPDATE_DOCUMENTS_LIST({ commit }, payload) { // ACTION_FETCH_DOCUMENTS_WITH_PARAMS
+      commit('MUTATION_UPDATE_DOCUMENTS_LIST', payload)
     },
     REMOVE_DOCUMENT({ commit }, id) {
       return axios.delete(`/v1/documents/${id}`,)
@@ -237,14 +197,17 @@ export default {
     ACTION_TOGGLE_CATMODE({ commit }) {
       commit('MUTATION_TOGGLE_CATMODE')
     },
-    ACTION_FETCH_COUNT_DOCUMENTS({ commit }, filters) {
-      commit('MUTATION_FETCH_COUNT_DOCUMENTS', filters)
-    },
     ACTION_CACHE_SMELTED_IDS({ commit }, payload) {
       commit('MUTATION_CACHE_SMELTED_IDS', payload)
     },
     ACTION_RESET_SMELTED_IDS({ commit }) {
       commit('MUTATION_RESET_SMELTED_IDS')
+    },
+    ACTION_UPDATE_TOTAL_DOC_COUNT({ commit }, payload) { // TODO REMOVE IF NOT USABLE IN SUBBAR
+      commit('MUTATION_UPDATE_TOTAL_DOC_COUNT', payload)
+    },
+    ACTION_CACHE_IDS({ commit }, payload) {
+      commit('MUTATION_CACHE_IDS', payload)
     },
   },
   getters: {
@@ -252,15 +215,16 @@ export default {
     currentPageData: state => get(state, 'formattedDocument.metadata', {})['page_' + state.page],
     currentPage: state => get(state, 'page'),
     documentsList: state => state.documentsList,
-    documentsIdList: state => state.documentsList.map(x => x.id),
+    documentsIdList: state => state.documentsIdList, // todo remove
     smeltedIdList: state => state.documentsList.filter(x => {
       return x.status === 'smelted'
     }).map(x => x.id),
     currentActiveIndex: state => state.currentIdx,
     catMode: state => state.catMode,
     docTableLoading: state => state.loading, // TODO: eliminate
-    docTablePagination: state => state.pagination,
     docQueryParams: state => state.queryParams,
     docSmeltedCache: state => state.smeltedCache,
+    docPagination: state => pick(state.queryParams, ['page', 'limit']),
+    totalDocumentsCount: state => state.totalDocumentsCount, // TODO REMOVE IF NOT USABLE IN SUBBAR
   },
 }

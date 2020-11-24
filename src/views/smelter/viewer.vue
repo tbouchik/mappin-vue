@@ -62,7 +62,6 @@ export default {
       this.$store.dispatch('UPDATE_DOCUMENT', doc.data)
       this.currentFilter = this.current.osmium
     })
-    this.$store.dispatch('FETCH_DOCUMENTS')
   },
   watch: {
     documentId: function() {

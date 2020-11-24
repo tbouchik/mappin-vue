@@ -47,13 +47,15 @@
         <a-button
           type="link"
           :disabled="currentIndexIsFirst"
+          :loading="leftLoading"
           @click="goPrevious"
         >
           <a-icon type="left" />Previous</a-button
         >
-        <a-button type="link" :disabled="currentIndexIsLast"
-                              :loading="loading"
-                              @click="goNext">
+        <a-button type="link"
+                  :disabled="currentIndexIsLast"
+                  :loading="rightLoading"
+                  @click="goNext">
           Next<a-icon type="right" />
         </a-button>
       </a-button-group>
@@ -70,12 +72,18 @@ export default {
   name: 'SmelterSubbar',
   data: function () {
     return {
-      loading: false,
+      rightLoading: false,
+      leftLoading: false,
       loadedAllSmelted: false,
+      loadedAllDocsFromRight: false,
+      loadedAllDocsFromLeft: false,
     }
   },
   computed: {
-    ...mapGetters(['smeltedIdList', 'documentsIdList', 'docSmeltedCache', 'docQueryParams']),
+    ...mapGetters([ 'documentsIdList',
+      'docSmeltedCache',
+      'docQueryParams',
+      'docPagination']),
     currentIndex: function () {
       if (this.smeltedValidation) {
         return this.docSmeltedCache.indexOf(this.current.id)
@@ -89,13 +97,17 @@ export default {
       return this.documentsIdList.length - 1
     },
     currentIndexIsLast: function () {
-      if (this.currentIndex === this.lastIndex && !this.loadedAllSmelted) {
-        this.fetchNewIds()
+      if (this.currentIndex === this.lastIndex && this.smeltedValidation && !this.loadedAllSmelted) {
+        this.fetchNewSmeltedIds()
+      } else if (this.currentIndex === this.lastIndex && !this.smeltedValidation && !this.loadedAllDocsFromRight) {
+        this.fetchNewDocs('right')
       }
       return this.currentIndex === this.lastIndex
     },
     currentIndexIsFirst: function () {
-      console.log('this is the first index')
+      if (this.currentIndex === 0 && !this.smeltedValidation && !this.loadedAllDocsFromLeft) {
+        this.fetchNewDocs('left')
+      }
       return this.currentIndex === 0
     },
   },
@@ -120,6 +132,7 @@ export default {
           },
         })
       } else {
+        console.log(this.currentIndex)
         this.$router.push({
           name: 'viewer',
           params: {
@@ -139,6 +152,7 @@ export default {
           },
         })
       } else {
+        console.log(this.currentIndex)
         this.$router.push({
           name: 'viewer',
           params: {
@@ -164,8 +178,8 @@ export default {
     goToClient() {
       this.$router.push({ name: 'client', params: { clientId: this.current.client._id } })
     },
-    fetchNewIds() {
-      this.loading = true
+    fetchNewSmeltedIds() {
+      this.rightLoading = true
       const cacheLength = this.docSmeltedCache.length
       DocumentService.fetchNextSmeltedDocuments({
         ...this.docQueryParams,
@@ -177,15 +191,61 @@ export default {
         } else {
           this.loadedAllSmelted = true
         }
-        this.loading = false
+        this.rightLoading = false
       }).catch(error => {
         console.log(error)
-        this.loading = false
+        this.rightLoading = false
       })
+    },
+    fetchNewDocs(side) {
+      // this.docPagination
+      if (side === 'left') {
+        this.leftLoading = true
+        if (this.docPagination.page === 1) {
+          this.loadedAllDocsFromLeft = true
+          this.leftLoading = false
+        } else {
+          DocumentService.fetchNextDocuments({
+            ...this.docQueryParams,
+            side: 'left',
+            current: this.current.id,
+          }).then((idsArray) => {
+            if (idsArray.length) {
+              this.$store.dispatch('ACTION_CACHE_IDS', { idsArray,
+                left: true,
+                right: false })
+            } else {
+              this.loadedAllDocsFromLeft = true
+            }
+            this.leftLoading = false
+          }).catch(error => {
+            console.log(error)
+            this.leftLoading = false
+          })
+        }
+      } else {
+        this.rightLoading = true
+        DocumentService.fetchNextDocuments({
+          ...this.docQueryParams,
+          side: 'right',
+          current: this.current.id,
+        }).then((idsArray) => {
+          if (idsArray.length) {
+            this.$store.dispatch('ACTION_CACHE_IDS', { idsArray,
+              left: false,
+              right: true })
+          } else {
+            this.loadedAllDocsFromRight = true
+          }
+          this.rightLoading = false
+        }).catch(error => {
+          console.log(error)
+          this.rightLoading = false
+        })
+      }
     },
   },
   destroyed() {
-    console.log('destory')
     this.$store.dispatch('ACTION_RESET_SMELTED_IDS')
     this.loadedAllSmelted = false
   },
