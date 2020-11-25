@@ -36,6 +36,13 @@ function saveDocToAPI(osmium, id) {
   }
 }
 
+function filterAlpha (str) {
+  if (typeof str === 'string') {
+    return str.replace(/[^\d.-]/g, '')
+  }
+  return str
+}
+
 export default {
   state: {
     formattedDocument: {},
@@ -92,20 +99,23 @@ export default {
     },
     MUTATION_UPDATE_ACTIVE_VALUE(state, value) {
       let updateFormattedDoc = cloneDeep(state.formattedDocument)
+      const keyType = state.formattedDocument.filter.keys[state.currentIdx].type
+      const newVal = keyType === 'NUMBER' ? filterAlpha(value) : value
       if (state.catMode) {
-        let appendix = ' '.concat(value)
+        let appendix = ' '.concat(newVal)
         let currentValue = updateFormattedDoc.osmium[state.currentIdx].Value
         updateFormattedDoc.osmium[state.currentIdx].Value = currentValue ? currentValue.concat(appendix) : appendix.trim()
       } else {
-        updateFormattedDoc.osmium[state.currentIdx].Value = value
+        updateFormattedDoc.osmium[state.currentIdx].Value = newVal
       }
       state.formattedDocument = updateFormattedDoc
       saveDocToAPI(updateFormattedDoc.osmium, state.formattedDocument.id)
     },
     MUTATION_DO_CHANGES_TO_DOCUMENT(state, changeData) {
       let { value, itemIdx, column } = changeData
+      const keyType = state.formattedDocument.filter.keys[itemIdx].type
       let tempDoc = cloneDeep(state.formattedDocument)
-      tempDoc.osmium[itemIdx][column] = value
+      tempDoc.osmium[itemIdx][column] = keyType === 'NUMBER' ? filterAlpha(value) : value
       state.formattedDocument = tempDoc
       saveDocToAPI(state.formattedDocument.osmium, state.formattedDocument.id)
     },
