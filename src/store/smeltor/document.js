@@ -4,6 +4,7 @@ import axios from 'axios'
 import { cloneDeep, omit, get, pick } from 'lodash'
 import DocumentService from '../../services/documentService.js'
 import uuidv4 from 'uuid/v4'
+import moment from 'moment'
 
 Vue.use(Vuex)
 
@@ -41,6 +42,33 @@ function filterAlpha (str) {
     return str.replace(/[^\d.-]/g, '')
   }
   return str
+}
+
+function parseDate (value) {
+  if (!value) return ''
+  let parsedInput = ''
+  try {
+    parsedInput = moment(value).format('DD/MM/YYYY')
+    console.log('parsed input : ', moment(value).format('DD/MM/YYYY'))
+  } catch (error) {
+    console.log('parsing date failed: ', error)
+  }
+  return parsedInput
+}
+
+function formatValue (value, keyType, entryType) {
+  let parsedValue = null
+  switch (keyType) {
+    case 'NUMBER':
+      parsedValue = filterAlpha(value)
+      break
+    case 'DATE':
+      parsedValue = entryType === 'auto' ? parseDate(value) : value
+      break
+    default:
+      parsedValue = value
+  }
+  return parsedValue
 }
 
 export default {
@@ -100,7 +128,7 @@ export default {
     MUTATION_UPDATE_ACTIVE_VALUE(state, value) {
       let updateFormattedDoc = cloneDeep(state.formattedDocument)
       const keyType = state.formattedDocument.filter.keys[state.currentIdx].type
-      const newVal = keyType === 'NUMBER' ? filterAlpha(value) : value
+      const newVal = formatValue(value, keyType, 'auto')
       if (state.catMode) {
         let appendix = ' '.concat(newVal)
         let currentValue = updateFormattedDoc.osmium[state.currentIdx].Value
@@ -115,7 +143,7 @@ export default {
       let { value, itemIdx, column } = changeData
       const keyType = state.formattedDocument.filter.keys[itemIdx].type
       let tempDoc = cloneDeep(state.formattedDocument)
-      tempDoc.osmium[itemIdx][column] = keyType === 'NUMBER' ? filterAlpha(value) : value
+      tempDoc.osmium[itemIdx][column] = formatValue(value, keyType, 'manual')
       state.formattedDocument = tempDoc
       saveDocToAPI(state.formattedDocument.osmium, state.formattedDocument.id)
     },
