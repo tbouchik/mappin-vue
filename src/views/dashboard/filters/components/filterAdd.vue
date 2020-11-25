@@ -21,6 +21,20 @@
                   v-decorator="['description', { rules: [{ required: false, message: 'Input here your template description' }] }]"
               />
               </a-form-item>
+              <a-form-item label="Type">
+                <a-select
+                  v-decorator="[
+                    'type',
+                    { rules: [{ required: false, message: 'Please select your template type' }] },
+                  ]"
+                  placeholder="Select a type: Expense or Sale"
+                >
+                  <template>
+                    <a-select-option value="expense"> Expense </a-select-option>
+                    <a-select-option value="sale"> Sale </a-select-option>
+                  </template>
+                </a-select>
+              </a-form-item>
               <a-form-item
                 v-for="(k, index) in names"
                 :key="index"
@@ -92,6 +106,9 @@ export default {
     description: {
       type: String,
     },
+    type: {
+      type: String,
+    },
     keys: {
       type: Array,
       default: function () {
@@ -104,6 +121,7 @@ export default {
     this.form.getFieldDecorator('keys', { initialValue: [], preserve: true })
     this.form.getFieldDecorator('names', { initialValue: [], preserve: true })
     this.form.getFieldDecorator('description', { initialValue: '', preserve: true })
+    this.form.getFieldDecorator('type', { initialValue: '', preserve: true })
     this.form.getFieldDecorator('name', { initialValue: '', preserve: true })
   },
   data() {
@@ -131,6 +149,7 @@ export default {
     this.form.setFieldsValue({
       name: this.name,
       description: this.description,
+      type: this.type,
       keys: this.keys,
       names: this.keys,
     })
@@ -150,10 +169,11 @@ export default {
       e.preventDefault()
       this.form.validateFields((err, values) => {
         if (!err) {
-          const { description, name } = values
+          const { description, name, type } = values
           this.$store.dispatch('ACTION_ADD_FILTER', {
             name,
             description,
+            type,
             keys: this.names,
           })
         }

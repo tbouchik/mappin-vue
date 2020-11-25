@@ -9,6 +9,12 @@
     </ul>
     <div :class="$style.divider" class="mr-4 d-none d-xl-block" />
     <ul :class="$style.breadcrumbs" class="mr-4">
+      <b-nav>
+        <b-nav-item>{{ templateType }}</b-nav-item>
+      </b-nav>
+    </ul>
+    <div :class="$style.divider" class="mr-4 d-none d-xl-block" />
+    <ul :class="$style.breadcrumbs" class="mr-4">
       <li :class="$style.breadcrumb">
         <a
           href="#"
@@ -112,6 +118,15 @@ export default {
       }
       return this.currentIndex === 0
     },
+    templateType: function () {
+      let preffix = 'Invoice type: '
+      let suffix = 'Not Specified'
+      let type = this.current.filter.type
+      if (type) {
+        suffix = type.charAt(0).toUpperCase() + type.slice(1)
+      }
+      return preffix.concat(suffix)
+    },
   },
   props: {
     smeltedValidation: {
@@ -166,9 +181,12 @@ export default {
     },
     csvExport() {
       let csvContent = 'data:text/csv;charset=utf-8,'
-      let arrData = ['Key;Value']
-      this.current.osmium.map((item) => {
-        arrData.push(Object.values(pick(item, ['Key', 'Value'])).join(';'))
+      let lines = ['Key', 'Value']
+      let arrData = []
+      lines.map(line => {
+        arrData.push(this.current.osmium.map(item => {
+          return Object.values(pick(item, [line]))
+        }).join(';'))
       })
       csvContent += arrData.join('\n').replace(/(^\[)|(\]$)/gm, '')
       const data = encodeURI(csvContent)

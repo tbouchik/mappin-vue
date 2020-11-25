@@ -37,6 +37,21 @@
                 v-decorator="['description', { rules: [{ required: false, message: 'Input here your template description' }] }]"
               />
               </a-form-item>
+              <a-form-item label="Type">
+                <a-select
+                  :disabled="isSmartTemplate"
+                  v-decorator="[
+                    'type',
+                    { rules: [{ required: false, message: 'Please select your template type' }] },
+                  ]"
+                  placeholder="Select a type: Expense or Sale"
+                >
+                  <template>
+                    <a-select-option value="expense"> Expense </a-select-option>
+                    <a-select-option value="sale"> Sale </a-select-option>
+                  </template>
+                </a-select>
+              </a-form-item>
               <a-form-item
                 v-for="(k, index) in names"
                 :key="index"
@@ -117,6 +132,7 @@ export default {
     this.form.getFieldDecorator('keys', { initialValue: [], preserve: true })
     this.form.getFieldDecorator('names', { initialValue: [], preserve: true })
     this.form.getFieldDecorator('description', { initialValue: '', preserve: true })
+    this.form.getFieldDecorator('type', { initialValue: '', preserve: true })
     this.form.getFieldDecorator('name', { initialValue: '', preserve: true })
   },
   data() {
@@ -144,6 +160,9 @@ export default {
       description: {
         type: String,
       },
+      type: {
+        type: String,
+      },
       isSmartTemplate: true,
     }
   },
@@ -155,10 +174,12 @@ export default {
             this.isSmartTemplate = defaultFilterId === filter.id
             this.name = filter.name
             this.description = filter.description
+            this.type = filter.type
             this.names = filter.keys
             this.form.setFieldsValue({
               name: this.name,
               description: this.description,
+              type: this.type,
               names: this.names,
             })
             id = this.names.length || 0
@@ -180,10 +201,11 @@ export default {
       e.preventDefault()
       this.form.validateFields((err, values) => {
         if (!err) {
-          const { description, name } = values
+          const { description, name, type } = values
           const payloadBody = {
             name,
             description,
+            type,
             keys: this.names,
           }
 

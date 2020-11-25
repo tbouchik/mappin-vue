@@ -34,6 +34,7 @@ export default {
         filterId: this.template.id,
         name: this.template.name,
         description: this.template.description,
+        type: this.template.type,
         keys: this.template.keys,
       }
       this.$router.push({ name: 'filter', params })
