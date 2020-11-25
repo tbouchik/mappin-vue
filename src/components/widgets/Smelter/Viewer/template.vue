@@ -1,15 +1,6 @@
 <template>
   <div>
   <br>
-      <div :class="$style.subbar">
-        <div>
-          Concatenation Mode:
-          <a-switch
-          :checked="catMode"
-          @change="toggleCatMode"
-           />
-        </div>
-      </div>
       <a-table  :columns="columns"
                 :data-source="pageData"
                 :pagination=false
