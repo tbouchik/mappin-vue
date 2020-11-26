@@ -5,6 +5,7 @@
     <div class="mr-auto d-none d-md-block">
     </div>
     <div class="mb-0 mr-4 d-xl-block d-none">
+      <air-status />
     </div>
     <div class="mr-4 d-none d-sm-block">
     </div>
@@ -18,8 +19,11 @@
 
 <script>
 import AirUserMenu from '@/components/layout/TopBar/UserMenu/userMenu.vue'
+import AirStatus from '@/components/layout/TopBar/Status'
+
 export default {
   components: {
+    AirStatus,
     AirUserMenu,
   },
 }

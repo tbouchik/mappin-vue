@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
+import { cloneDeep } from 'lodash'
 
 Vue.use(Vuex)
 
@@ -24,6 +25,11 @@ export default {
     CLEAR_USER_DATA() {
       localStorage.removeItem('user')
       location.reload()
+    },
+    MUTATION_SET_USER_COUNTER(state, counter) {
+      const newStateUser = cloneDeep(state.user)
+      newStateUser.user.counter = counter
+      state.user = newStateUser
     },
   },
   actions: {
@@ -60,6 +66,13 @@ export default {
           }
         })
     },
+    ACTION_UPDATE_COUNTER({ commit }, userId) {
+      return axios
+        .get(`/v1/users/${userId}`)
+        .then(({ data }) => {
+          commit('MUTATION_SET_USER_COUNTER', data.counter)
+        })
+    },
     LOGOUT({ commit }) {
       commit('CLEAR_USER_DATA')
     },
@@ -70,7 +83,10 @@ export default {
         return state.user.user
       }
     },
+    userId: state => state.user.user.id,
     loggedIn: state => !!state.user,
     userIsClient: state => !!state.user.user.isClient,
+    userCount: state => state.user.user.counter ? state.user.user.counter : 0,
+    canUpload: state => state.user.user.counter ? state.user.user.counter < 100 : false,
   },
 }

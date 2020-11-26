@@ -103,6 +103,7 @@ new Vue({
     if (userString) {
       const userData = JSON.parse(userString)
       this.$store.commit('SET_USER_DATA', userData)
+      this.$store.dispatch('ACTION_UPDATE_COUNTER', userData.user.id)
     }
     axios.interceptors.response.use(
       response => response,

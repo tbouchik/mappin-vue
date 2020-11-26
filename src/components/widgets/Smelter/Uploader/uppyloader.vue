@@ -40,7 +40,7 @@ export default {
     this.instantiateUppy()
   },
   computed: {
-    ...mapGetters(['uploaderClient', 'uploaderFilter']),
+    ...mapGetters(['uploaderClient', 'uploaderFilter', 'userId']),
   },
   methods: {
     instantiateUppy() {
@@ -107,7 +107,7 @@ export default {
               message: 'Upload',
               description: 'Files were uploaded successfully',
             })
-            this.$router.push({ name: 'documents' })
+            this.$store.dispatch('ACTION_UPDATE_COUNTER', this.userId)
           }
         )
         this.files = []

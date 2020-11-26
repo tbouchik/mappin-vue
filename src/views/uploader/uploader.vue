@@ -14,6 +14,19 @@
       <br>
       <div>
         <template v-if="steps[uploaderStep].title == 'Client'">
+        <div>
+          Monthly Credit Limit:
+        <a-progress
+            :stroke-color="{
+              '0%': '#108ee9',
+              '100%': 'red',
+            }"
+            :percent="userCount"
+          />
+            <!-- <b-progress height="2rem" :value="value" variant="secondary" :striped="striped" show-progress class="mb-2"></b-progress> -->
+<!-- <b-progress :value="23" variant="danger" height="2rem" show-progress  class="mt-2"></b-progress> -->
+        </div>
+        <br>
         <a-input-search placeholder="Search Client" v-model="searchedClient" />
         <br> <br> <br>
         </template>
@@ -31,7 +44,7 @@
                     <a slot="title">{{ item.name }} | </a>
                     <a slot="title"> {{ item.company }}</a>
                   </a-list-item-meta>
-                  <a-button type="primary" @click="selectClient(item)" ghost>
+                  <a-button type="primary" @click="selectClient(item)" :disabled="!canUpload" ghost>
                     select
                   </a-button>
                 </a-list-item>
@@ -110,7 +123,9 @@ export default {
       'filters',
       'clients',
       'clientTableLoading',
-      'templateLoading']),
+      'templateLoading',
+      'userCount',
+      'canUpload']),
   },
   created() {
     this.$store.dispatch('ACTION_FETCH_CLIENTS', {
