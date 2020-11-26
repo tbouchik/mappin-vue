@@ -55,11 +55,18 @@
           <button
             type="button"
             class="btn btn-success btn-with-addon mr-auto text-nowrap d-none d-md-block"
-            :disabled="!documentsList.length"
+            :disabled="!documentsList.length||bulkCsvExportIsLoading"
             @click="() => bulkExportToCSV()"
           >
-            <span class="btn-addon">
+            <span v-if="!bulkCsvExportIsLoading" class="btn-addon">
               <i class="btn-addon-icon fe fe-download-cloud" />
+            </span>
+            <span v-if="bulkCsvExportIsLoading" class="btn-addon" style>
+              <i class="btn-addon-icon" >
+                <div class="spinner-grow spinner-grow-sm text-light" role="status">
+                <span class="sr-only">Loading...</span>
+                </div>
+              </i>
             </span>
             Bulk Download
           </button>
@@ -251,6 +258,7 @@ export default {
       confirmDeletionLoading: false,
       deletionModalVisible: false,
       currentDeletableId: null,
+      bulkCsvExportIsLoading: false,
       deletionMessage: '',
       limit: 10,
       page: 1,
@@ -487,22 +495,28 @@ export default {
       this.$router.push({ name: 'upload' })
     },
     bulkExportToCSV() {
+      this.bulkCsvExportIsLoading = true
       let zip = JSZip()
-      this.documentsList.map((document, idx) => {
-        let documentCsvContent = ''
-        let arrData = ['Key;Value']
-        document.osmium.map((item) => {
-          arrData.push(Object.values(pick(item, ['Key', 'Value'])).join(';'))
-        })
-        documentCsvContent += arrData.join('\n').replace(/(^\[)|(\]$)/gm, '')
-        zip.file(`${document.name}-${idx}.csv`, documentCsvContent)
-      })
-      zip
-        .generateAsync({
-          type: 'base64',
-        })
-        .then(function (content) {
-          window.location.href = 'data:application/zip;base64,' + content
+      DocumentService.bulkExportCSV((this.queryParams))
+        .then((templateAggregates) => {
+          templateAggregates.map((templateAggregate) => {
+            let templateCsvContent = ''
+            let arrData = []
+            arrData.push(templateAggregate.header.join(';'))
+            templateAggregate.osmiums.map((osmium) => {
+              arrData.push(osmium.join(';'))
+            })
+            templateCsvContent += arrData.join('\n').replace(/(^\[)|(\]$)/gm, '')
+            zip.file(`${templateAggregate.template}.csv`, templateCsvContent)
+            this.bulkCsvExportIsLoading = false
+          })
+          zip
+            .generateAsync({
+              type: 'base64',
+            })
+            .then(function (content) {
+              window.location.href = 'data:application/zip;base64,' + content
+            })
         })
     },
     handleTableChange(pagination, filters, sorter) {
