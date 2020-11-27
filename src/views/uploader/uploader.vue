@@ -67,13 +67,20 @@
             </div>
           </div>
           <div v-if="steps[uploaderStep].title == 'Files'">
-            <smelter-uppy-loader :maxFileSizeInBytes=10000000></smelter-uppy-loader>
+            <a-row>
+              <a-col :span="4"/>
+              <a-col :span="16">
+                <smelter-uppy-loader :maxFileSizeInBytes=10000000></smelter-uppy-loader>
+              </a-col>
+              <a-col :span="4"/>
+            </a-row>
           </div>
       </div>
       <div class="steps-action">
         <a-button v-if="uploaderStep > 0" style="margin-left: 8px" @click="prev">
           Previous
         </a-button>
+        <br><br>
       </div>
 
   </div>
