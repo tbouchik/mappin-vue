@@ -1,9 +1,8 @@
 <template>
   <div>
-    {{ $t('topBar.status') }}
     <span
       class="ml-2 p-1 badge bg-danger text-white font-size-12 text-uppercase"
-    >Trialing</span>
+    >Trial Version</span>
   </div>
 </template>
 <script>

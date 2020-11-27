@@ -50,7 +50,7 @@
           <a href="#">Contacts</a>
         </li>
       </ul>
-      <div class="text-gray-4 text-center">© 2019 Mediatec. All rights reserved.</div>
+      <div class="text-gray-4 text-center">© 2019 Smeltor. All rights reserved.</div>
     </div>
   </div>
 </template>

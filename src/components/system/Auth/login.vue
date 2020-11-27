@@ -35,10 +35,6 @@
         >Log in</button>
       </a-form>
 
-      <router-link
-        to="/system/forgot-password"
-        class="text-blue font-weight-bold font-size-18"
-      >Forgot password?</router-link>
     </div>
     <div class="text-center font-size-18 pt-4 mb-auto">
       Don't have an account?
@@ -47,7 +43,7 @@
       </router-link>
     </div>
     <div class="mt-auto pb-5 pt-5">
-      <ul
+      <!-- <ul
         class="list-unstyled d-flex mb-2 flex-wrap justify-content-center"
         :class="$style.footerNav"
       >
@@ -63,8 +59,8 @@
         <li>
           <a href="#">Contacts</a>
         </li>
-      </ul>
-      <div class="text-gray-4 text-center">© 2019 Mediatec. All rights reserved.</div>
+      </ul> -->
+      <div class="text-gray-4 text-center">© 2019 Smeltor. All rights reserved.</div>
     </div>
   </div>
 </template>
