@@ -10,7 +10,7 @@
     </div>
         <div class="card">
           <div class="card-body">
-            <a-form :form="form" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }" @submit="handleSubmit">
+            <a-form :form="form" :label-col="{ span: 4 }" :wrapper-col="{ span: 12 }" @submit="handleSubmit">
               <a-form-item label="Name">
               <a-input
                   v-decorator="['name', { rules: [{ required: true, message: 'Please input your template name' }] }]"
