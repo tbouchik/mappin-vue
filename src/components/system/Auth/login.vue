@@ -94,6 +94,7 @@ export default {
             this.$notification['warning']({
               message: error.response.statusText,
               description: error.response.data.message,
+              duration: 1,
             })
           })
         }

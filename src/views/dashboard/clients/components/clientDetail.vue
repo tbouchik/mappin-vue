@@ -117,6 +117,7 @@ export default {
               this.$notification['warning']({
                 message: response.message,
                 description: response.description,
+                duration: 2,
               })
             }
           }).finally(() => {

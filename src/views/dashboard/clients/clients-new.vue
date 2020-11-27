@@ -14,7 +14,7 @@
           <h5 class="mb-0">Your clients</h5>
         </div>
         <div class="d-flex flex-column justify-content-center">
-          <button class="btn btn-success"
+          <button class="btn btn-success btn-sm"
             v-if="!addMode"
             @click="openAddMode"
           >
@@ -234,6 +234,7 @@ export default {
                 this.$notification['warning']({
                   message: response.message,
                   description: response.description,
+                  duration: 2,
                 })
               }
             }).finally(() => {

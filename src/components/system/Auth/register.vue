@@ -110,12 +110,14 @@ export default {
             this.$notification['success']({
               message: 'Signed Up',
               description: 'You have successfully signed up to Smeltor!',
+              duration: 1,
             })
           }).catch((error) => {
             this.$nprogress.done()
             this.$notification['warning']({
               message: error.response.statusText,
               description: error.response.data.message,
+              duration: 2,
             })
           })
         }

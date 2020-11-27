@@ -19,7 +19,7 @@
         >
           <button
             type="button"
-            class="btn btn-primary btn-with-addon mr-auto text-nowrap d-none d-md-block"
+            class="btn btn-primary btn-with-addon mr-auto text-nowrap d-none d-md-block btn-sm"
             @click="goToUpload"
           >
             <span class="btn-addon">
@@ -31,7 +31,7 @@
         <div class="d-flex flex-column justify-content-center col-2">
           <button
             type="button"
-            class="btn btn-success btn-with-addon mr-auto text-nowrap d-none d-md-block"
+            class="btn btn-success btn-with-addon mr-auto text-nowrap d-none d-md-block btn-sm"
             :disabled="everythingIsValidated"
             @click="() => goToValidation()"
           >
