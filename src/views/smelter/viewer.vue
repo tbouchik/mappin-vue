@@ -1,6 +1,6 @@
 <template>
 <div >
-  <div v-if="current" v-shortkey.push="['alt']" @shortkey="toggleCatMode">
+  <div v-if="current" v-shortkey.push="['ctrl']" @shortkey="toggleCatMode">
     <a-layout-header>
       <smelter-subbar :smeltedValidation="smeltedValidation" :current="current"/>
     </a-layout-header>
