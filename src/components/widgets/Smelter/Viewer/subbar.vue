@@ -82,7 +82,8 @@ export default {
     return {
       rightLoading: false,
       leftLoading: false,
-      loadedAllSmelted: false,
+      loadedAllSmeltedFromLeft: false,
+      loadedAllSmeltedFromRight: false,
       loadedAllDocsFromRight: false,
       loadedAllDocsFromLeft: false,
     }
@@ -106,14 +107,16 @@ export default {
     },
     currentIndexIsLast: function () {
       if (this.currentIndex === this.lastIndex && this.smeltedValidation && !this.loadedAllSmelted) {
-        this.fetchNewSmeltedIds()
+        this.fetchNewSmeltedIds('right')
       } else if (this.currentIndex === this.lastIndex && !this.smeltedValidation && !this.loadedAllDocsFromRight) {
         this.fetchNewDocs('right')
       }
       return this.currentIndex === this.lastIndex
     },
     currentIndexIsFirst: function () {
-      if (this.currentIndex === 0 && !this.smeltedValidation && !this.loadedAllDocsFromLeft) {
+      if (this.currentIndex === 0 && this.smeltedValidation && !this.loadedAllSmelted) {
+        this.fetchNewSmeltedIds('left')
+      } else if (this.currentIndex === 0 && !this.smeltedValidation && !this.loadedAllDocsFromLeft) {
         this.fetchNewDocs('left')
       }
       return this.currentIndex === 0
@@ -159,6 +162,7 @@ export default {
         })
       }
     },
+
     goPrevious() {
       if (this.smeltedValidation) {
         this.$router.push({
@@ -179,6 +183,7 @@ export default {
         })
       }
     },
+
     csvExport() {
       let csvContent = 'data:text/csv;charset=utf-8,'
       let lines = ['Key', 'Value']
@@ -195,28 +200,75 @@ export default {
       link.setAttribute('download', `${this.current.name.split('.')[0]}.csv`)
       link.click()
     },
+
     goToClient() {
       this.$router.push({ name: 'client', params: { clientId: this.current.client._id } })
     },
-    fetchNewSmeltedIds() {
-      this.rightLoading = true
-      const cacheLength = this.docSmeltedCache.length
-      DocumentService.fetchNextSmeltedDocuments({
-        ...this.docQueryParams,
-        skip: cacheLength,
-      }).then((idsArray) => {
-        if (idsArray.length) {
-          this.$store.dispatch('ACTION_CACHE_SMELTED_IDS', { idsArray,
-            concat: true })
+
+    fetchNewSmeltedIds(side) {
+      // this.rightLoading = true
+      // const cacheLength = this.docSmeltedCache.length
+      // DocumentService.fetchNextSmeltedDocuments({
+      //   ...this.docQueryParams,
+      //   skip: cacheLength,
+      // }).then((idsArray) => {
+      //   if (idsArray.length) {
+      //     this.$store.dispatch('ACTION_CACHE_SMELTED_IDS', { idsArray,
+      //       concat: true })
+      //   } else {
+      //     this.loadedAllSmelted = true
+      //   }
+      //   this.rightLoading = false
+      // }).catch(error => {
+      //   console.log(error)
+      //   this.rightLoading = false
+      // })
+      if (side === 'left') {
+        this.leftLoading = true
+        if (this.docPagination.page === 1) {
+          this.loadedAllSmeltedFromLeft = true
+          this.leftLoading = false
         } else {
-          this.loadedAllSmelted = true
+          DocumentService.fetchNextSmeltedDocuments({
+            ...this.docQueryParams,
+            side: 'left',
+            current: this.current.id,
+          }).then((idsArray) => {
+            if (idsArray.length) {
+              this.$store.dispatch('ACTION_CACHE_SMELTED_IDS', { idsArray,
+                left: true,
+                right: false })
+            } else {
+              this.loadedAllSmeltedFromLeft = true
+            }
+            this.leftLoading = false
+          }).catch(error => {
+            console.log(error)
+            this.leftLoading = false
+          })
         }
-        this.rightLoading = false
-      }).catch(error => {
-        console.log(error)
-        this.rightLoading = false
-      })
+      } else {
+        this.rightLoading = true
+        DocumentService.fetchNextSmeltedDocuments({
+          ...this.docQueryParams,
+          side: 'right',
+          current: this.current.id,
+        }).then((idsArray) => {
+          if (idsArray.length) {
+            this.$store.dispatch('ACTION_CACHE_SMELTED_IDS', { idsArray,
+              left: false,
+              right: true })
+          } else {
+            this.loadedAllSmeltedFromRight = true
+          }
+          this.rightLoading = false
+        }).catch(error => {
+          console.log(error)
+          this.rightLoading = false
+        })
+      }
     },
+
     fetchNewDocs(side) {
       // this.docPagination
       if (side === 'left') {

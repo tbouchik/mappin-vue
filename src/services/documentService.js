@@ -29,7 +29,7 @@ class DocumentService {
   }
 
   static fetchNextSmeltedDocuments(queryParams) {
-    const { client, name, filter, skip, status } = queryParams
+    const { client, name, filter, skip, status, side, current } = queryParams
     if (typeof cancelToken !== typeof undefined) {
       cancelToken.cancel('Operation canceled due to new request.')
     }
@@ -37,6 +37,8 @@ class DocumentService {
     cancelToken = axios.CancelToken.source()
     const params = {
       client,
+      side,
+      current,
     }
     if (name && name !== '') {
       params.name = name

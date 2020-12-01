@@ -170,12 +170,12 @@ export default {
       state.documentsIdList = state.documentsList.map(x => x.id)
     },
     MUTATION_CACHE_SMELTED_IDS(state, payload) {
-      let newIdArray = []
-      payload.idsArray.map(x => newIdArray.push(x.id))
-      if (payload.concat) {
-        state.smeltedCache = state.smeltedCache.concat(newIdArray)
+      if (payload.right && payload.idsArray.length) {
+        state.smeltedCache = state.smeltedCache.concat(payload.idsArray.map(x => x.id))
+      } else if (payload.left && payload.idsArray.length) {
+        state.smeltedCache = payload.idsArray.map(x => x.id).concat(state.smeltedCache)
       } else {
-        state.smeltedCache = newIdArray
+        state.smeltedCache = payload.idsArray.map(x => x.id)
       }
     },
     MUTATION_RESET_SMELTED_IDS(state) {

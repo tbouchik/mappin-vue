@@ -452,6 +452,12 @@ export default {
               this.$store.dispatch('ACTION_UPDATE_DOCUMENTS_LIST', { documentsList, queryParams: paramsUsedInQuery })
             }
           })
+        DocumentService.fetchNextSmeltedDocuments(this.queryParams)
+          .then(idsArray => {
+            this.$store.dispatch('ACTION_CACHE_SMELTED_IDS', { idsArray,
+              concat: false })
+            this.validatorIsLoading = false
+          })
       }, 10000)
       this.$store.dispatch('ACTION_FETCH_FILTERS')
     }
