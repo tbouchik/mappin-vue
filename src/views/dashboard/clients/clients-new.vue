@@ -244,7 +244,6 @@ export default {
       })
     },
     handleTableChange(pagination, filters, sorter) {
-      console.log(pagination, filters, sorter)
       const pager = { ...this.clientTablePagination }
       pager.current = pagination.current
       this.clientTablePagination = pager

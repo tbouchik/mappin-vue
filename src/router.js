@@ -24,6 +24,7 @@ const router = new Router({
           name: 'viewer',
           meta: {
             title: 'Smelter Viewer',
+            authRequired: true,
           },
           props: true,
           component: () => import('./views/smelter/viewer.vue'),
@@ -33,6 +34,7 @@ const router = new Router({
           name: 'upload',
           meta: {
             title: 'Smelter Uploader',
+            authRequired: true,
           },
           props: true,
           component: () => import('./views/uploader/uploader.vue'),
@@ -43,6 +45,7 @@ const router = new Router({
           name: 'documents',
           meta: {
             title: 'Dashboard Documents',
+            authRequired: true,
           },
           props: true,
           component: () => import('./views/dashboard/documents/documents.vue'),
@@ -52,6 +55,7 @@ const router = new Router({
           name: 'clients',
           meta: {
             title: 'Dashboard Clients',
+            authRequired: true,
           },
           props: true,
           component: () => import('./views/dashboard/clients/clients-new.vue'),
@@ -61,6 +65,7 @@ const router = new Router({
           name: 'client',
           meta: {
             title: 'Client Detail',
+            authRequired: true,
           },
           props: true,
           component: () => import('./views/dashboard/clients/components/clientDetail.vue'),
@@ -70,6 +75,7 @@ const router = new Router({
           name: 'filters',
           meta: {
             title: 'Dashboard Filters',
+            authRequired: true,
           },
           props: true,
           component: () => import('./views/dashboard/filters/filters.vue'),
@@ -79,6 +85,7 @@ const router = new Router({
           name: 'filter',
           meta: {
             title: 'Dashboard Filters',
+            authRequired: true,
           },
           props: true,
           component: () => import('./views/dashboard/filters/components/filterDetail.vue'),
@@ -89,6 +96,7 @@ const router = new Router({
           name: 'addNewFilter',
           meta: {
             title: 'Add New Template',
+            authRequired: true,
           },
           props: true,
           component: () => import('./views/dashboard/filters/components/filterAdd.vue'),

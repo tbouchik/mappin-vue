@@ -1,8 +1,8 @@
 <template>
 <div >
-  <div v-if="current" v-shortkey.push="['ctrl']" @shortkey="toggleCatMode">
+  <div v-if="currentIsReady" v-shortkey.push="['ctrl']" @shortkey="toggleCatMode">
     <a-layout-header>
-      <smelter-subbar :smeltedValidation="smeltedValidation" :current="current"/>
+      <smelter-subbar :smeltedValidation="smeltedValidation" :current="currentDocument"/>
     </a-layout-header>
     <a-layout-content>
       <div  class="container-fluid"
@@ -23,6 +23,13 @@
               <smelter-image-window  :name="documentName" :currentPageData="currentPageData" />
           </div>
         </div>
+      </div>
+    </a-layout-content>
+  </div>
+  <div v-else>
+    <a-layout-content>
+      <div class="center ">
+        <a-spin  size="large"/>
       </div>
     </a-layout-content>
   </div>
@@ -47,6 +54,7 @@ export default {
   data() {
     return {
       currentFilter: [],
+      currentDocument: {},
     }
   },
   props: {
@@ -62,27 +70,32 @@ export default {
   created() {
     DocumentService.fetchDocument(this.documentId).then(doc => {
       this.$store.dispatch('UPDATE_DOCUMENT', doc.data)
-      this.currentFilter = this.current.osmium
+      this.currentDocument = doc.data
+      this.currentFilter = this.currentDocument.osmium
     })
   },
   watch: {
     documentId: function() {
       return DocumentService.fetchDocument(this.documentId).then(doc => {
         this.$store.dispatch('UPDATE_DOCUMENT', doc.data)
+        this.currentDocument = doc.data
         this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', 0)
       })
     },
-    current: function() {
-      this.currentFilter = this.current.osmium
+    currentDocument: function() {
+      this.currentFilter = this.currentDocument.osmium
     },
   },
   computed: {
-    ...mapGetters(['current', 'documentsIdList', 'currentPageData', 'currentActiveIndex']),
+    ...mapGetters(['documentsIdList', 'currentPageData', 'currentActiveIndex']),
     documentName: function() {
-      return get(this.current, 'alias')
+      return get(this.currentDocument, 'alias')
     },
     documentIsPdf: function() {
-      return get(this.current, 'mimeType') === 'application/pdf'
+      return get(this.currentDocument, 'mimeType') === 'application/pdf'
+    },
+    currentIsReady: function() {
+      return Object.values(this.currentDocument).length > 0
     },
   },
   methods: {
@@ -113,9 +126,6 @@ export default {
     toggleCatMode() {
       this.$store.dispatch('ACTION_TOGGLE_CATMODE')
     },
-    goNext() {
-      console.log('haha')
-    },
   },
 }
 </script>
@@ -124,6 +134,14 @@ div.sticky {
   position: -webkit-sticky; /* Safari */
   position: sticky;
   top: 10px;
+}
+.center {
+  text-align: center;
+  background: white;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  padding: 30px 50px;
+  margin: 20px 0;
 }
 
 </style>

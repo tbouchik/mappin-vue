@@ -114,7 +114,6 @@ export default {
   },
   watch: {
     searchedClient: function() {
-      console.log(this.searchedClient)
       this.$store.dispatch('ACTION_FETCH_CLIENTS', {
         limit: 100,
         page: 1,

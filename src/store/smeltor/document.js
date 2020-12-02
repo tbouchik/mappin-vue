@@ -49,7 +49,6 @@ function parseDate (value) {
   let parsedInput = ''
   try {
     parsedInput = moment(value).format('DD/MM/YYYY')
-    console.log('parsed input : ', moment(value).format('DD/MM/YYYY'))
   } catch (error) {
     console.log('parsing date failed: ', error)
   }

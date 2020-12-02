@@ -230,7 +230,6 @@ const columns = [
     scopedSlots: {
       customRender: 'status',
     },
-    onFilter: (value, record) => console.log(value),
   },
   {
     title: 'Date Added',
@@ -277,7 +276,7 @@ export default {
       this.validatorIsLoading = true
       DocumentService.fetchDocuments(this.queryParams)
         .then(documentsList => {
-          console.log('number: searchedName')
+          // console.log('number: searchedName')
 
           this.page = 1
 
@@ -310,7 +309,7 @@ export default {
       this.validatorIsLoading = true
       DocumentService.fetchDocuments(this.queryParams)
         .then(documentsList => {
-          console.log('number: searchedStatus')
+          // console.log('number: searchedStatus')
           this.page = 1
 
           this.documentsList = documentsList.map((item, index) => { // TODO: Implement these properties in DB
@@ -342,7 +341,7 @@ export default {
       this.validatorIsLoading = true
       DocumentService.fetchDocuments(this.queryParams)
         .then(documentsList => {
-          console.log('number: searchedTemplate',)
+          // console.log('number: searchedTemplate',)
           this.page = 1
           this.documentsList = documentsList.map((item, index) => { // TODO: Implement these properties in DB
             item.date = item.createdAt
@@ -401,7 +400,7 @@ export default {
       const queryParams = pick(this.queryParams, ['client', 'limit', 'page'])
       DocumentService.fetchDocuments(queryParams)
         .then(documentsList => {
-          console.log('number: @created inside first "if"')
+          // console.log('number: @created inside first "if"')
           this.documentsList = documentsList.map((item, index) => { // TODO: Implement these properties in DB
             item.date = item.createdAt
             item.key = index
@@ -423,7 +422,7 @@ export default {
       const queryParams = pick(this.queryParams, ['client', 'limit', 'page'])
       DocumentService.fetchDocuments(queryParams)
         .then(documentsList => {
-          console.log('number: @created inside first "else" ',)
+          // console.log('number: @created inside first "else" ',)
           this.documentsList = documentsList.map((item, index) => { // TODO: Implement these properties in DB
             item.date = item.createdAt
             item.key = index
@@ -441,9 +440,9 @@ export default {
         const paramsUsedInQuery = Object.assign({}, this.queryParams)
         DocumentService.fetchDocuments(paramsUsedInQuery)
           .then(documentsList => {
-            console.log('set Interval is goinnnnnn to ....')
+            // console.log('set Interval is goinnnnnn to ....')
             if (isEqual(paramsUsedInQuery, this.queryParams)) {
-              console.log('DOOOONE: number: Time interval')
+              // console.log('DOOOONE: number: Time interval')
               this.documentsList = documentsList.map((item, index) => { // TODO: Implement these properties in DB
                 item.date = item.createdAt
                 item.key = index
@@ -526,13 +525,12 @@ export default {
         })
     },
     handleTableChange(pagination, filters, sorter) {
-      console.log(pagination, filters, sorter)
       this.limit = pagination.pageSize
       this.page = pagination.current
       this.loading = true
       DocumentService.fetchDocuments(this.queryParams)
         .then(documentsList => {
-          console.log('number: HANDLE TABLE CHANGE')
+          // console.log('number: HANDLE TABLE CHANGE')
           this.documentsList = documentsList.map((item, index) => { // TODO: Implement these properties in DB
             item.date = item.createdAt
             item.key = index

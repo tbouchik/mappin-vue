@@ -19,8 +19,7 @@
         <a
           href="#"
           :class="[$style.breadcrumbLink, $style.breadcrumbLink__current]"
-          >{{ current.name }}</a
-        >
+          >{{ current.name }}</a>
       </li>
     </ul>
     <div :class="$style.divider" class="mr-4 d-none d-xl-block" />
@@ -152,7 +151,6 @@ export default {
           },
         })
       } else {
-        console.log(this.currentIndex)
         this.$router.push({
           name: 'viewer',
           params: {
@@ -173,7 +171,6 @@ export default {
           },
         })
       } else {
-        console.log(this.currentIndex)
         this.$router.push({
           name: 'viewer',
           params: {
