@@ -1,20 +1,11 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
-import { cloneDeep, omit, get, pick } from 'lodash'
-import DocumentService from '../../services/documentService.js'
+import { cloneDeep, get, pick } from 'lodash'
 import uuidv4 from 'uuid/v4'
 import moment from 'moment'
 
 Vue.use(Vuex)
-
-function omitKeyFromFilter(filter) {
-  let formattedCopy = cloneDeep(filter)
-  formattedCopy = filter.map(item => {
-    return omit(item, ['key'])
-  })
-  return formattedCopy
-}
 
 let cancelToken
 
@@ -91,19 +82,7 @@ export default {
         item.key = index // This is to avoid ant design spitting on your face for
         return item // inserting items from osmium in ant table <a-table> without a unique key
       })
-    },
-    SAVE_CURRENT_DOCUMENT(state, filter) {
-      Object.assign(state.formattedDocument.osmium, filter)
-      const updatedDocument = {
-        name: document.name,
-        osmium: omitKeyFromFilter(filter),
-        status: 'validated',
-      }
-      state.documentsList[state.documentsList.findIndex(x => x.id === state.formattedDocument.id)].osmium = filter
-      DocumentService.updateDocument(
-        updatedDocument,
-        state.formattedDocument.id
-      )
+      state.documentsList[state.documentsList.findIndex(x => x.id === state.formattedDocument.id)] = state.formattedDocument
     },
     CLEAR_DOCUMENT_DATA(state) {
       state.formattedDocument = null
@@ -194,9 +173,6 @@ export default {
   actions: {
     UPDATE_DOCUMENT({ commit }, document) {
       commit('UPDATE_DOCUMENT_DATA', document)
-    },
-    SAVE_DOCUMENT({ commit }, filter) {
-      commit('SAVE_CURRENT_DOCUMENT', filter)
     },
     CLEAR_DOCUMENT({ commit }) {
       commit('CLEAR_DOCUMENT_DATA')

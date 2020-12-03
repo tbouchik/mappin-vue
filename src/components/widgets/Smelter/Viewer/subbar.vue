@@ -3,8 +3,34 @@
         v-shortkey="['enter']"
       @shortkey="goNext()">
     <ul :class="$style.breadcrumbs" class="mr-4">
-      <b-nav @click="goToClient">
+      <b-nav @click="showClientModal">
         <b-nav-item>{{ current.client.name }}</b-nav-item>
+        <a-modal  v-model="clientModalVisible"
+                  title="Change client"
+                  on-ok="handleOk"
+                  :width="660"
+                  >
+          <template slot="footer">
+            <a-button key="back" :disabled="clientTableLoading" @click="handleCancelClientChange">
+              Return
+            </a-button>
+          </template>
+          <div class="demo-infinite-container ">
+            <a-input-search placeholder="Search Client" v-model="searchedClient" />
+              <a-list :data-source="clients"
+                      :loading="clientTableLoading">
+                <a-list-item  slot="renderItem" slot-scope="item">
+                  <a-list-item-meta :description="item.email">
+                    <a slot="title">{{ item.name }} | </a>
+                    <a slot="title"> {{ item.company }}</a>
+                  </a-list-item-meta>
+                  <a-button type="primary" @click="selectClient(item)" ghost>
+                    select
+                  </a-button>
+                </a-list-item>
+              </a-list>
+            </div>
+        </a-modal>
       </b-nav>
     </ul>
     <div :class="$style.divider" class="mr-4 d-none d-xl-block" />
@@ -15,12 +41,14 @@
     </ul>
     <div :class="$style.divider" class="mr-4 d-none d-xl-block" />
     <ul :class="$style.breadcrumbs" class="mr-4">
+      <a-tooltip placement="topLeft" :title="current.name" arrowPointAtCenter>
       <li :class="$style.breadcrumb">
         <a
           href="#"
           :class="[$style.breadcrumbLink, $style.breadcrumbLink__current]"
-          >{{ current.name }}</a>
+          >{{ current.name| shortened }}</a>
       </li>
+      </a-tooltip>
     </ul>
     <div :class="$style.divider" class="mr-4 d-none d-xl-block" />
     <p
@@ -85,13 +113,42 @@ export default {
       loadedAllSmeltedFromRight: false,
       loadedAllDocsFromRight: false,
       loadedAllDocsFromLeft: false,
+      clientModalVisible: false,
+      searchedClient: null,
+      searchedTemplate: null,
+      clientName: '',
     }
+  },
+  created() {
+    this.clientName = this.current.client.name
+  },
+  watch: {
+    searchedClient: function() {
+      this.$store.dispatch('ACTION_FETCH_CLIENTS', {
+        limit: 100,
+        page: 1,
+        name: this.searchedClient,
+        current: this.current.client._id,
+      })
+    },
+    searchedTemplate: function() {
+      this.$store.dispatch('ACTION_FETCH_FILTERS', {
+        limit: 100,
+        page: 1,
+        name: this.searchedTemplate,
+      })
+    },
+    current: function() {
+      this.clientName = this.current.client.name // Computed does not work
+    },
   },
   computed: {
     ...mapGetters([ 'documentsIdList',
       'docSmeltedCache',
       'docQueryParams',
-      'docPagination']),
+      'docPagination',
+      'clients',
+      'clientTableLoading']),
     currentIndex: function () {
       if (this.smeltedValidation) {
         return this.docSmeltedCache.indexOf(this.current.id)
@@ -121,7 +178,7 @@ export default {
       return this.currentIndex === 0
     },
     templateType: function () {
-      let preffix = 'Invoice type: '
+      let preffix = 'Type: '
       let suffix = 'Not Specified'
       let type = this.current.filter.type
       if (type) {
@@ -203,23 +260,6 @@ export default {
     },
 
     fetchNewSmeltedIds(side) {
-      // this.rightLoading = true
-      // const cacheLength = this.docSmeltedCache.length
-      // DocumentService.fetchNextSmeltedDocuments({
-      //   ...this.docQueryParams,
-      //   skip: cacheLength,
-      // }).then((idsArray) => {
-      //   if (idsArray.length) {
-      //     this.$store.dispatch('ACTION_CACHE_SMELTED_IDS', { idsArray,
-      //       concat: true })
-      //   } else {
-      //     this.loadedAllSmelted = true
-      //   }
-      //   this.rightLoading = false
-      // }).catch(error => {
-      //   console.log(error)
-      //   this.rightLoading = false
-      // })
       if (side === 'left') {
         this.leftLoading = true
         if (this.docPagination.page === 1) {
@@ -312,6 +352,36 @@ export default {
           this.rightLoading = false
         })
       }
+    },
+
+    showClientModal() {
+      this.clientModalVisible = true
+      this.$store.dispatch('ACTION_FETCH_CLIENTS', {
+        limit: 100,
+        page: 1,
+        name: this.searchedClient,
+        current: this.current.client._id,
+      })
+    },
+
+    handleCancelClientChange(e) {
+      this.clientModalVisible = false
+      this.searchedClient = null
+    },
+
+    selectClient(client) {
+      this.$store.dispatch('ACTION_START_CLIENT_LOADER')
+      const body = { client: client.id }
+      DocumentService.updateDocument(body, this.current.id)
+        .then(() => {
+          DocumentService.fetchDocument(this.current.id)
+            .then(doc => {
+              this.$store.dispatch('UPDATE_DOCUMENT', doc)
+              this.$store.dispatch('ACTION_STOP_CLIENT_LOADER')
+              this.clientModalVisible = false
+              this.searchedClient = null
+            })
+        })
     },
   },
   destroyed() {

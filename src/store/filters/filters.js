@@ -9,15 +9,15 @@ Vue.use(Vuex)
 let cancelToken
 
 function fetchTemplates (queryParams) {
-  const { page, limit, name } = queryParams
+  const { page, limit, name, current } = queryParams
   if (typeof cancelToken !== typeof undefined) {
     cancelToken.cancel('Operation canceled due to new request.')
   }
   // Save the cancel token for the current request
   cancelToken = axios.CancelToken.source()
-  console.log(cancelToken)
   const params = {
     limit,
+    current,
   }
   if (page && page > 0) {
     params.page = page - 1
@@ -30,11 +30,6 @@ function fetchTemplates (queryParams) {
       .then(
         ({ data }) => data
       )
-      .catch(thrown => {
-        if (axios.isCancel(thrown)) {
-          console.log('req canceled', thrown)
-        }
-      })
   } catch (error) {
     console.log(error)
   }
@@ -80,6 +75,12 @@ export default {
           state.filtersList.filter(item => item.id !== id)
         })
     },
+    MUTATION_START_FILTER_LOADER(state) {
+      state.loading = true
+    },
+    MUTATION_STOP_FILTER_LOADER(state) {
+      state.loading = false
+    },
   },
   actions: {
     ACTION_FETCH_FILTERS({ commit }, payload) {
@@ -93,6 +94,12 @@ export default {
     },
     ACTION_REMOVE_FILTER({ commit }, payload) {
       commit('MUTATION_REMOVE_FILTER', payload)
+    },
+    ACTION_START_FILTER_LOADER({ commit }) {
+      commit('MUTATION_START_FILTER_LOADER')
+    },
+    ACTION_STOP_FILTER_LOADER({ commit }) {
+      commit('MUTATION_STOP_FILTER_LOADER')
     },
   },
   getters: {

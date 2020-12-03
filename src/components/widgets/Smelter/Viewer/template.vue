@@ -78,15 +78,8 @@ export default {
     switchEditMode() {
       this.editMode = !this.editMode
     },
-    // async saveVersion() {
-    //   await this.$store.dispatch('SAVE_DOCUMENT', this.pageData)
-    // },
     handleChange(value, itemIdx, column) {
       this.$store.dispatch('ACTION_DO_CHANGES_TO_DOCUMENT', { value, itemIdx, column })
-    },
-    async remove(record, itemIdx) {
-      this.pageData.splice(itemIdx, 1)
-      await this.$store.dispatch('SAVE_DOCUMENT', this.pageData)
     },
     activateIndex(idx) {
       this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', idx)

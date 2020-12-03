@@ -24,6 +24,15 @@ Vue.filter('timestamp', function (value) {
   return moment(value).format('DD/MM/YYYY h:mm A')
 })
 
+Vue.filter('shortened', function (value) {
+  if (!value) return ''
+  else if (value.length > 17) {
+    return value.slice(0, 7).concat('...').concat(value.slice(value.length - 7, value.length))
+  } else {
+    return value
+  }
+})
+
 Vue.use(BootstrapVue)
 Vue.use(VueLayers)
 Vue.use(Skeleton)
@@ -108,7 +117,7 @@ new Vue({
     axios.interceptors.response.use(
       response => response,
       error => {
-        if (error.response.status === 401) {
+        if (error.response && error.response.status === 401) {
           this.$store.dispatch('LOGOUT')
         }
         return Promise.reject(error)

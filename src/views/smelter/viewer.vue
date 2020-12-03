@@ -69,25 +69,29 @@ export default {
   },
   created() {
     DocumentService.fetchDocument(this.documentId).then(doc => {
-      this.$store.dispatch('UPDATE_DOCUMENT', doc.data)
-      this.currentDocument = doc.data
+      this.$store.dispatch('UPDATE_DOCUMENT', doc)
+      this.currentDocument = doc
       this.currentFilter = this.currentDocument.osmium
     })
   },
   watch: {
     documentId: function() {
       return DocumentService.fetchDocument(this.documentId).then(doc => {
-        this.$store.dispatch('UPDATE_DOCUMENT', doc.data)
-        this.currentDocument = doc.data
+        this.$store.dispatch('UPDATE_DOCUMENT', doc)
+        this.currentDocument = doc
         this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', 0)
       })
     },
     currentDocument: function() {
       this.currentFilter = this.currentDocument.osmium
     },
+    current: function() {
+      this.currentDocument = this.current
+      this.currentFilter = this.current.osmium
+    },
   },
   computed: {
-    ...mapGetters(['documentsIdList', 'currentPageData', 'currentActiveIndex']),
+    ...mapGetters(['current', 'documentsIdList', 'currentPageData', 'currentActiveIndex']),
     documentName: function() {
       return get(this.currentDocument, 'alias')
     },

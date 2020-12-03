@@ -5,11 +5,16 @@ class DocumentService {
   static updateDocument(body, documentId) {
     return axios.patch(`/v1/documents/${documentId}`, {
       ...body,
-    })
+    }).then(
+      ({ data }) => data
+    )
   }
 
   static fetchDocument(documentId) {
     return axios.get(`/v1/documents/${documentId}`)
+      .then(
+        ({ data }) => data
+      )
   }
 
   static downloadMedia(url) {

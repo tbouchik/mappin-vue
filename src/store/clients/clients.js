@@ -8,7 +8,7 @@ Vue.use(Vuex)
 let cancelToken
 
 function fetchClients(queryParams) {
-  const { page, limit, name } = queryParams
+  const { page, limit, name, current } = queryParams
   if (typeof cancelToken !== typeof undefined) {
     cancelToken.cancel('Operation canceled due to new request.')
   }
@@ -16,11 +16,13 @@ function fetchClients(queryParams) {
   cancelToken = axios.CancelToken.source()
   const params = {
     limit,
+    current,
     page: page - 1,
   }
   if (name && name !== '') {
     params.name = name
   }
+
   try {
     return axios.get(`/v1/clients`, { params }, { cancelToken: cancelToken.token })
       .then(
@@ -84,6 +86,12 @@ export default {
           state.pagination = newPagination
         })
     },
+    MUTATION_START_CLIENT_LOADER(state) {
+      state.loading = true
+    },
+    MUTATION_STOP_CLIENT_LOADER(state) {
+      state.loading = false
+    },
   },
   actions: {
     ACTION_FETCH_CLIENTS({ commit }, payload) {
@@ -100,6 +108,12 @@ export default {
     },
     ACTION_FETCH_COUNT_CLIENTS({ commit }, filters) {
       commit('MUTATION_FETCH_COUNT_CLIENTS', filters)
+    },
+    ACTION_START_CLIENT_LOADER({ commit }) {
+      commit('MUTATION_START_CLIENT_LOADER')
+    },
+    ACTION_STOP_CLIENT_LOADER({ commit }) {
+      commit('MUTATION_STOP_CLIENT_LOADER')
     },
   },
   getters: {

@@ -97,7 +97,9 @@ export default {
           let bottomBoundary = canvas.height * (parseFloat(textInfo.Top) + parseFloat(textInfo.Height))
           return (x > leftBoundary && x < rightBoundary) && (y > topBoundary && y < bottomBoundary)
         })
-        store.dispatch('ACTION_UPDATE_ACTIVE_VALUE', selectedTextSection[0].Text)
+        if (selectedTextSection[0] && selectedTextSection[0].Text) {
+          store.dispatch('ACTION_UPDATE_ACTIVE_VALUE', selectedTextSection[0].Text)
+        }
       })
       let img = document.getElementById('stub')
       img.onload = function() {
