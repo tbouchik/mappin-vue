@@ -6,16 +6,50 @@ import FilterService from '../../services/filterService.js'
 
 Vue.use(Vuex)
 
+let cancelToken
+
+function fetchTemplates (queryParams) {
+  const { page, limit, name } = queryParams
+  if (typeof cancelToken !== typeof undefined) {
+    cancelToken.cancel('Operation canceled due to new request.')
+  }
+  // Save the cancel token for the current request
+  cancelToken = axios.CancelToken.source()
+  console.log(cancelToken)
+  const params = {
+    limit,
+  }
+  if (page && page > 0) {
+    params.page = page - 1
+  }
+  if (name && name !== '') {
+    params.name = name
+  }
+  try {
+    return axios.get(`/v1/filters`, { params }, { cancelToken: cancelToken.token })
+      .then(
+        ({ data }) => data
+      )
+      .catch(thrown => {
+        if (axios.isCancel(thrown)) {
+          console.log('req canceled', thrown)
+        }
+      })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export default {
   state: {
     filtersList: [],
     loading: false,
   },
   mutations: {
-    MUTATION_SET_FILTERS(state) {
+    MUTATION_SET_FILTERS(state, payload) {
       state.loading = true
-      return axios.get(`/v1/filters`,)
-        .then(({ data }) => {
+      fetchTemplates(payload)
+        .then((data) => {
           state.filtersList = data
           state.loading = false
         })
@@ -48,8 +82,8 @@ export default {
     },
   },
   actions: {
-    ACTION_FETCH_FILTERS({ commit }) {
-      commit('MUTATION_SET_FILTERS')
+    ACTION_FETCH_FILTERS({ commit }, payload) {
+      commit('MUTATION_SET_FILTERS', payload)
     },
     ACTION_UPDATE_FILTER({ commit }, payload) {
       commit('MUTATION_UPDATE_FILTER', payload)

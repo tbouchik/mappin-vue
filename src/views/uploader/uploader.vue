@@ -23,19 +23,12 @@
             }"
             :percent="userCount"
           />
-            <!-- <b-progress height="2rem" :value="value" variant="secondary" :striped="striped" show-progress class="mb-2"></b-progress> -->
-<!-- <b-progress :value="23" variant="danger" height="2rem" show-progress  class="mt-2"></b-progress> -->
         </div>
         <br>
         <a-input-search placeholder="Search Client" v-model="searchedClient" />
         <br> <br> <br>
-        </template>
+
           <div v-if="steps[uploaderStep].title == 'Client'">
-            <!-- <clients-dashboard
-              class="card-body steps-content"
-              :readOnlyMode="clientsComponentReadMode"
-              :perPage="perPage">
-            </clients-dashboard> -->
             <div class="demo-infinite-container ">
               <a-list :data-source="clients"
                       :loading="clientTableLoading">
@@ -51,21 +44,27 @@
               </a-list>
             </div>
           </div>
-          <div v-if="steps[uploaderStep].title == 'Template'">
-            <div class="demo-infinite-container ">
-              <a-list :data-source="filters"
-                      :loading="templateLoading">
-                <a-list-item  slot="renderItem" slot-scope="item">
-                  <a-list-item-meta :description="item.description">
-                    <a slot="title">{{ item.name }}</a>
-                  </a-list-item-meta>
-                  <a-button type="primary" @click="selectFilter(item)" ghost>
-                    select
-                  </a-button>
-                </a-list-item>
-              </a-list>
+          </template>
+          <template v-if="steps[uploaderStep].title == 'Template'">
+            <br>
+            <a-input-search placeholder="Search Template" v-model="searchedTemplate" />
+            <br> <br> <br>
+            <div v-if="steps[uploaderStep].title == 'Template'">
+              <div class="demo-infinite-container ">
+                <a-list :data-source="filters"
+                        :loading="templateLoading">
+                  <a-list-item  slot="renderItem" slot-scope="item">
+                    <a-list-item-meta :description="item.description">
+                      <a slot="title">{{ item.name }}</a>
+                    </a-list-item-meta>
+                    <a-button type="primary" @click="selectFilter(item)" ghost>
+                      select
+                    </a-button>
+                  </a-list-item>
+                </a-list>
+              </div>
             </div>
-          </div>
+          </template>
           <div v-if="steps[uploaderStep].title == 'Files'">
             <a-row>
               <a-col :span="4"/>
@@ -99,6 +98,7 @@ export default {
       perPage: 5,
       nextIsEnabled: false,
       searchedClient: null,
+      searchedTemplate: null,
       steps: [
         {
           title: 'Client',
@@ -120,6 +120,13 @@ export default {
         name: this.searchedClient,
       })
     },
+    searchedTemplate: function() {
+      this.$store.dispatch('ACTION_FETCH_FILTERS', {
+        limit: 100,
+        page: 1,
+        name: this.searchedTemplate,
+      })
+    },
   },
   computed: {
     ...mapGetters([ 'uploaderStep',
@@ -139,7 +146,11 @@ export default {
       page: 1,
       name: this.searchedClient,
     })
-    this.$store.dispatch('ACTION_FETCH_FILTERS')
+    this.$store.dispatch('ACTION_FETCH_FILTERS', {
+      limit: 100,
+      page: 1,
+      name: this.searchedTemplate,
+    })
   },
   destroyed() {
     this.$store.dispatch('ACTION_RESET_STEPS')

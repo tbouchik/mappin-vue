@@ -458,7 +458,7 @@ export default {
             this.validatorIsLoading = false
           })
       }, 10000)
-      this.$store.dispatch('ACTION_FETCH_FILTERS')
+      this.$store.dispatch('ACTION_FETCH_FILTERS', {})
     }
     DocumentService.fetchNextSmeltedDocuments(this.queryParams)
       .then(idsArray => {

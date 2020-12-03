@@ -54,7 +54,7 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('ACTION_FETCH_FILTERS')
+    this.$store.dispatch('ACTION_FETCH_FILTERS', {})
   },
   computed: {
     ...mapGetters(['filters']),
