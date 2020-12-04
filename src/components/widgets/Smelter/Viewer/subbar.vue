@@ -35,8 +35,34 @@
     </ul>
     <div :class="$style.divider" class="mr-4 d-none d-xl-block" />
     <ul :class="$style.breadcrumbs" class="mr-4">
-      <b-nav>
-        <b-nav-item>{{ templateType }}</b-nav-item>
+      <b-nav @click="showTemplateModal">
+        <b-nav-item>{{ current.filter.name }}</b-nav-item>
+        <a-modal  v-model="templateModalVisible"
+                  title="Change template"
+                  on-ok="handleOk"
+                  :width="660"
+                  >
+          <template slot="footer">
+            <a-button key="back" :disabled="templateLoading" @click="handleCancelTemplateChange">
+              Return
+            </a-button>
+          </template>
+          <div class="demo-infinite-container ">
+            <a-input-search placeholder="Search Template" v-model="searchedTemplate" />
+              <a-list :data-source="filters"
+                      :loading="templateLoading">
+
+                  <a-list-item  slot="renderItem" slot-scope="item">
+                    <a-list-item-meta :description="item.description">
+                      <a slot="title">{{ item.name }}</a>
+                    </a-list-item-meta>
+                  <a-button type="primary" @click="selectTemplate(item)" ghost>
+                    select
+                  </a-button>
+                </a-list-item>
+              </a-list>
+            </div>
+        </a-modal>
       </b-nav>
     </ul>
     <div :class="$style.divider" class="mr-4 d-none d-xl-block" />
@@ -114,13 +140,10 @@ export default {
       loadedAllDocsFromRight: false,
       loadedAllDocsFromLeft: false,
       clientModalVisible: false,
+      templateModalVisible: false,
       searchedClient: null,
       searchedTemplate: null,
-      clientName: '',
     }
-  },
-  created() {
-    this.clientName = this.current.client.name
   },
   watch: {
     searchedClient: function() {
@@ -138,9 +161,6 @@ export default {
         name: this.searchedTemplate,
       })
     },
-    current: function() {
-      this.clientName = this.current.client.name // Computed does not work
-    },
   },
   computed: {
     ...mapGetters([ 'documentsIdList',
@@ -148,7 +168,9 @@ export default {
       'docQueryParams',
       'docPagination',
       'clients',
-      'clientTableLoading']),
+      'clientTableLoading',
+      'filters',
+      'templateLoading']),
     currentIndex: function () {
       if (this.smeltedValidation) {
         return this.docSmeltedCache.indexOf(this.current.id)
@@ -176,15 +198,6 @@ export default {
         this.fetchNewDocs('left')
       }
       return this.currentIndex === 0
-    },
-    templateType: function () {
-      let preffix = 'Type: '
-      let suffix = 'Not Specified'
-      let type = this.current.filter.type
-      if (type) {
-        suffix = type.charAt(0).toUpperCase() + type.slice(1)
-      }
-      return preffix.concat(suffix)
     },
   },
   props: {
@@ -217,7 +230,6 @@ export default {
         })
       }
     },
-
     goPrevious() {
       if (this.smeltedValidation) {
         this.$router.push({
@@ -237,7 +249,6 @@ export default {
         })
       }
     },
-
     csvExport() {
       let csvContent = 'data:text/csv;charset=utf-8,'
       let lines = ['Key', 'Value']
@@ -254,11 +265,9 @@ export default {
       link.setAttribute('download', `${this.current.name.split('.')[0]}.csv`)
       link.click()
     },
-
     goToClient() {
       this.$router.push({ name: 'client', params: { clientId: this.current.client._id } })
     },
-
     fetchNewSmeltedIds(side) {
       if (side === 'left') {
         this.leftLoading = true
@@ -305,7 +314,6 @@ export default {
         })
       }
     },
-
     fetchNewDocs(side) {
       // this.docPagination
       if (side === 'left') {
@@ -353,7 +361,6 @@ export default {
         })
       }
     },
-
     showClientModal() {
       this.clientModalVisible = true
       this.$store.dispatch('ACTION_FETCH_CLIENTS', {
@@ -363,12 +370,23 @@ export default {
         current: this.current.client._id,
       })
     },
-
+    showTemplateModal() {
+      this.templateModalVisible = true
+      this.$store.dispatch('ACTION_FETCH_FILTERS', {
+        limit: 100,
+        page: 1,
+        name: this.searchedTemplate,
+        current: this.current.filter._id,
+      })
+    },
     handleCancelClientChange(e) {
       this.clientModalVisible = false
       this.searchedClient = null
     },
-
+    handleCancelTemplateChange(e) {
+      this.templateModalVisible = false
+      this.searchedTemplate = null
+    },
     selectClient(client) {
       this.$store.dispatch('ACTION_START_CLIENT_LOADER')
       const body = { client: client.id }
@@ -379,6 +397,20 @@ export default {
               this.$store.dispatch('UPDATE_DOCUMENT', doc)
               this.$store.dispatch('ACTION_STOP_CLIENT_LOADER')
               this.clientModalVisible = false
+              this.searchedClient = null
+            })
+        })
+    },
+    selectTemplate(template) {
+      this.$store.dispatch('ACTION_START_FILTER_LOADER')
+      const body = { filter: template.id }
+      DocumentService.updateDocument(body, this.current.id)
+        .then(() => {
+          DocumentService.fetchDocument(this.current.id)
+            .then(doc => {
+              this.$store.dispatch('UPDATE_DOCUMENT', doc)
+              this.$store.dispatch('ACTION_STOP_FILTER_LOADER')
+              this.templateModalVisible = false
               this.searchedClient = null
             })
         })
