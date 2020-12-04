@@ -62,14 +62,19 @@
         v-decorator="['name', { rules: [{ required: true, message: 'Please input your client full name' }] }]"
       />
     </a-form-item>
+    <a-form-item label="Client Reference">
+      <a-input
+        v-decorator="['reference', { rules: [{ required: true, message: 'Please input your client reference' }] }]"
+      />
+    </a-form-item>
     <a-form-item label="Email Address">
       <a-input
-        v-decorator="['email', { rules: [{ required: true, message: 'Please input your client email address' }] }]"
+        v-decorator="['email', { rules: [{ required: false, message: 'Please input your client email address' }] }]"
       />
     </a-form-item>
     <a-form-item label="Company Name">
       <a-input
-        v-decorator="['company', { rules: [{ required: true, message: 'Please input your client company name' }] }]"
+        v-decorator="['company', { rules: [{ required: false, message: 'Please input your client company name' }] }]"
       />
     </a-form-item>
     <a-form-item label="Phone Number">
@@ -130,6 +135,15 @@ const columns = [
   {
     title: 'Email Address',
     dataIndex: 'email',
+    scopedSlots: {
+      filterDropdown: 'filterDropdown',
+      filterIcon: 'filterIcon',
+      customRender: 'customRenderComposed',
+    },
+  },
+  {
+    title: 'Reference',
+    dataIndex: 'reference',
     scopedSlots: {
       filterDropdown: 'filterDropdown',
       filterIcon: 'filterIcon',

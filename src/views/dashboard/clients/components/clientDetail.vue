@@ -17,14 +17,19 @@
                     v-decorator="['name', { rules: [{ required: true, message: 'Please input your client full name' }] }]"
                 />
                 </a-form-item>
+                <a-form-item label="Client Reference">
+                <a-input
+                    v-decorator="['reference', { rules: [{ required: true, message: 'Please input your client reference' }] }]"
+                />
+                </a-form-item>
                 <a-form-item label="Email Address">
                 <a-input
-                    v-decorator="['email', { rules: [{ required: true, message: 'Please input your client email address' }] }]"
+                    v-decorator="['email', { rules: [{ required: false, message: 'Please input your client email address' }] }]"
                 />
                 </a-form-item>
                 <a-form-item label="Company Name">
                 <a-input
-                    v-decorator="['company', { rules: [{ required: true, message: 'Please input your client company name' }] }]"
+                    v-decorator="['company', { rules: [{ required: false, message: 'Please input your client company name' }] }]"
                 />
                 </a-form-item>
                 <a-form-item label="Phone Number">
@@ -71,6 +76,7 @@ export default {
     return {
       form: this.$form.createForm(this, { name: 'coordinated' }),
       name: '',
+      reference: '',
       email: '',
       company: '',
       number: '',
@@ -82,11 +88,13 @@ export default {
         this.name = client.name
         this.email = client.email
         this.company = client.company
+        this.reference = client.reference
         this.number = client.number
         this.form.setFieldsValue({
           name: this.name,
           email: this.email,
           company: this.company,
+          reference: this.reference,
           number: this.number,
         })
       })
@@ -97,9 +105,10 @@ export default {
       this.form.validateFields((err, values) => {
         if (!err) {
           this.$nprogress.start()
-          const { name, company, email } = values
+          const { name, company, reference, email } = values
           const payloadBody = {
             name,
+            reference,
             company,
             email,
           }
