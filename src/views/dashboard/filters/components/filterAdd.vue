@@ -55,6 +55,9 @@
                     placeholder="Select a type for this key"
                     @change="e => handleTypeChange(e, index)"
                   >
+                    <a-select-option value="REF">
+                      REF
+                    </a-select-option>
                     <a-select-option value="TEXT">
                       TEXT
                     </a-select-option>
@@ -162,7 +165,7 @@ export default {
     },
 
     add() {
-      this.names.push({})
+      this.names.push({ type: null, value: null })
     },
 
     handleSubmit(e) {
