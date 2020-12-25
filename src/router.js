@@ -130,7 +130,7 @@ const router = new Router({
           meta: {
             title: 'Forgot Password',
           },
-          component: () => import('./views/system/forgot-password'),
+          component: () => import('./views/system/forgot-password.vue'),
         },
         {
           path: '/system/register',

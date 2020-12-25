@@ -31,8 +31,12 @@
           type="submit"
           name="button"
           size="large"
-          class="text-center btn btn-success w-100 font-weight-bold font-size-18"
+          class="text-center btn btn-success w-100 font-weight-bold font-size-18 mb-3"
         >Log in</button>
+        <router-link
+        to="/system/forgot-password"
+        class="text-blue font-weight-bold font-size-18"
+      >Forgot password?</router-link>
       </a-form>
 
     </div>

@@ -13,12 +13,14 @@
         <a-form-item>
           <a-input
             placeholder="Email Address"
-            v-decorator="['email', {rules: [{ required: true, message: 'Please input your Email!' }]}]"
+            v-decorator="['email', {rules: [{ required: true, message: 'Please input your Email!', type: 'email' }]}]"
           />
         </a-form-item>
         <button
           type="button"
           class="text-center btn btn-success w-100 font-weight-bold font-size-18"
+          @click="sendResetPasswordMail"
+          :disabled="hasErrors(form.getFieldsError())"
         >Reset my password</button>
       </a-form>
     </div>
@@ -28,7 +30,7 @@
       </router-link>
     </div>
     <div class="mt-auto pb-5 pt-5">
-      <ul
+      <!-- <ul
         class="list-unstyled d-flex mb-2 flex-wrap justify-content-center"
         :class="$style.footerNav"
       >
@@ -44,18 +46,45 @@
         <li>
           <a href="#">Contacts</a>
         </li>
-      </ul>
+      </ul> -->
       <div class="text-gray-4 text-center">© 2019 Smeltor. All rights reserved.</div>
     </div>
   </div>
 </template>
 <script>
+import UserService from '../../../services/userService.js'
+
+function hasErrors(fieldsError) {
+  return Object.keys(fieldsError).some(field => fieldsError[field])
+}
 export default {
   name: 'AirForgotPassword',
   data: function () {
     return {
       form: this.$form.createForm(this),
+      hasErrors,
     }
+  },
+  methods: {
+    sendResetPasswordMail() {
+      this.form.validateFields((err, values) => {
+        if (!err) {
+          const { email } = values
+          this.$nprogress.start()
+          UserService.sendResetPasswordMail(email)
+            .then(() => {
+              this.$nprogress.done()
+              this.$notification['success']({
+                message: 'Reset Password',
+                description: `If there's an account associated with this email, we'll send the password reset instructions immediately`,
+                duration: 4,
+              })
+            })
+        } else {
+          console.log('err', err)
+        }
+      })
+    },
   },
 }
 </script>

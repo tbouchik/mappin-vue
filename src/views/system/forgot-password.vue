@@ -4,7 +4,7 @@
   </div>
 </template>
 <script>
-import AirForgotPassword from '@/components/system/Auth/ForgotPassword'
+import AirForgotPassword from '@/components/system/Auth/forgot-password.vue'
 export default {
   components: {
     AirForgotPassword,
