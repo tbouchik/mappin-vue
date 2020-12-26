@@ -133,6 +133,13 @@ const router = new Router({
           component: () => import('./views/system/forgot-password.vue'),
         },
         {
+          path: '/system/reset-password',
+          meta: {
+            title: 'Reset Password',
+          },
+          component: () => import('./views/system/reset-password.vue'),
+        },
+        {
           path: '/system/register',
           meta: {
             title: 'Register',
