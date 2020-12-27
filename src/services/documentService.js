@@ -63,7 +63,6 @@ class DocumentService {
           ({ data }) => data
         )
     } catch (error) {
-      console.log(error)
     }
   }
 
@@ -96,7 +95,6 @@ class DocumentService {
           ({ data }) => data
         )
     } catch (error) {
-      console.log(error)
     }
   }
 
@@ -128,7 +126,6 @@ class DocumentService {
           ({ data }) => data
         )
     } catch (error) {
-      console.log(error)
     }
   }
 
@@ -157,7 +154,6 @@ class DocumentService {
       return axios.delete(`/v1/documents/${id}`,)
         .then(() => id)
     } catch (error) {
-      console.log(error)
     }
   }
 
@@ -189,7 +185,6 @@ class DocumentService {
           ({ data }) => data
         )
     } catch (error) {
-      console.log(error)
     }
   }
 }

@@ -24,7 +24,6 @@ function saveDocToAPI(osmium, id) {
       ...updatedDocument,
     }, { cancelToken: cancelToken.token }) // Pass the cancel token to the current request)
   } catch (error) {
-    console.log(error)
   }
 }
 
@@ -41,7 +40,6 @@ function parseDate (value) {
   try {
     parsedInput = moment(value).format('DD/MM/YYYY')
   } catch (error) {
-    console.log('parsing date failed: ', error)
   }
   return parsedInput
 }

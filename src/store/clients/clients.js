@@ -29,7 +29,6 @@ function fetchClients(queryParams) {
         ({ data }) => data
       )
   } catch (error) {
-    console.log(error)
   }
 }
 
