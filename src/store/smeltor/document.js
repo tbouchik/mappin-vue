@@ -4,7 +4,6 @@ import axios from 'axios'
 import { cloneDeep, get, pick } from 'lodash'
 import uuidv4 from 'uuid/v4'
 import moment from 'moment'
-
 Vue.use(Vuex)
 
 let cancelToken
@@ -38,8 +37,10 @@ function parseDate (value) {
   if (!value) return ''
   let parsedInput = ''
   try {
-    parsedInput = moment(value).format('DD/MM/YYYY')
+    moment.locale('en-GB')
+    parsedInput = moment(value, ['DD/MM/YYYY', 'dddd, MMMM Do YYYY', 'dddd [the] Do [of] MMMM', 'YYYY-MM-DD', 'MMM DD, YYYY']).format('DD/MM/YYYY')
   } catch (error) {
+    console.log('erroe', error)
   }
   return parsedInput
 }
