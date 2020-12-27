@@ -288,8 +288,7 @@ export default {
               this.loadedAllSmeltedFromLeft = true
             }
             this.leftLoading = false
-          }).catch(error => {
-            console.log(error)
+          }).catch(() => {
             this.leftLoading = false
           })
         }
@@ -308,8 +307,7 @@ export default {
             this.loadedAllSmeltedFromRight = true
           }
           this.rightLoading = false
-        }).catch(error => {
-          console.log(error)
+        }).catch(() => {
           this.rightLoading = false
         })
       }
@@ -335,8 +333,7 @@ export default {
               this.loadedAllDocsFromLeft = true
             }
             this.leftLoading = false
-          }).catch(error => {
-            console.log(error)
+          }).catch(() => {
             this.leftLoading = false
           })
         }
@@ -355,8 +352,7 @@ export default {
             this.loadedAllDocsFromRight = true
           }
           this.rightLoading = false
-        }).catch(error => {
-          console.log(error)
+        }).catch(() => {
           this.rightLoading = false
         })
       }

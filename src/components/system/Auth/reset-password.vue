@@ -104,7 +104,6 @@ export default {
             })
           }
         } else {
-          console.log('err', err)
         }
       })
     },
