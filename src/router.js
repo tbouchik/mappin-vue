@@ -6,6 +6,7 @@ import AppLayout from '@/layouts/App'
 Vue.use(Router)
 
 const router = new Router({
+  mode: 'history',
   base: process.env.BASE_URL,
   // mode: 'history',
   scrollBehavior() {
@@ -133,7 +134,7 @@ const router = new Router({
           component: () => import('./views/system/forgot-password.vue'),
         },
         {
-          path: '/system/reset-password/:token',
+          path: '/system/reset-password',
           meta: {
             title: 'Reset Password',
           },
