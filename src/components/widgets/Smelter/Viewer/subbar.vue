@@ -105,6 +105,14 @@
     </div>
     <div :class="$style.amount" class="mr-3 ml-auto d-none d-sm-flex">
       <a-button-group>
+        <a-tooltip placement="topLeft" title="View Shortcuts" arrowPointAtCenter>
+          <a-button
+            type="link"
+            @click="pullDrawer"
+          >
+            <a-icon type="info-circle" />
+          </a-button>
+        </a-tooltip>
         <a-button
           type="link"
           :disabled="currentIndexIsFirst"
@@ -122,6 +130,18 @@
       </a-button-group>
       <a-button-group> </a-button-group>
     </div>
+    <a-drawer
+      title="Keyboard Shortcuts"
+      placement="right"
+      :closable="false"
+      :visible="drawerVisible"
+      @close="onDrawerClose"
+    >
+      <p><b>Tab</b>: Go to next entry</p>
+      <p><b>Shift + Tab</b>: Go to previous entry</p>
+      <p><b>Keep Ctrl pressed </b>: Concatenate in same entry</p>
+      <p><b>Enter</b>: Go to next file</p>
+    </a-drawer>
   </div>
 </template>
 <script>
@@ -143,6 +163,7 @@ export default {
       templateModalVisible: false,
       searchedClient: null,
       searchedTemplate: null,
+      drawerVisible: false,
     }
   },
   watch: {
@@ -410,6 +431,12 @@ export default {
               this.searchedClient = null
             })
         })
+    },
+    pullDrawer() {
+      this.drawerVisible = true
+    },
+    onDrawerClose() {
+      this.drawerVisible = false
     },
   },
   destroyed() {
