@@ -86,6 +86,23 @@ const messages = {
     expense: 'Expense',
     sale: 'Sale',
   },
+  client: {
+    dashboardTitle: 'Your clients',
+    add: 'Add New Client',
+    cancel: 'Cancel',
+    searchClient: `Type the Client's name`,
+    fullName: 'Full Name',
+    ref: 'Reference',
+    clientref: 'Client Reference',
+    email: 'Email Address',
+    company: 'Company Name',
+    number: 'Phone Number',
+  },
+  util: {
+    submit: 'Submit',
+    view: 'View',
+    remove: 'Remove',
+  },
 }
 
 export default {

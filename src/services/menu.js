@@ -1,7 +1,7 @@
 export const getMenuData = [
   {
     category: true,
-    title: 'Dashboards',
+    title: 'Tableau de bord',
   },
   {
     title: 'Documents',
