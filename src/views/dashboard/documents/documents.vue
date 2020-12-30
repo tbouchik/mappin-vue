@@ -11,7 +11,7 @@
     <div class="card">
       <div v-if="!clientViz" class="card-header card-header-flex row">
         <div class="d-flex flex-column justify-content-center mr-auto col-4">
-          <h5 class="mb-0">Your extractions</h5>
+          <h5 class="mb-0">{{ $t('dashboard.document.extractions') }}</h5>
         </div>
         <div
           class="d-flex flex-column justify-content-center col-2"
@@ -25,7 +25,7 @@
             <span class="btn-addon">
               <i class="btn-addon-icon fe fe-upload" />
             </span>
-            Upload Documents
+            {{ $t('dashboard.document.upload') }}
           </button>
         </div>
         <div class="d-flex flex-column justify-content-center col-2">
@@ -41,11 +41,11 @@
             <span v-if="validatorIsLoading" class="btn-addon" style>
               <i class="btn-addon-icon" >
                 <div class="spinner-grow spinner-grow-sm text-light" role="status">
-                <span class="sr-only">Loading...</span>
+                <span class="sr-only">{{ $t('dashboard.document.loading') }}</span>
                 </div>
               </i>
             </span>
-            Validate Smelted
+            {{ $t('dashboard.document.validate') }}
           </button>
         </div>
 
@@ -64,54 +64,54 @@
             <span v-if="bulkCsvExportIsLoading" class="btn-addon" style>
               <i class="btn-addon-icon" >
                 <div class="spinner-grow spinner-grow-sm text-light" role="status">
-                <span class="sr-only">Loading...</span>
+                <span class="sr-only">{{ $t('dashboard.document.loading') }}</span>
                 </div>
               </i>
             </span>
-            Bulk Download
+            {{ $t('dashboard.document.bulkDownload') }}
           </button>
         </div>
       </div>
       <br />
       <div v-if="!clientViz" class="card-body">
         <a-collapse expand-icon-position="right" style="background: #eef3fc">
-          <a-collapse-panel key="1" header="Filter Settings">
+          <a-collapse-panel key="1" :header=" $t('dashboard.document.filterSettings') ">
             <br>
             <a-form
               :form="form"
               :label-col="{ span: 5 }"
               :wrapper-col="{ span: 12 }"
             >
-              <a-form-item label="Name">
+              <a-form-item :label="$t('dashboard.document.name')">
                 <a-input
-                  placeholder="Type the Document's name"
+                  :placeholder="$t('dashboard.document.placeholder.name')"
                   v-model="searchedName"
                 />
               </a-form-item>
-              <a-form-item label="Template">
+              <a-form-item :label="$t('dashboard.document.template')">
                 <a-select
                   v-model="searchedTemplate"
-                  placeholder="Select a Template"
+                  :placeholder="$t('dashboard.document.placeholder.template')"
                 >
                   <template v-for="(template, index) in filters">
                     <a-select-option :key="index" :value="template._id"> {{template.name}} </a-select-option>
                   </template>
                 </a-select>
               </a-form-item>
-              <a-form-item label="Status">
+              <a-form-item :label="$t('dashboard.document.status')">
                 <a-select
                   v-model="searchedStatus"
-                  placeholder="Select a Status"
+                  :placeholder="$t('dashboard.document.placeholder.status')"
                 >
                   <template>
-                    <a-select-option value="pending"> Pending </a-select-option>
-                    <a-select-option value="smelted"> Smelted </a-select-option>
-                    <a-select-option value="validated"> Validated </a-select-option>
+                    <a-select-option value="pending"> {{ $t('dashboard.document.states.pending') }} </a-select-option>
+                    <a-select-option value="smelted"> {{ $t('dashboard.document.states.smelted') }} </a-select-option>
+                    <a-select-option value="validated"> {{ $t('dashboard.document.states.validated') }} </a-select-option>
                   </template>
                 </a-select>
               </a-form-item>
               <a-form-item :wrapper-col="{ span: 12, offset: 5 }">
-                <a-button type="primary" @click="resetFilterSettings" ghost> Reset Settings </a-button>
+                <a-button type="primary" @click="resetFilterSettings" ghost> {{ $t('dashboard.document.resetSettings') }} </a-button>
               </a-form-item>
             </a-form>
             <a-icon slot="extra" type="filter" />
@@ -158,14 +158,14 @@
                 class="btn btn-sm btn-light mr-2"
               >
                 <i class="fe fe-edit mr-2" />
-                View
+                {{ $t('dashboard.document.view') }}
               </button>
               <button @click="showModal(record)"
                        class="btn btn-sm btn-light">
                 <small>
                   <i class="fe fe-trash mr-2" />
                 </small>
-                Remove
+                {{ $t('dashboard.document.remove') }}
               </button>
 
               <!-- <a-popconfirm title="Are you sure？"
@@ -202,52 +202,51 @@ import JSZip from 'jszip'
 import { pick, isEqual } from 'lodash'
 import DocumentService from '../../../services/documentService'
 
-const columns = [
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    scopedSlots: {
-      customRender: 'customRender',
-    },
-  },
-  {
-    title: 'Template',
-    dataIndex: 'filter',
-    scopedSlots: {
-      customRender: 'customRenderComposed',
-    },
-  },
-  {
-    title: 'Client',
-    dataIndex: 'client',
-    scopedSlots: {
-      customRender: 'customRenderComposed',
-    },
-  },
-  {
-    title: 'Status',
-    dataIndex: 'status',
-    scopedSlots: {
-      customRender: 'status',
-    },
-  },
-  {
-    title: 'Date Added',
-    dataIndex: 'date',
-    scopedSlots: { customRender: 'date' },
-  },
-  {
-    title: 'Action',
-    scopedSlots: { customRender: 'action' },
-  },
-]
 export default {
   name: 'Documents',
   data: function () {
     return {
       documentsList: [],
       form: this.$form.createForm(this, { name: 'filter_form' }),
-      columns: columns,
+      columns: [
+        {
+          title: this.$t('dashboard.document.name'),
+          dataIndex: 'name',
+          scopedSlots: {
+            customRender: 'customRender',
+          },
+        },
+        {
+          title: this.$t('dashboard.document.template'),
+          dataIndex: 'filter',
+          scopedSlots: {
+            customRender: 'customRenderComposed',
+          },
+        },
+        {
+          title: this.$t('dashboard.document.client'),
+          dataIndex: 'client',
+          scopedSlots: {
+            customRender: 'customRenderComposed',
+          },
+        },
+        {
+          title: this.$t('dashboard.document.status'),
+          dataIndex: 'status',
+          scopedSlots: {
+            customRender: 'status',
+          },
+        },
+        {
+          title: this.$t('dashboard.document.dateAdded'),
+          dataIndex: 'date',
+          scopedSlots: { customRender: 'date' },
+        },
+        {
+          title: this.$t('dashboard.document.action'),
+          scopedSlots: { customRender: 'action' },
+        },
+      ],
       timeInterval: null,
       searchedName: null,
       searchedStatus: null,

@@ -16,7 +16,7 @@ const STORED_SETTINGS = storedSettings => {
 export default {
   state: {
     ...STORED_SETTINGS({
-      locale: 'en-US',
+      locale: 'fr-FR',
       isSidebarOpen: false,
       isSupportChatOpen: false,
       isMobileView: false,
