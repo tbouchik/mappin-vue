@@ -8,6 +8,7 @@
       <air-status />
     </div>
     <div class="mr-4 d-none d-sm-block">
+      <air-language-switcher />
     </div>
     <div class="mr-20 d-none d-sm-block">
     </div>
@@ -19,12 +20,14 @@
 
 <script>
 import AirUserMenu from '@/components/layout/TopBar/UserMenu/userMenu.vue'
+import AirLanguageSwitcher from '@/components/layout/TopBar/LanguageSwitcher/languageSwitcher.vue'
 import AirStatus from '@/components/layout/TopBar/Status'
 
 export default {
   components: {
     AirStatus,
     AirUserMenu,
+    AirLanguageSwitcher,
   },
 }
 </script>

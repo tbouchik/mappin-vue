@@ -110,7 +110,11 @@
             type="link"
             @click="pullDrawer"
           >
-            <a-icon type="info-circle" />
+           <span class="icmn-keyboard"
+           size="large"
+           >
+
+                </span>
           </a-button>
         </a-tooltip>
         <a-button
