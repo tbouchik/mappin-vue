@@ -45,6 +45,25 @@ const messages = {
       },
     },
   },
+  subbar: {
+    return: 'Return',
+    select: 'Select',
+    previous: 'Previous',
+    next: 'Next',
+    shortcutsView: 'View Shortcuts',
+    shortcutsTitle: 'Keyboard Shortcuts',
+    exportCSV: 'Export CSV',
+    keys: {
+      tab: 'Tab',
+      tabAction: 'Go to next entry',
+      shift: 'Shift + Tab',
+      shiftAction: 'Go to previous entry',
+      ctrl: 'Keep Ctrl pressed',
+      ctrlAction: 'Concatenate in same entry',
+      enter: 'Enter',
+      enterAction: 'Go to next file',
+    },
+  },
 }
 
 export default {

@@ -12,7 +12,7 @@
                   >
           <template slot="footer">
             <a-button key="back" :disabled="clientTableLoading" @click="handleCancelClientChange">
-              Return
+              {{ $t('dashboard.subbar.return') }}
             </a-button>
           </template>
           <div class="demo-infinite-container ">
@@ -25,7 +25,7 @@
                     <a slot="title"> {{ item.company }}</a>
                   </a-list-item-meta>
                   <a-button type="primary" @click="selectClient(item)" ghost>
-                    select
+                    {{ $t('dashboard.subbar.select') }}
                   </a-button>
                 </a-list-item>
               </a-list>
@@ -44,7 +44,7 @@
                   >
           <template slot="footer">
             <a-button key="back" :disabled="templateLoading" @click="handleCancelTemplateChange">
-              Return
+              {{ $t('dashboard.subbar.return') }}
             </a-button>
           </template>
           <div class="demo-infinite-container ">
@@ -57,7 +57,7 @@
                       <a slot="title">{{ item.name }}</a>
                     </a-list-item-meta>
                   <a-button type="primary" @click="selectTemplate(item)" ghost>
-                    select
+                    {{ $t('dashboard.subbar.select') }}
                   </a-button>
                 </a-list-item>
               </a-list>
@@ -93,7 +93,7 @@
         {{ current.status }}
       </a-tag>
       <a-button-group>
-        <a-tooltip placement="topLeft" title="Export CSV" arrowPointAtCenter>
+        <a-tooltip placement="topLeft" :title="$t('dashboard.subbar.exportCSV')" arrowPointAtCenter>
           <a-button
             type="primary"
             icon="cloud-download"
@@ -105,7 +105,7 @@
     </div>
     <div :class="$style.amount" class="mr-3 ml-auto d-none d-sm-flex">
       <a-button-group>
-        <a-tooltip placement="topLeft" title="View Shortcuts" arrowPointAtCenter>
+        <a-tooltip placement="topLeft" :title="$t('dashboard.subbar.shortcutsView')" arrowPointAtCenter>
           <a-button
             type="link"
             @click="pullDrawer"
@@ -119,28 +119,28 @@
           :loading="leftLoading"
           @click="goPrevious"
         >
-          <a-icon type="left" />Previous</a-button
+          <a-icon type="left" />{{ $t('dashboard.subbar.previous') }}</a-button
         >
         <a-button type="link"
                   :disabled="currentIndexIsLast"
                   :loading="rightLoading"
                   @click="goNext">
-          Next<a-icon type="right" />
+          {{ $t('dashboard.subbar.next') }}<a-icon type="right" />
         </a-button>
       </a-button-group>
       <a-button-group> </a-button-group>
     </div>
     <a-drawer
-      title="Keyboard Shortcuts"
+      :title="$t('dashboard.subbar.shortcutsTitle')"
       placement="right"
       :closable="false"
       :visible="drawerVisible"
       @close="onDrawerClose"
     >
-      <p><b>Tab</b>: Go to next entry</p>
-      <p><b>Shift + Tab</b>: Go to previous entry</p>
-      <p><b>Keep Ctrl pressed </b>: Concatenate in same entry</p>
-      <p><b>Enter</b>: Go to next file</p>
+      <p><b>{{ $t('dashboard.subbar.keys.tab') }}</b>: {{ $t('dashboard.subbar.keys.tabAction') }}</p>
+      <p><b>{{ $t('dashboard.subbar.keys.shift') }}</b>: {{ $t('dashboard.subbar.keys.shiftAction') }}</p>
+      <p><b>{{ $t('dashboard.subbar.keys.ctrl') }}</b>: {{ $t('dashboard.subbar.keys.ctrlAction') }}</p>
+      <p><b>{{ $t('dashboard.subbar.keys.enter') }}</b>: {{ $t('dashboard.subbar.keys.enterAction') }}</p>
     </a-drawer>
   </div>
 </template>

@@ -45,6 +45,25 @@ const messages = {
         validated: 'Validé',
       },
     },
+    subbar: {
+      return: 'Retour',
+      select: 'Selectionner',
+      previous: 'Précédent',
+      next: 'Suivant',
+      shortcutsView: 'Voir les court-circuits',
+      shortcutsTitle: 'Court-Circuits Clavier',
+      exportCSV: 'Exporter en CSV',
+      keys: {
+        tab: 'Tab',
+        tabAction: `Active l'entrée suivante`,
+        shift: 'Shift + Tab',
+        shiftAction: `Active l'entrée précédente`,
+        ctrl: 'Touche Ctrl enfoncée',
+        ctrlAction: 'Enchaîne dans la même entrée',
+        enter: 'Entrée',
+        enterAction: 'Charge le document suivant',
+      },
+    },
   },
 }
 
