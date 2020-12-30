@@ -75,6 +75,18 @@ const messages = {
     credits: 'Statut du Crédit Mensuel',
     searchClient: 'Entrez le nom du client',
   },
+  template: {
+    addButton: 'Nouveau Template',
+    addTitle: 'Nouveau Template',
+    view: 'Consulter le template',
+    typeSelect: 'Sélectionner le type: Achat ou Vente',
+    addField: 'Nouvelle entrée',
+    submit: 'Envoyer',
+  },
+  accounting: {
+    expense: 'Achat',
+    sale: 'Vente',
+  },
 }
 
 export default {

@@ -44,11 +44,11 @@
                     'type',
                     { rules: [{ required: false, message: 'Please select your template type' }] },
                   ]"
-                  placeholder="Select a type: Expense or Sale"
+                  :placeholder="$t('template.typeSelect')"
                 >
                   <template>
-                    <a-select-option value="expense"> Expense </a-select-option>
-                    <a-select-option value="sale"> Sale </a-select-option>
+                    <a-select-option value="expense"> {{ $t('accounting.expense') }} </a-select-option>
+                    <a-select-option value="sale">{{ $t('accounting.sale') }} </a-select-option>
                   </template>
                 </a-select>
               </a-form-item>

@@ -15,7 +15,7 @@
             <span class="btn-addon">
               <i class="btn-addon-icon fe fe-plus-circle" />
             </span>
-            Add New Template
+            {{ $t('template.addButton') }}
           </button>
 
         </b-col>

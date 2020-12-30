@@ -8,7 +8,7 @@
     <p class="mb-4">
       {{template.description}}
     </p>
-    <a-button class="mr-2 mb-2" type="primary" @click="goEditFilter" ghost>View Template</a-button>
+    <a-button class="mr-2 mb-2" type="primary" @click="goEditFilter" ghost>{{ $t('template.view') }}</a-button>
   </div>
 </template>
 <script>

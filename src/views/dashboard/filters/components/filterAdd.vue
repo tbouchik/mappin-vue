@@ -4,7 +4,7 @@
     <div class="air__utils__heading">
       <b-row>
         <b-col md="3" class="my-1">
-          <h5>Add New Template</h5>
+          <h5>{{ $t('template.addTitle') }}</h5>
         </b-col>
       </b-row>
     </div>
@@ -27,11 +27,11 @@
                     'type',
                     { rules: [{ required: false, message: 'Please select your template type' }] },
                   ]"
-                  placeholder="Select a type: Expense or Sale"
+                  :placeholder="$t('template.typeSelect')"
                 >
                   <template>
-                    <a-select-option value="expense"> Expense </a-select-option>
-                    <a-select-option value="sale"> Sale </a-select-option>
+                    <a-select-option value="expense">{{ $t('accounting.expense') }}</a-select-option>
+                    <a-select-option value="sale"> {{ $t('accounting.sale') }}</a-select-option>
                   </template>
                 </a-select>
               </a-form-item>
@@ -78,12 +78,12 @@
               </a-form-item>
         <a-form-item v-bind="formItemLayoutWithOutLabel">
         <a-button type="dashed" style="width: 60%" @click="add">
-            <a-icon type="plus" /> Add field
+            <a-icon type="plus" /> {{ $t('template.addField') }}
         </a-button>
         </a-form-item>
         <a-form-item v-bind="formItemLayoutWithOutLabel">
         <a-button type="primary" html-type="submit">
-            Submit
+            {{ $t('template.submit') }}
         </a-button>
         </a-form-item>
           </a-form>

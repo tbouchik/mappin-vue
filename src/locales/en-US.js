@@ -74,6 +74,18 @@ const messages = {
     credits: 'Monthly Credit Limit',
     searchClient: 'Search Client',
   },
+  template: {
+    addButton: 'Add New Template',
+    addTitle: 'Add New Template',
+    view: 'View Template',
+    typeSelect: 'Select a type: Expense or Sale',
+    addField: 'Add field',
+    submit: 'Submit',
+  },
+  accounting: {
+    expense: 'Expense',
+    sale: 'Sale',
+  },
 }
 
 export default {
