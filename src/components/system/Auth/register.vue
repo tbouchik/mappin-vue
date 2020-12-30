@@ -8,32 +8,32 @@
       </div>
     </div>
     <div class="pl-5 pr-5 pt-5 pb-5 bg-white text-center" :class="$style.container">
-      <div class="text-dark font-size-30 mb-4">Register</div>
+      <div class="text-dark font-size-30 mb-4">Inscription</div>
       <a-form class="mb-4" :form="form" @submit.prevent="register">
         <a-form-item>
           <a-input
-            placeholder="Full Name"
+            placeholder="Nom Complet"
             v-model="fullName"
             v-decorator="['fullName', {rules: [{ required: true, message: 'Please input your full name!' }]}]"
           />
         </a-form-item>
         <a-form-item>
           <a-input
-            placeholder="Email Address"
+            placeholder="Adresse Email"
             v-model="email"
             v-decorator="['email', {rules: [{ required: true, message: 'Please input your email address!' },  { type: 'email' }]}]"
           />
         </a-form-item>
         <a-form-item>
           <a-input
-            placeholder="Company Name"
+            placeholder="Nom de l'entreprise"
             v-model="company"
             v-decorator="['company', {rules: [{ required: true, message: 'Please input your email address!' }]}]"
           />
         </a-form-item>
         <a-form-item>
           <a-input
-            placeholder="Password"
+            placeholder="Mot de passe"
             v-model="password"
             type="password"
             v-decorator="['password', {rules: [{ required: true, message: 'Please input your Password!' }]}]"
@@ -43,7 +43,7 @@
           type="submit"
           name="button"
           class="text-center btn btn-success w-100 font-weight-bold font-size-18"
-        >Sign Up</button>
+        >S'inscrire</button>
       </a-form>
       <!-- <div class="font-size-18">
         By signing up, you agree to the
@@ -55,9 +55,9 @@
       </div> -->
     </div>
     <div class="text-center font-size-18 pt-4 mb-auto">
-      Already have an account?
+      Vous avez déjà un compte?
       <router-link to="/system/login" class="font-weight-bold text-blue text-underlined">
-        <u>Log In</u>
+        <u>Se connecter</u>
       </router-link>
     </div>
     <div class="mt-auto pb-5 pt-5">

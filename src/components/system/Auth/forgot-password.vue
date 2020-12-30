@@ -8,11 +8,11 @@
       </div>
     </div>
     <div class="pl-5 pr-5 pt-5 pb-5 bg-white text-center" :class="$style.container">
-      <div class="text-dark font-size-30 mb-4">Reset Password</div>
+      <div class="text-dark font-size-30 mb-4">Réinitialiser le mot de passe</div>
       <a-form class="mb-4" :form="form">
         <a-form-item>
           <a-input
-            placeholder="Email Address"
+            placeholder="Adresse Email"
             v-decorator="['email', {rules: [{ required: true, message: 'Please input your Email!', type: 'email' }]}]"
           />
         </a-form-item>

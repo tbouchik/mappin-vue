@@ -1,7 +1,7 @@
 <template>
   <a-dropdown :trigger="['click']" placement="bottomRight">
     <div :class="$style.dropdown">
-      <span class="text-uppercase"><img :src="countryFlagPath" class="mb-1" alt="Smeltor" /> - {{ language }}</span>
+      <span class="text-uppercase"><img :src="countryFlagPath" class="mb-1" alt="Smeltor" />  {{ language }}</span>
     </div>
 
     <a-menu slot="overlay" @click="selectLocale">

@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="pl-5 pr-5 pt-5 pb-5 bg-white text-center" :class="$style.container">
-      <div class="text-dark font-size-30 mb-2 text-center">Log In</div>
+      <div class="text-dark font-size-30 mb-2 text-center">Se Connecter</div>
       <a-form class="mb-4" :form="form" @submit.prevent="login">
         <a-form-item>
           <a-input
@@ -32,18 +32,18 @@
           name="button"
           size="large"
           class="text-center btn btn-success w-100 font-weight-bold font-size-18 mb-3"
-        >Log in</button>
+        >Se Connecter</button>
         <router-link
         to="/system/forgot-password"
         class="text-blue font-weight-bold font-size-18"
-      >Forgot password?</router-link>
+      >Mot de passe oublié?</router-link>
       </a-form>
 
     </div>
     <div class="text-center font-size-18 pt-4 mb-auto">
-      Don't have an account?
+      Pas encore inscrit?
       <router-link to="/system/register" class="font-weight-bold text-blue text-underlined">
-        <u>Sign Up</u>
+        <u>S'inscrire</u>
       </router-link>
     </div>
     <div class="mt-auto pb-5 pt-5">

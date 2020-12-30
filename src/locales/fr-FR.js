@@ -14,7 +14,7 @@ const messages = {
       email: 'Email',
       phone: 'Téléphone',
       editProfile: 'Editer le profil',
-      logout: 'Connectez - Out',
+      logout: 'Se déconnecter',
     },
   },
   dashboard: {

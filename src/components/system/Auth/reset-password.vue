@@ -8,13 +8,13 @@
       </div>
     </div>
     <div class="pl-5 pr-5 pt-5 pb-5 bg-white text-center" :class="$style.container">
-      <div class="text-dark font-size-30 mb-4">Reset Password</div>
+      <div class="text-dark font-size-30 mb-4">Réinitialiser le mot de passe</div>
       <a-form class="mb-4" :form="form">
         <a-form-item>
           <a-input
             size="large"
             v-model="password"
-            placeholder="New Password"
+            placeholder="Nouveau Mot de passe"
             type="password"
             v-decorator="['password', {initialValue: '', rules: [{ required: true, message: 'Please input your Password!' }]}]"
           />
@@ -23,7 +23,7 @@
           <a-input
             size="large"
             v-model="passwordConfirmation"
-            placeholder="Confirm New Password"
+            placeholder="Confirmation du Mot de passe"
             type="password"
             id="confirm-password"
             v-decorator="['passwordConfirmation', {initialValue: '', rules: [{ required: true, message: 'Please input your Password Confirmation!' }]}]"
