@@ -11,7 +11,7 @@
           <a-button type="primary">
             <span class="page-info">
               Page
-              <span id="page-num"></span> of
+              <span id="page-num"></span> {{ $t('windows.of') }}
               <span id="page-count"></span>
             </span>
           </a-button>
@@ -25,7 +25,7 @@
         <a-button-group>
           <a-button type="primary" icon="download" ghost>
             <a
-            @click.prevent="downloadItem">Download PDF
+            @click.prevent="downloadItem">{{ $t('windows.downloadPdf') }}
             </a>
         </a-button>
         </a-button-group>

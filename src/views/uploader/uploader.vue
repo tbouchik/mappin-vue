@@ -4,7 +4,7 @@
     <div class="air__utils__heading">
       <b-row>
         <b-col md="3" class="my-1">
-          <h5>Upload Documents</h5>
+          <h5>{{ $t('upload.title') }}</h5>
         </b-col>
       </b-row>
     </div>
@@ -15,7 +15,7 @@
       <div>
         <template v-if="steps[uploaderStep].title == 'Client'">
         <div>
-          Monthly Credit Limit:
+          {{ $t('upload.credits') }}:
         <a-progress
             :stroke-color="{
               '0%': '#108ee9',
@@ -25,7 +25,7 @@
           />
         </div>
         <br>
-        <a-input-search placeholder="Search Client" v-model="searchedClient" />
+        <a-input-search :placeholder="$t('upload.searchClient')" v-model="searchedClient" />
         <br> <br> <br>
 
           <div v-if="steps[uploaderStep].title == 'Client'">
@@ -38,7 +38,7 @@
                     <a slot="title"> {{ item.company }}</a>
                   </a-list-item-meta>
                   <a-button type="primary" @click="selectClient(item)" :disabled="!canUpload" ghost>
-                    select
+                    {{ $t('subbar.select') }}
                   </a-button>
                 </a-list-item>
               </a-list>
@@ -58,7 +58,7 @@
                       <a slot="title">{{ item.name }}</a>
                     </a-list-item-meta>
                     <a-button type="primary" @click="selectFilter(item)" ghost>
-                      select
+                      {{ $t('subbar.select') }}
                     </a-button>
                   </a-list-item>
                 </a-list>
@@ -77,7 +77,7 @@
       </div>
       <div class="steps-action">
         <a-button v-if="uploaderStep > 0" style="margin-left: 8px" @click="prev">
-          Previous
+          {{ $t('subbar.previous') }}
         </a-button>
         <br><br>
       </div>

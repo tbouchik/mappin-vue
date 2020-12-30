@@ -7,7 +7,7 @@
     <a-button-group>
       <a-button type="primary" icon="download" style="padding-right:10px" ghost>
       <a
-      @click.prevent="downloadItem">Download Image</a>
+      @click.prevent="downloadItem">{{ $t('windows.downloadImg') }}</a>
     </a-button>
     </a-button-group>
     </div>

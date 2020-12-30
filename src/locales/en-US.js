@@ -64,6 +64,16 @@ const messages = {
       enterAction: 'Go to next file',
     },
   },
+  windows: {
+    downloadImg: 'Download Image',
+    downloadPdf: 'Download PDF',
+    of: 'of',
+  },
+  upload: {
+    title: 'Upload Documents',
+    credits: 'Monthly Credit Limit',
+    searchClient: 'Search Client',
+  },
 }
 
 export default {
