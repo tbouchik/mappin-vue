@@ -106,7 +106,7 @@ export default {
             this.$notification['success']({
               message: 'Upload',
               description: 'Files were uploaded successfully',
-              duration: 0.5,
+              duration: 0.9,
             })
             this.$store.dispatch('ACTION_UPDATE_COUNTER', this.userId)
           }

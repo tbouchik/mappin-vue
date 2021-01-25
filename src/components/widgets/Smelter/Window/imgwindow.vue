@@ -98,7 +98,7 @@ export default {
           return (x > leftBoundary && x < rightBoundary) && (y > topBoundary && y < bottomBoundary)
         })
         if (selectedTextSection[0] && selectedTextSection[0].Text) {
-          store.dispatch('ACTION_UPDATE_ACTIVE_VALUE', selectedTextSection[0].Text)
+          store.dispatch('ACTION_UPDATE_ACTIVE_VALUE', selectedTextSection[0])
         }
       })
       let img = document.getElementById('stub')

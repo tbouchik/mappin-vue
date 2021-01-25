@@ -8,8 +8,9 @@ Vue.use(Vuex)
 
 let cancelToken
 
-function saveDocToAPI(osmium, id) {
+function saveDocToAPI(mbc, osmium, id) {
   const updatedDocument = {
+    mbc: mbc,
     osmium: osmium,
     status: 'validated',
   }
@@ -102,10 +103,12 @@ export default {
     MUTATION_UPDATE_INDEX(state, idx) {
       state.currentIdx = idx
     },
-    MUTATION_UPDATE_ACTIVE_VALUE(state, value) {
+    MUTATION_UPDATE_ACTIVE_VALUE(state, bbox) {
       let updateFormattedDoc = cloneDeep(state.formattedDocument)
       const keyType = state.formattedDocument.filter.keys[state.currentIdx].type
-      const newVal = formatValue(value, keyType, 'auto')
+      const newVal = formatValue(bbox.Text, keyType, 'auto')
+      let mbcData = new Map()
+      mbcData.set(updateFormattedDoc.osmium[state.currentIdx].Key, bbox)
       if (state.catMode) {
         let appendix = ' '.concat(newVal)
         let currentValue = updateFormattedDoc.osmium[state.currentIdx].Value
@@ -114,15 +117,16 @@ export default {
         updateFormattedDoc.osmium[state.currentIdx].Value = newVal
       }
       state.formattedDocument = updateFormattedDoc
-      saveDocToAPI(updateFormattedDoc.osmium, state.formattedDocument.id)
+      saveDocToAPI(Object.fromEntries(mbcData), updateFormattedDoc.osmium, state.formattedDocument.id)
     },
     MUTATION_DO_CHANGES_TO_DOCUMENT(state, changeData) {
       let { value, itemIdx, column } = changeData
+      let mbcData = new Map()
       const keyType = state.formattedDocument.filter.keys[itemIdx].type
       let tempDoc = cloneDeep(state.formattedDocument)
       tempDoc.osmium[itemIdx][column] = formatValue(value, keyType, 'manual')
       state.formattedDocument = tempDoc
-      saveDocToAPI(state.formattedDocument.osmium, state.formattedDocument.id)
+      saveDocToAPI(Object.fromEntries(mbcData), state.formattedDocument.osmium, state.formattedDocument.id)
     },
     MUTATION_ADD_RECORD_AFTER_INDEX(state) {
       const newElement = {
