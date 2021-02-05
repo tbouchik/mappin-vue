@@ -21,7 +21,7 @@ import './global.scss'
 
 Vue.filter('timestamp', function (value) {
   if (!value) return ''
-  moment.locale('en-GB')
+  moment.locale('fr')
   return moment(value).format('DD/MM/YYYY h:mm A')
 })
 

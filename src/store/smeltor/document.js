@@ -8,10 +8,11 @@ Vue.use(Vuex)
 
 let cancelToken
 
-function saveDocToAPI(mbc, osmium, id) {
+function saveDocToAPI(mbc, osmium, ggMetadata, id) {
   const updatedDocument = {
     mbc: mbc,
     osmium: osmium,
+    ggMetadata: ggMetadata,
     status: 'validated',
   }
   if (typeof cancelToken !== typeof undefined) {
@@ -29,7 +30,7 @@ function saveDocToAPI(mbc, osmium, id) {
 
 function filterAlpha (str) {
   if (typeof str === 'string') {
-    return str.replace(/[^\d.-]/g, '')
+    return str.replace(',', '.').replace(/[^\d.-]/g, '')
   }
   return str
 }
@@ -38,8 +39,8 @@ function parseDate (value) {
   if (!value) return ''
   let parsedInput = ''
   try {
-    moment.locale('en-GB')
-    parsedInput = moment(value, ['DD/MM/YYYY', 'DD-MM-YYYY', 'dddd, MMMM Do YYYY', 'dddd [the] Do [of] MMMM', 'YYYY-MM-DD', 'MMM DD, YYYY']).format('DD/MM/YYYY')
+    moment.locale('fr')
+    parsedInput = moment(value, ['D MMMM YYYY', 'DD MMMM YYYY', 'D MMM YYYY', 'DD MMM YYYY', 'D MMMM YY', 'DD MMMM YY', 'D MMM YY', 'DD MMM YY', 'DD/MM/YYYY', 'DD-MM-YYYY', 'dddd, MMMM Do YYYY', 'dddd [the] Do [of] MMMM', 'YYYY-MM-DD', 'MMM DD, YYYY']).format('DD/MM/YYYY')
   } catch (error) {
     console.log('erroe', error)
   }
@@ -117,7 +118,7 @@ export default {
         updateFormattedDoc.osmium[state.currentIdx].Value = newVal
       }
       state.formattedDocument = updateFormattedDoc
-      saveDocToAPI(Object.fromEntries(mbcData), updateFormattedDoc.osmium, state.formattedDocument.id)
+      saveDocToAPI(Object.fromEntries(mbcData), updateFormattedDoc.osmium, updateFormattedDoc.ggMetadata, state.formattedDocument.id)
     },
     MUTATION_DO_CHANGES_TO_DOCUMENT(state, changeData) {
       let { value, itemIdx, column } = changeData
@@ -126,7 +127,7 @@ export default {
       let tempDoc = cloneDeep(state.formattedDocument)
       tempDoc.osmium[itemIdx][column] = formatValue(value, keyType, 'manual')
       state.formattedDocument = tempDoc
-      saveDocToAPI(Object.fromEntries(mbcData), state.formattedDocument.osmium, state.formattedDocument.id)
+      saveDocToAPI(Object.fromEntries(mbcData), state.formattedDocument.osmium, state.formattedDocument.ggMetadata, state.formattedDocument.id)
     },
     MUTATION_ADD_RECORD_AFTER_INDEX(state) {
       const newElement = {
