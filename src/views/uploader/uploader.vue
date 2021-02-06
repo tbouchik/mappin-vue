@@ -138,9 +138,11 @@ export default {
       'clientTableLoading',
       'templateLoading',
       'userCount',
-      'canUpload']),
+      'canUpload',
+      'userId']),
   },
   created() {
+    this.$store.dispatch('ACTION_UPDATE_COUNTER', this.userId)
     this.$store.dispatch('ACTION_FETCH_CLIENTS', {
       limit: 100,
       page: 1,

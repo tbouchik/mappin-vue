@@ -11,6 +11,12 @@ class UserService {
     } catch (error) {
     }
   }
+  static getUserCounter() {
+    try {
+      return axios.get(`/v1/users/count`)
+    } catch (error) {
+    }
+  }
 }
 
 export default UserService

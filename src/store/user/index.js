@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
-import { cloneDeep } from 'lodash'
 
 Vue.use(Vuex)
 
@@ -27,9 +26,8 @@ export default {
       location.reload()
     },
     MUTATION_SET_USER_COUNTER(state, counter) {
-      const newStateUser = cloneDeep(state.user)
-      newStateUser.user.counter = counter
-      state.user = newStateUser
+      state.user.user.counter = counter
+      localStorage.setItem('user', JSON.stringify(state.user))
     },
   },
   actions: {
