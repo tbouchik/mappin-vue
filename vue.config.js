@@ -20,13 +20,27 @@ module.exports = {
   },
   devServer: {
     proxy: {
-      '/v1': {
-        target: 'http://localhost:3000/',
+      '^/v1': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
         secure: false,
+        pathRewrite: {
+          '^/v1': '/v1',
+        },
+        headers: {
+          Connection: 'keep-alive',
+        },
       },
-      '/': {
-        target: 'http://localhost:3000/',
+      '^/': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
         secure: false,
+        pathRewrite: {
+          '^/': '/',
+        },
+        headers: {
+          Connection: 'keep-alive',
+        },
       },
       '^/mappin-test': {
         target: 'https://ltm03gutjl.execute-api.us-east-1.amazonaws.com/',

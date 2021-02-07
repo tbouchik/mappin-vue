@@ -171,10 +171,10 @@ export default {
   },
   beforeMount() {
     FilterService.getDefaultFilterId()
-      .then(defaultFilterId => {
+      .then(defaultFilterIds => {
         FilterService.fetchFilter(this.filterId)
           .then((filter) => {
-            this.isSmartTemplate = defaultFilterId === filter.id
+            this.isSmartTemplate = defaultFilterIds ? defaultFilterIds.includes(filter.id) : false
             this.name = filter.name
             this.description = filter.description
             this.type = filter.type

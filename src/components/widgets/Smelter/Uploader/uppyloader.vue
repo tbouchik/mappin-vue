@@ -109,6 +109,7 @@ export default {
               duration: 0.9,
             })
             this.$store.dispatch('ACTION_UPDATE_COUNTER', this.userId)
+            this.$router.push({ name: 'documents' })
           }
         )
         this.files = []
