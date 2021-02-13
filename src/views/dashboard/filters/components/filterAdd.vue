@@ -58,6 +58,9 @@
                     <a-select-option value="REF">
                       REF
                     </a-select-option>
+                    <a-select-option value="IMPUT">
+                      IMPUT
+                    </a-select-option>
                     <a-select-option value="TEXT">
                       TEXT
                     </a-select-option>

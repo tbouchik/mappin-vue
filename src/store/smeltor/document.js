@@ -8,9 +8,10 @@ Vue.use(Vuex)
 
 let cancelToken
 
-function saveDocToAPI(mbc, osmium, ggMetadata, id) {
+function saveDocToAPI(mbc, osmium, ggMetadata, imput, id) {
   const updatedDocument = {
     mbc: mbc,
+    imput: imput || null,
     osmium: osmium,
     ggMetadata: ggMetadata,
     status: 'validated',
@@ -118,16 +119,17 @@ export default {
         updateFormattedDoc.osmium[state.currentIdx].Value = newVal
       }
       state.formattedDocument = updateFormattedDoc
-      saveDocToAPI(Object.fromEntries(mbcData), updateFormattedDoc.osmium, updateFormattedDoc.ggMetadata, state.formattedDocument.id)
+      saveDocToAPI(Object.fromEntries(mbcData), updateFormattedDoc.osmium, updateFormattedDoc.ggMetadata, null, state.formattedDocument.id)
     },
     MUTATION_DO_CHANGES_TO_DOCUMENT(state, changeData) {
       let { value, itemIdx, column } = changeData
       let mbcData = new Map()
       const keyType = state.formattedDocument.filter.keys[itemIdx].type
+      const imput = keyType === 'IMPUT' ? value : null
       let tempDoc = cloneDeep(state.formattedDocument)
       tempDoc.osmium[itemIdx][column] = formatValue(value, keyType, 'manual')
       state.formattedDocument = tempDoc
-      saveDocToAPI(Object.fromEntries(mbcData), state.formattedDocument.osmium, state.formattedDocument.ggMetadata, state.formattedDocument.id)
+      saveDocToAPI(Object.fromEntries(mbcData), state.formattedDocument.osmium, state.formattedDocument.ggMetadata, imput, state.formattedDocument.id)
     },
     MUTATION_ADD_RECORD_AFTER_INDEX(state) {
       const newElement = {
