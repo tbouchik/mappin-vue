@@ -199,7 +199,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import JSZip from 'jszip'
-import { pick, isEqual } from 'lodash'
+import { pick, isEqual, cloneDeep } from 'lodash'
 import DocumentService from '../../../services/documentService'
 
 export default {
@@ -501,7 +501,9 @@ export default {
     bulkExportToCSV() {
       this.bulkCsvExportIsLoading = true
       let zip = JSZip()
-      DocumentService.bulkExportCSV((this.queryParams))
+      let downloadQueryParams = cloneDeep(this.queryParams)
+      downloadQueryParams.status = 'validated'
+      DocumentService.bulkExportCSV(downloadQueryParams)
         .then((templateAggregates) => {
           templateAggregates.map((templateAggregate) => {
             let templateCsvContent = ''
