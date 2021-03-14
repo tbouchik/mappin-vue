@@ -54,6 +54,8 @@ const messages = {
     shortcutsView: 'Voir les court-circuits',
     shortcutsTitle: 'Court-Circuits Clavier',
     exportCSV: 'Exporter en CSV',
+    validate: 'Valider',
+    invalidate: 'Invalider',
     keys: {
       tab: 'Tab',
       tabAction: `Active l'entrée suivante`,

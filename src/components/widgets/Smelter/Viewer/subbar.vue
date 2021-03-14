@@ -101,6 +101,29 @@
             ghost
           />
         </a-tooltip>
+
+      </a-button-group>
+
+      &nbsp;	&nbsp;
+      <a-button-group>
+        <a-button v-if="currentStatusIsValidated"
+                  type="primary"
+                  @click="invalidateCurrent"
+                  ghost>
+          {{ $t('subbar.invalidate') }}
+        </a-button>
+        <button
+            v-else
+            :enabled="!currentStatusIsPending"
+            type="button"
+            class="btn btn-success btn-with-addon mr-auto text-nowrap d-none d-md-block"
+            @click="validateCurrent"
+          >
+            <span class="btn-addon">
+              <i class="btn-addon-icon fe fe-check-circle" />
+            </span>
+            {{ $t('subbar.validate') }}
+        </button>
       </a-button-group>
     </div>
     <div :class="$style.amount" class="mr-3 ml-auto d-none d-sm-flex">
@@ -223,6 +246,12 @@ export default {
         this.fetchNewDocs('left')
       }
       return this.currentIndex === 0
+    },
+    currentStatusIsPending: function() {
+      return this.current.status === 'pending'
+    },
+    currentStatusIsValidated: function() {
+      return this.current.status === 'validated'
     },
   },
   props: {
@@ -433,6 +462,26 @@ export default {
               this.$store.dispatch('ACTION_STOP_FILTER_LOADER')
               this.templateModalVisible = false
               this.searchedClient = null
+            })
+        })
+    },
+    validateCurrent() {
+      const body = { status: 'validated' }
+      DocumentService.updateDocument(body, this.current.id)
+        .then(() => {
+          DocumentService.fetchDocument(this.current.id)
+            .then(doc => {
+              this.$store.dispatch('UPDATE_DOCUMENT', doc)
+            })
+        })
+    },
+    invalidateCurrent() {
+      const body = { status: 'smelted' }
+      DocumentService.updateDocument(body, this.current.id)
+        .then(() => {
+          DocumentService.fetchDocument(this.current.id)
+            .then(doc => {
+              this.$store.dispatch('UPDATE_DOCUMENT', doc)
             })
         })
     },

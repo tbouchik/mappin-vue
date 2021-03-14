@@ -108,6 +108,7 @@ label.btn {
   &.btn-primary,
   &.btn-secondary,
   &.btn-success,
+  &.btn-vsuccess,
   &.btn-info,
   &.btn-warning,
   &.btn-danger,
@@ -173,6 +174,21 @@ label.btn {
     &.active {
       background: darken($success, 6%);
       border-color: darken($success, 6%);
+    }
+  }
+  &.btn-vsuccess {
+    background-color: $vsuccess;
+    border-color: $vsuccess;
+    &:hover,
+    &:active {
+      background-color: lighten($vsuccess, 6%);
+      border-color: lighten($vsuccess, 6%);
+    }
+    &:hover:active,
+    &:focus,
+    &.active {
+      background: darken($vsuccess, 6%);
+      border-color: darken($vsuccess, 6%);
     }
   }
   &.btn-danger {
@@ -316,6 +332,23 @@ label.btn {
     &.active {
       background-color: darken($success, 6%);
       border-color: darken($success, 6%);
+      color: $white;
+    }
+  }
+  &.btn-outline-vsuccess {
+    border-color: $vsuccess;
+    color: $vsuccess;
+    &:hover,
+    &:active {
+      background-color: lighten($vsuccess, 6%);
+      border-color: lighten($vsuccess, 6%);
+      color: $white;
+    }
+    &:hover:active,
+    &:focus,
+    &.active {
+      background-color: darken($vsuccess, 6%);
+      border-color: darken($vsuccess, 6%);
       color: $white;
     }
   }

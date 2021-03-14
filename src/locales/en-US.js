@@ -53,6 +53,8 @@ const messages = {
     shortcutsView: 'View Shortcuts',
     shortcutsTitle: 'Keyboard Shortcuts',
     exportCSV: 'Export CSV',
+    validate: 'Validate',
+    invalidate: 'Invalidate',
     keys: {
       tab: 'Tab',
       tabAction: 'Go to next entry',
