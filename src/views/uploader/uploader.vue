@@ -67,11 +67,11 @@
           </template>
           <div v-if="steps[uploaderStep].title == 'Files'">
             <a-row>
-              <a-col :span="4"/>
-              <a-col :span="16">
+              <a-col :span="6"/>
+              <a-col :span="12">
                 <smelter-uppy-loader :maxFileSizeInBytes=10000000></smelter-uppy-loader>
               </a-col>
-              <a-col :span="4"/>
+              <a-col :span="6"/>
             </a-row>
           </div>
       </div>

@@ -13,14 +13,9 @@
         <div class="d-flex flex-column justify-content-center mr-auto col-4">
           <h5 class="mb-0">{{ $t('dashboard.document.extractions') }}</h5>
         </div>
-        <div
-          class="d-flex flex-column justify-content-center col-2"
-          style="float: right"
-        >
-          <button
-            type="button"
-            class="btn btn-primary btn-with-addon mr-auto text-nowrap d-none d-md-block btn-sm"
-            @click="goToUpload"
+        <div class="d-flex flex-column justify-content-center">
+          <button class="btn btn-primary btn-with-addon"
+                  @click="goToUpload"
           >
             <span class="btn-addon">
               <i class="btn-addon-icon fe fe-upload" />
@@ -28,14 +23,14 @@
             {{ $t('dashboard.document.upload') }}
           </button>
         </div>
-        <div class="d-flex flex-column justify-content-center col-2">
-          <button
-            type="button"
-            class="btn btn-success btn-with-addon mr-auto text-nowrap d-none d-md-block btn-sm"
-            :disabled="everythingIsValidated"
-            @click="() => goToValidation()"
+        &nbsp;	&nbsp;
+        <div class="d-flex flex-column justify-content-center">
+          <button class="btn btn-success btn-with-addon"
+                  :disabled="everythingIsValidated"
+
+            @click="goToValidation"
           >
-            <span v-if="!validatorIsLoading" class="btn-addon">
+           <span v-if="!validatorIsLoading" class="btn-addon">
               <i class="btn-addon-icon fe fe-edit" />
             </span>
             <span v-if="validatorIsLoading" class="btn-addon" style>

@@ -2,11 +2,7 @@
     <form>
         <!-- <div class="row"> -->
             <!-- <div class="col-2"></div> -->
-                <div class="card">
-                    <div class="card-body">
                         <div ref="dashboardContainer" ></div>
-                    </div>
-                </div>
             <!-- <div class="col-2"></div> -->
         <!-- </div> -->
     </form>
