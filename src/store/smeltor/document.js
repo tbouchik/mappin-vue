@@ -40,7 +40,7 @@ function parseDate (value) {
   if (!value) return ''
   let parsedInput = ''
   try {
-    moment.locale('fr')
+    moment.locale('en-GB')
     parsedInput = moment(value, ['D MMMM YYYY', 'DD MMMM YYYY', 'D MMM YYYY', 'DD MMM YYYY', 'D MMMM YY', 'DD MMMM YY', 'D MMM YY', 'DD MMM YY', 'DD/MM/YYYY', 'DD-MM-YYYY', 'dddd, MMMM Do YYYY', 'dddd [the] Do [of] MMMM', 'YYYY-MM-DD', 'MMM DD, YYYY']).format('DD/MM/YYYY')
   } catch (error) {
     console.log('erroe', error)
