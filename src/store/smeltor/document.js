@@ -8,10 +8,9 @@ Vue.use(Vuex)
 
 let cancelToken
 
-function saveDocToAPI(mbc, osmium, ggMetadata, imput, id) {
+function saveDocToAPI(mbc, osmium, ggMetadata, id) {
   const updatedDocument = {
     mbc: mbc,
-    imput: imput || null,
     osmium: osmium,
     ggMetadata: ggMetadata,
     status: 'validated',
@@ -154,17 +153,24 @@ export default {
         updateFormattedDoc.osmium[state.currentIdx].Value = newVal
       }
       state.formattedDocument = updateFormattedDoc
-      saveDocToAPI(Object.fromEntries(mbcData), updateFormattedDoc.osmium, updateFormattedDoc.ggMetadata, null, state.formattedDocument.id)
+      saveDocToAPI(Object.fromEntries(mbcData), updateFormattedDoc.osmium, updateFormattedDoc.ggMetadata, state.formattedDocument.id)
     },
     MUTATION_DO_CHANGES_TO_DOCUMENT(state, changeData) {
       let { value, itemIdx, column } = changeData
       let mbcData = new Map()
       const keyType = state.formattedDocument.filter.keys[itemIdx].type
-      const imput = keyType === 'IMPUT' ? value : null
       let tempDoc = cloneDeep(state.formattedDocument)
       tempDoc.osmium[itemIdx][column] = formatValue(value, keyType, 'manual')
       state.formattedDocument = tempDoc
-      saveDocToAPI(Object.fromEntries(mbcData), state.formattedDocument.osmium, state.formattedDocument.ggMetadata, imput, state.formattedDocument.id)
+      saveDocToAPI(Object.fromEntries(mbcData), state.formattedDocument.osmium, state.formattedDocument.ggMetadata, state.formattedDocument.id)
+    },
+    MUTATION_DO_IMPUTATION_CHANGES_TO_DOCUMENT(state, changeData) {
+      let { itemIdx, imputation, libelle } = changeData
+      let tempDoc = cloneDeep(state.formattedDocument)
+      tempDoc.osmium[itemIdx]['Imputation'] = imputation
+      tempDoc.osmium[itemIdx]['Libelle'] = libelle
+      state.formattedDocument = tempDoc
+      saveDocToAPI({}, state.formattedDocument.osmium, state.formattedDocument.ggMetadata, state.formattedDocument.id)
     },
     MUTATION_ADD_RECORD_AFTER_INDEX(state) {
       const newElement = {
@@ -259,6 +265,9 @@ export default {
     },
     ACTION_CACHE_IDS({ commit }, payload) {
       commit('MUTATION_CACHE_IDS', payload)
+    },
+    ACTION_DO_IMPUTATION_CHANGES_TO_DOCUMENT({ commit }, payload) {
+      commit('MUTATION_DO_IMPUTATION_CHANGES_TO_DOCUMENT', payload)
     },
   },
   getters: {

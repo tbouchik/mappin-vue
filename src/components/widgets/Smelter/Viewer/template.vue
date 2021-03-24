@@ -28,9 +28,9 @@
           <div :key="col"  v-if="col==='Imputation' && isActive(dataIndex, col)" @click="activateIndex(dataIndex, col)">
             <template v-if="record.Imputation !== undefined">
               <vue-simple-suggest
-              @input="e => changeLibelle(e, dataIndex, col)"
-              @hover="e => changeLibelle(e, dataIndex, col)"
-              @select="e => updateImputation(e, dataIndex, col)"
+              @input="e => changeLibelle(e, dataIndex)"
+              @hover="e => changeLibelle(e, dataIndex)"
+              @select="e => updateImputation(e, dataIndex)"
               :value="text"
               :styles="autoCompleteStyle"
               :list="simpleSuggestionList"
@@ -73,8 +73,6 @@ import { accountNumbers1,
 import labels from '../../../../assets/accounting/labels'
 import VueSimpleSuggest from 'vue-simple-suggest'
 import 'vue-simple-suggest/dist/styles.css' // Optional CSS
-
-// import labels from '../../../../assets/accounting/labels'
 
 const columns = [
   {
@@ -119,7 +117,7 @@ export default {
     }
   },
   created() {
-    this.pageData = this.filter.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation, Libelle: x.Imputation ? '' : null } })
+    this.pageData = this.filter.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation, Libelle: x.Libelle } })
     this.activateIndex(0, 'Value')
   },
   props: {
@@ -135,7 +133,7 @@ export default {
   },
   watch: {
     filter: function () {
-      this.pageData = this.filter.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation, Libelle: x.Imputation ? '' : null } })
+      this.pageData = this.filter.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation, Libelle: x.Libelle } })
     },
     currentActiveIndex: function() {
       if (this.currentActiveColumn === 'Value') {
@@ -174,13 +172,16 @@ export default {
     hash(idx, col) {
       return `${idx}_${col}`
     },
-    changeLibelle(input, idx, col) {
-      console.log(labels[parseInt(input)])
+    changeLibelle(input, idx) {
       this.pageData[idx].Libelle = labels[parseInt(input)]
-      console.log(this.pageData[idx])
     },
-    updateImputation(input, idx, col) {
-      console.log(input, idx, col)
+    updateImputation(input, idx) {
+      const payload = {
+        itemIdx: idx,
+        imputation: input,
+        libelle: labels[parseInt(input)],
+      }
+      this.$store.dispatch('ACTION_DO_IMPUTATION_CHANGES_TO_DOCUMENT', payload)
     },
   },
   destroyed() {
