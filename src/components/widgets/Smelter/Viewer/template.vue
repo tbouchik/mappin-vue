@@ -28,6 +28,9 @@
           <div :key="col"  v-if="col==='Imputation' && isActive(dataIndex, col)" @click="activateIndex(dataIndex, col)">
             <template v-if="record.Imputation !== undefined">
               <vue-simple-suggest
+              @input="e => changeLibelle(e, dataIndex, col)"
+              @hover="e => changeLibelle(e, dataIndex, col)"
+              @select="e => updateImputation(e, dataIndex, col)"
               :value="text"
               :styles="autoCompleteStyle"
               :list="simpleSuggestionList"
@@ -47,7 +50,7 @@
             </template>
           </div>
           <div :key="col"  v-if="col==='Libelle'" @click="activateIndex(dataIndex, col)">
-            Libelléekzjhezbdyi
+            {{text}}
           </div>
         </template>
       </a-table>
@@ -67,6 +70,7 @@ import { accountNumbers1,
   accountNumbers8,
   accountNumbers9,
   accountNumbers0 } from '../../../../assets/accounting/accounts'
+import labels from '../../../../assets/accounting/labels'
 import VueSimpleSuggest from 'vue-simple-suggest'
 import 'vue-simple-suggest/dist/styles.css' // Optional CSS
 
@@ -115,9 +119,8 @@ export default {
     }
   },
   created() {
-    this.pageData = this.filter.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation } })
+    this.pageData = this.filter.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation, Libelle: x.Imputation ? '' : null } })
     this.activateIndex(0, 'Value')
-    this.$refs['0_Value'][0].$el.focus()
   },
   props: {
     insideUploaderView: {
@@ -132,7 +135,7 @@ export default {
   },
   watch: {
     filter: function () {
-      this.pageData = this.filter.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation || '' } })
+      this.pageData = this.filter.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation, Libelle: x.Imputation ? '' : null } })
     },
     currentActiveIndex: function() {
       if (this.currentActiveColumn === 'Value') {
@@ -170,6 +173,14 @@ export default {
     },
     hash(idx, col) {
       return `${idx}_${col}`
+    },
+    changeLibelle(input, idx, col) {
+      console.log(labels[parseInt(input)])
+      this.pageData[idx].Libelle = labels[parseInt(input)]
+      console.log(this.pageData[idx])
+    },
+    updateImputation(input, idx, col) {
+      console.log(input, idx, col)
     },
   },
   destroyed() {
