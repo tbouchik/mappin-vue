@@ -5,23 +5,49 @@
                 :data-source="pageData"
                 :pagination=false
                 bordered>
-        <template v-for="col in ['Key', 'Value']" :slot="col"   slot-scope="text, record, dataIndex" style="background:blue">
-          <div :key="col"  v-if="col==='Key'" @click="activateIndex(dataIndex)" >
+        <template v-for="col in ['Key', 'Value', 'Imputation', 'Libelle']" :slot="col"   slot-scope="text, record, dataIndex" style="background:blue">
+          <div :key="col"  v-if="col==='Key'" @click="activateIndex(dataIndex, col)" >
             {{text}}
           </div>
-          <div :key="col"  v-if="col==='Value' && isActive(dataIndex)" @click="activateIndex(dataIndex)">
+          <div :key="col"  v-if="col==='Value' && isActive(dataIndex, col)" @click="activateIndex(dataIndex, col)">
             <a-input
               style="margin: -5px 0; background:#CCCCFF"
               :value="text"
               @change="e => handleChange(e.target.value, dataIndex, col)"
+              :ref="hash(dataIndex,col)"
             />
           </div>
-          <div :key="col"  v-if="col==='Value' && !isActive(dataIndex)" @click="activateIndex(dataIndex)">
+          <div :key="col"  v-if="col==='Value' && !isActive(dataIndex, col)" @click="activateIndex(dataIndex, col)">
             <a-input
               style="margin: -5px 0"
               :value="text"
               @change="e => handleChange(e.target.value, dataIndex, col)"
+              :ref="hash(dataIndex,col)"
             />
+          </div>
+          <div :key="col"  v-if="col==='Imputation' && isActive(dataIndex, col)" @click="activateIndex(dataIndex, col)">
+            <template v-if="record.Imputation !== undefined">
+              <vue-simple-suggest
+              :value="text"
+              :styles="autoCompleteStyle"
+              :list="simpleSuggestionList"
+              :filter-by-query="true"
+              :ref="hash(dataIndex,col)">
+          </vue-simple-suggest>
+            </template>
+          </div>
+          <div :key="col"  v-if="col==='Imputation' && !isActive(dataIndex, col)" @click="activateIndex(dataIndex, col)">
+            <template v-if="record.Imputation !== undefined">
+              <vue-simple-suggest
+              :value="text"
+              :list="simpleSuggestionList"
+              :filter-by-query="true"
+              :ref="hash(dataIndex,col)">
+          </vue-simple-suggest>
+            </template>
+          </div>
+          <div :key="col"  v-if="col==='Libelle'" @click="activateIndex(dataIndex, col)">
+            Libelléekzjhezbdyi
           </div>
         </template>
       </a-table>
@@ -31,32 +57,67 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
+import { accountNumbers1,
+  accountNumbers2,
+  accountNumbers3,
+  accountNumbers4,
+  accountNumbers5,
+  accountNumbers6,
+  accountNumbers7,
+  accountNumbers8,
+  accountNumbers9,
+  accountNumbers0 } from '../../../../assets/accounting/accounts'
+import VueSimpleSuggest from 'vue-simple-suggest'
+import 'vue-simple-suggest/dist/styles.css' // Optional CSS
+
+// import labels from '../../../../assets/accounting/labels'
+
 const columns = [
   {
     title: 'Key',
     dataIndex: 'Key',
-    width: '40%',
+    width: '25%',
     scopedSlots: { customRender: 'Key' },
   },
   {
     title: 'Value',
     dataIndex: 'Value',
-    width: '45%',
+    width: '40%',
     scopedSlots: { customRender: 'Value' },
+  },
+  {
+    title: 'Imputation',
+    dataIndex: 'Imputation',
+    width: '15%',
+    scopedSlots: { customRender: 'Imputation' },
+  },
+  {
+    title: 'Libelle',
+    dataIndex: 'Libelle',
+    width: '20%',
+    scopedSlots: { customRender: 'Libelle' },
   },
 ]
 export default {
+  components: {
+    VueSimpleSuggest,
+  },
   name: 'TemplateViewer',
   data() {
     return {
       editMode: false,
       columns,
       pageData: [],
+      chosen: '',
+      autoCompleteStyle: {
+        inputWrapper: 'c1',
+      },
     }
   },
   created() {
-    this.pageData = this.filter.map(x => { return { Key: x.Key, Value: x.Value } })
-    this.activateIndex(0)
+    this.pageData = this.filter.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation } })
+    this.activateIndex(0, 'Value')
+    this.$refs['0_Value'][0].$el.focus()
   },
   props: {
     insideUploaderView: {
@@ -67,11 +128,25 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['currentPage', 'currentActiveIndex', 'catMode']),
+    ...mapGetters(['currentPage', 'currentActiveIndex', 'currentActiveColumn', 'catMode']),
   },
   watch: {
     filter: function () {
-      this.pageData = this.filter.map(x => { return { Key: x.Key, Value: x.Value } })
+      this.pageData = this.filter.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation || '' } })
+    },
+    currentActiveIndex: function() {
+      if (this.currentActiveColumn === 'Value') {
+        this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
+      } else {
+        this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.children[0].children[0].focus()
+      }
+    },
+    currentActiveColumn: function() {
+      if (this.currentActiveColumn === 'Value') {
+        this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
+      } else {
+        this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.children[0].children[0].focus()
+      }
     },
   },
   methods: {
@@ -81,14 +156,20 @@ export default {
     handleChange(value, itemIdx, column) {
       this.$store.dispatch('ACTION_DO_CHANGES_TO_DOCUMENT', { value, itemIdx, column })
     },
-    activateIndex(idx) {
-      this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', idx)
+    activateIndex(idx, col) {
+      this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', { idx, col })
     },
-    isActive(dataIndex) {
-      return dataIndex === this.currentActiveIndex
+    isActive(dataIndex, column) {
+      return dataIndex === this.currentActiveIndex && column === this.currentActiveColumn
     },
     toggleCatMode() {
       this.$store.dispatch('ACTION_TOGGLE_CATMODE')
+    },
+    simpleSuggestionList() {
+      return accountNumbers1.concat(accountNumbers2, accountNumbers3, accountNumbers4, accountNumbers5, accountNumbers6, accountNumbers7, accountNumbers8, accountNumbers9, accountNumbers0)
+    },
+    hash(idx, col) {
+      return `${idx}_${col}`
     },
   },
   destroyed() {
@@ -99,4 +180,8 @@ export default {
 
 <style lang="scss" module>
 @import "./style.module.scss";
+
+.c1 {
+  background: #CCCCFF;
+}
 </style>

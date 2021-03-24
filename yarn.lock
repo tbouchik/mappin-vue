@@ -11038,6 +11038,11 @@ vue-shortkey@^3.1.7:
     custom-event-polyfill "^1.0.7"
     element-matches "^0.1.2"
 
+vue-simple-suggest@^1.10.3:
+  version "1.10.3"
+  resolved "https://registry.yarnpkg.com/vue-simple-suggest/-/vue-simple-suggest-1.10.3.tgz#c3773f06eb4d9d91ee7eabbf799bab45c8dd15d9"
+  integrity sha512-5yBGlVOQ5gvrkuoT6TtdVHLXy507EKN7X8vgXhPJsMbcJFuDTqzd6AFElSK7Bv4UwcKSU/o1OPzD9GBi86VuTQ==
+
 vue-sticky@^3.3.4:
   version "3.3.4"
   resolved "https://registry.yarnpkg.com/vue-sticky/-/vue-sticky-3.3.4.tgz#d06288c4d28cfefdc7037e90b2ce51e5b51585c9"

@@ -9,17 +9,17 @@
             v-shortkey="{up: ['tab'], down: ['shift', 'tab']}"
             @shortkey="updateActiveIndex">
         <div class="row">
-          <div class="col-md-4">
+          <div class="col-md-5">
             <div class="sticky">
               <template-viewer :filter="currentFilter" />
             </div>
           </div>
-          <div v-if="documentIsPdf" class="col-md-8">
+          <div v-if="documentIsPdf" class="col-md-7">
             <div>
             <smelter-pdf-window  :name="documentName" :currentPageData="currentPageData" />
             </div>
           </div>
-          <div v-else class="col-md-8 container-fluid">
+          <div v-else class="col-md-7 container-fluid">
               <smelter-image-window  :name="documentName" :currentPageData="currentPageData" />
           </div>
         </div>
@@ -79,7 +79,7 @@ export default {
       return DocumentService.fetchDocument(this.documentId).then(doc => {
         this.$store.dispatch('UPDATE_DOCUMENT', doc)
         this.currentDocument = doc
-        this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', 0)
+        this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', { idx: 0, col: 'Value' })
       })
     },
     currentDocument: function() {
@@ -91,7 +91,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['current', 'documentsIdList', 'currentPageData', 'currentActiveIndex']),
+    ...mapGetters(['current', 'documentsIdList', 'currentPageData']),
     documentName: function() {
       return get(this.currentDocument, 'alias')
     },
@@ -103,27 +103,13 @@ export default {
     },
   },
   methods: {
-    incrementActiveIndex() {
-      if (this.currentActiveIndex < this.currentFilter.length - 1) {
-        this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', this.currentActiveIndex + 1)
-      } else {
-        this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', 0)
-      }
-    },
-    decrementActiveIndex() {
-      if (this.currentActiveIndex > 0) {
-        this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', this.currentActiveIndex - 1)
-      } else {
-        this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', this.currentFilter.length - 1)
-      }
-    },
     updateActiveIndex(event) {
       switch (event.srcKey) {
         case 'up':
-          this.incrementActiveIndex()
+          this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', { move: 'inc' })
           break
         case 'down':
-          this.decrementActiveIndex()
+          this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', { move: 'dec' })
           break
       }
     },

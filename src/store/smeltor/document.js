@@ -29,6 +29,33 @@ function saveDocToAPI(mbc, osmium, ggMetadata, imput, id) {
   }
 }
 
+function getGraphNextMove(osmium, currentIdx, currentCol, move) {
+  const graphDepth = osmium.length
+  if (move === 'inc') {
+    const nextIndex = currentIdx < graphDepth - 1 ? currentIdx + 1 : 0
+    if (currentCol === 'Imputation') {
+      return { idx: nextIndex, col: 'Value' }
+    } else {
+      if (osmium[currentIdx].Imputation !== undefined) {
+        return { idx: currentIdx, col: 'Imputation' }
+      } else {
+        return { idx: nextIndex, col: 'Value' }
+      }
+    }
+  } else {
+    const previousIndex = currentIdx > 0 ? currentIdx - 1 : graphDepth - 1
+    if (currentCol === 'Imputation') {
+      return { idx: currentIdx, col: 'Value' }
+    } else {
+      if (osmium[previousIndex].Imputation !== undefined) {
+        return { idx: previousIndex, col: 'Imputation' }
+      } else {
+        return { idx: previousIndex, col: 'Value' }
+      }
+    }
+  }
+}
+
 function filterAlpha (str) {
   if (typeof str === 'string') {
     return str.replace(',', '.').replace(/[^\d.-]/g, '')
@@ -73,6 +100,7 @@ export default {
     catMode: false,
     loading: false,
     queryParams: {},
+    currentCol: 'Value',
     smeltedCache: [],
     totalDocumentsCount: 0,
     documentsIdList: [],
@@ -102,8 +130,15 @@ export default {
     MUTATION_RESET_PAGE(state) {
       state.page = 1
     },
-    MUTATION_UPDATE_INDEX(state, idx) {
-      state.currentIdx = idx
+    MUTATION_UPDATE_INDEX(state, payload) {
+      if (payload.idx !== undefined && payload.col !== undefined) {
+        state.currentIdx = payload.idx
+        state.currentCol = payload.col
+      } else {
+        let nextCoords = getGraphNextMove(state.formattedDocument.osmium, state.currentIdx, state.currentCol, payload.move)
+        state.currentIdx = nextCoords.idx
+        state.currentCol = nextCoords.col
+      }
     },
     MUTATION_UPDATE_ACTIVE_VALUE(state, bbox) {
       let updateFormattedDoc = cloneDeep(state.formattedDocument)
@@ -198,8 +233,8 @@ export default {
     ACTION_RESET_PAGE({ commit }) {
       commit('MUTATION_RESET_PAGE')
     },
-    ACTION_UPDATE_ACTIVE_INDEX({ commit }, idx) {
-      commit('MUTATION_UPDATE_INDEX', idx)
+    ACTION_UPDATE_ACTIVE_INDEX({ commit }, payload) {
+      commit('MUTATION_UPDATE_INDEX', payload)
     },
     ACTION_UPDATE_ACTIVE_VALUE({ commit }, idx) {
       commit('MUTATION_UPDATE_ACTIVE_VALUE', idx)
@@ -236,6 +271,7 @@ export default {
       return x.status === 'smelted'
     }).map(x => x.id),
     currentActiveIndex: state => state.currentIdx,
+    currentActiveColumn: state => state.currentCol,
     catMode: state => state.catMode,
     docTableLoading: state => state.loading, // TODO: eliminate
     docQueryParams: state => state.queryParams,
