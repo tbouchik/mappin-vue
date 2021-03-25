@@ -8,9 +8,10 @@ Vue.use(Vuex)
 
 let cancelToken
 
-function saveDocToAPI(mbc, osmium, ggMetadata, id) {
+function saveDocToAPI(mbc, osmium, ggMetadata, imput, id) {
   const updatedDocument = {
     mbc: mbc,
+    imput: imput,
     osmium: osmium,
     ggMetadata: ggMetadata,
     status: 'validated',
@@ -35,7 +36,7 @@ function getGraphNextMove(osmium, currentIdx, currentCol, move) {
     if (currentCol === 'Imputation') {
       return { idx: nextIndex, col: 'Value' }
     } else {
-      if (osmium[currentIdx].Imputation !== undefined) {
+      if (osmium[currentIdx].Imputation !== undefined && osmium[currentIdx].Imputation !== null) {
         return { idx: currentIdx, col: 'Imputation' }
       } else {
         return { idx: nextIndex, col: 'Value' }
@@ -46,7 +47,7 @@ function getGraphNextMove(osmium, currentIdx, currentCol, move) {
     if (currentCol === 'Imputation') {
       return { idx: currentIdx, col: 'Value' }
     } else {
-      if (osmium[previousIndex].Imputation !== undefined) {
+      if (osmium[previousIndex].Imputation !== undefined && osmium[previousIndex].Imputation !== null) {
         return { idx: previousIndex, col: 'Imputation' }
       } else {
         return { idx: previousIndex, col: 'Value' }
@@ -153,7 +154,7 @@ export default {
         updateFormattedDoc.osmium[state.currentIdx].Value = newVal
       }
       state.formattedDocument = updateFormattedDoc
-      saveDocToAPI(Object.fromEntries(mbcData), updateFormattedDoc.osmium, updateFormattedDoc.ggMetadata, state.formattedDocument.id)
+      saveDocToAPI(Object.fromEntries(mbcData), updateFormattedDoc.osmium, updateFormattedDoc.ggMetadata, false, state.formattedDocument.id)
     },
     MUTATION_DO_CHANGES_TO_DOCUMENT(state, changeData) {
       let { value, itemIdx, column } = changeData
@@ -162,7 +163,7 @@ export default {
       let tempDoc = cloneDeep(state.formattedDocument)
       tempDoc.osmium[itemIdx][column] = formatValue(value, keyType, 'manual')
       state.formattedDocument = tempDoc
-      saveDocToAPI(Object.fromEntries(mbcData), state.formattedDocument.osmium, state.formattedDocument.ggMetadata, state.formattedDocument.id)
+      saveDocToAPI(Object.fromEntries(mbcData), state.formattedDocument.osmium, state.formattedDocument.ggMetadata, false, state.formattedDocument.id)
     },
     MUTATION_DO_IMPUTATION_CHANGES_TO_DOCUMENT(state, changeData) {
       let { itemIdx, imputation, libelle } = changeData
@@ -170,7 +171,7 @@ export default {
       tempDoc.osmium[itemIdx]['Imputation'] = imputation
       tempDoc.osmium[itemIdx]['Libelle'] = libelle
       state.formattedDocument = tempDoc
-      saveDocToAPI({}, state.formattedDocument.osmium, state.formattedDocument.ggMetadata, state.formattedDocument.id)
+      saveDocToAPI({}, state.formattedDocument.osmium, state.formattedDocument.ggMetadata, true, state.formattedDocument.id)
     },
     MUTATION_ADD_RECORD_AFTER_INDEX(state) {
       const newElement = {

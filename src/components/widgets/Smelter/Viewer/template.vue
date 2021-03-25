@@ -26,7 +26,7 @@
             />
           </div>
           <div :key="col"  v-if="col==='Imputation' && isActive(dataIndex, col)" @click="activateIndex(dataIndex, col)">
-            <template v-if="record.Imputation !== undefined">
+            <template v-if="record.Imputation !== undefined && record.Imputation !== null">
               <vue-simple-suggest
               @input="e => changeLibelle(e, dataIndex)"
               @hover="e => changeLibelle(e, dataIndex)"
@@ -40,7 +40,7 @@
             </template>
           </div>
           <div :key="col"  v-if="col==='Imputation' && !isActive(dataIndex, col)" @click="activateIndex(dataIndex, col)">
-            <template v-if="record.Imputation !== undefined">
+            <template v-if="record.Imputation !== undefined && record.Imputation !== null">
               <vue-simple-suggest
               :value="text"
               :list="simpleSuggestionList"
@@ -112,7 +112,7 @@ export default {
       pageData: [],
       chosen: '',
       autoCompleteStyle: {
-        inputWrapper: 'c1',
+        focus: 'c1',
       },
     }
   },
