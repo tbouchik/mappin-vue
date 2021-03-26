@@ -504,8 +504,10 @@ export default {
             let templateCsvContent = ''
             let arrData = []
             arrData.push(templateAggregate.header.join(';'))
-            templateAggregate.osmiums.map((osmium) => {
-              arrData.push(osmium.join(';'))
+            templateAggregate.osmiums.map((osmiumEntries) => {
+              osmiumEntries.map(osmiumEntry => {
+                arrData.push(osmiumEntry.join(';'))
+              })
             })
             templateCsvContent += arrData.join('\n').replace(/(^\[)|(\]$)/gm, '')
             zip.file(`${templateAggregate.template}.csv`, templateCsvContent)
