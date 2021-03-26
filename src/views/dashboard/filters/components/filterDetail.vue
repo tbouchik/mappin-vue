@@ -77,9 +77,6 @@
                     <a-select-option value="REF">
                       REF
                     </a-select-option>
-                    <a-select-option value="IMPUT">
-                      IMPUT
-                    </a-select-option>
                     <a-select-option value="TEXT">
                       TEXT
                     </a-select-option>
@@ -90,6 +87,9 @@
                       DATE
                     </a-select-option>
                   </a-select>
+                  <a-checkbox @change="e => imputationChange(e, index)" :checked="k.isImputable"  style="color:black">
+                    IMPUTABLE
+                  </a-checkbox>
                   <a-icon
                       v-if="names.length > 1 && !isSmartTemplate"
                       class="dynamic-delete-button"
@@ -255,6 +255,12 @@ export default {
           router.push({ name: 'filters' })
         },
       })
+    },
+    imputationChange(e, index) {
+      e.preventDefault()
+      let newNames = cloneDeep(this.names)
+      newNames[index].isImputable = e.target.checked
+      this.names = newNames
     },
   },
 }
