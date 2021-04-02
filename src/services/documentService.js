@@ -44,6 +44,7 @@ class DocumentService {
       client,
       side,
       current,
+      isArchived: false,
     }
     if (name && name !== '') {
       params.name = name
@@ -67,7 +68,7 @@ class DocumentService {
   }
 
   static fetchNextDocuments(queryParams) {
-    const { client, limit, sort, name, filter, status, side, current } = queryParams
+    const { client, limit, sort, name, filter, status, side, current, isArchived } = queryParams
     if (typeof cancelToken !== typeof undefined) {
       cancelToken.cancel('Operation canceled due to new request.')
     }
@@ -79,6 +80,7 @@ class DocumentService {
       sort,
       side,
       current,
+      isArchived,
     }
     if (name && name !== '') {
       params.name = name
@@ -99,7 +101,7 @@ class DocumentService {
   }
 
   static fetchDocuments(queryParams) {
-    const { client, page, limit, sort, name, filter, status } = queryParams
+    const { client, page, limit, sort, name, filter, status, isArchived } = queryParams
     if (typeof cancelToken !== typeof undefined) {
       cancelToken.cancel('Operation canceled due to new request.')
     }
@@ -108,6 +110,7 @@ class DocumentService {
     const params = {
       client,
       limit,
+      isArchived,
       sort,
       page: page - 1,
     }
@@ -130,9 +133,10 @@ class DocumentService {
   }
 
   static fetchDocumentsCount(queryParams) {
-    const { client, name, status, filter } = queryParams
+    const { client, name, status, filter, isArchived } = queryParams
     const params = {
       client,
+      isArchived,
     }
     if (name && name !== '') {
       params.name = name
@@ -168,6 +172,7 @@ class DocumentService {
       client,
       limit,
       sort,
+      isArchived: false,
       page: page - 1,
     }
     if (name && name !== '') {

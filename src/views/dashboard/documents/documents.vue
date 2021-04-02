@@ -378,6 +378,7 @@ export default {
         name: this.searchedName,
         filter: this.searchedTemplate,
         status: this.searchedStatus,
+        isArchived: false,
       }
     },
     tablePagination: function () {
@@ -391,7 +392,7 @@ export default {
   created() {
     if (this.clientId) {
       this.loading = true
-      const queryParams = pick(this.queryParams, ['client', 'limit', 'page'])
+      const queryParams = pick(this.queryParams, ['client', 'limit', 'page', 'isArchived'])
       DocumentService.fetchDocuments(queryParams)
         .then(documentsList => {
           // console.log('number: @created inside first "if"')
@@ -413,7 +414,7 @@ export default {
     } else {
       this.loading = true
       this.validatorIsLoading = true
-      const queryParams = pick(this.queryParams, ['client', 'limit', 'page'])
+      const queryParams = pick(this.queryParams, ['client', 'limit', 'page', 'isArchived'])
       DocumentService.fetchDocuments(queryParams)
         .then(documentsList => {
           // console.log('number: @created inside first "else" ',)
@@ -537,7 +538,7 @@ export default {
           this.$store.dispatch('ACTION_UPDATE_DOCUMENTS_LIST', { documentsList, queryParams: this.queryParams })
           this.loading = false
         })
-      DocumentService.fetchDocumentsCount(pick(this.queryParams, ['client', 'name', 'filter', 'status']))
+      DocumentService.fetchDocumentsCount(pick(this.queryParams, ['client', 'name', 'filter', 'status', 'isArchived']))
         .then(data => {
           this.total = data.count
         })

@@ -28,16 +28,17 @@
           <div :key="col"  v-if="col==='Imputation' && isActive(dataIndex, col)" @click="activateIndex(dataIndex, col)">
             <template v-if="record.Imputation !== undefined && record.Imputation !== null">
               <vue-simple-suggest
-              @input="e => changeLibelle(e, dataIndex)"
-              @hover="e => changeLibelle(e, dataIndex)"
-              @select="e => updateImputation(e, dataIndex)"
-              :value="text"
-              :styles="autoCompleteStyle"
-              :list="simpleSuggestionList"
-              :filter-by-query="true"
-              :filter="suggestFilter"
-              :ref="hash(dataIndex,col)">
-          </vue-simple-suggest>
+                @input="e => changeLibelle(e, dataIndex)"
+                @hover="e => changeLibelle(e, dataIndex)"
+                @select="e => updateImputation(e, dataIndex)"
+                :value="text"
+                :max-suggestions="0"
+                :styles="autoCompleteStyle"
+                :list="simpleSuggestionList"
+                :filter-by-query="true"
+                :filter="suggestFilter"
+                :ref="hash(dataIndex,col)">
+              </vue-simple-suggest>
             </template>
           </div>
           <div :key="col"  v-if="col==='Imputation' && !isActive(dataIndex, col)" @click="activateIndex(dataIndex, col)">

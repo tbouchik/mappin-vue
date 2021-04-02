@@ -22,6 +22,12 @@ export const getMenuData = [
     url: '/dashboard/filters',
   },
   {
+    title: 'Archive',
+    key: 'archive',
+    icon: 'fe fe-archive',
+    url: '/dashboard/documents',
+  },
+  {
     category: true,
     title: 'Actions',
   },
