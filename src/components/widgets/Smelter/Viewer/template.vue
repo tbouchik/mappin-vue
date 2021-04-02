@@ -35,6 +35,7 @@
               :styles="autoCompleteStyle"
               :list="simpleSuggestionList"
               :filter-by-query="true"
+              :filter="suggestFilter"
               :ref="hash(dataIndex,col)">
           </vue-simple-suggest>
             </template>
@@ -182,6 +183,9 @@ export default {
         libelle: labels[parseInt(input)],
       }
       this.$store.dispatch('ACTION_DO_IMPUTATION_CHANGES_TO_DOCUMENT', payload)
+    },
+    suggestFilter(singleItem, query) {
+      return singleItem.indexOf(query) === 0 && singleItem.length === query.length + 1
     },
   },
   destroyed() {
