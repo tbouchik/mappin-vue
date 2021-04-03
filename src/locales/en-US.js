@@ -55,6 +55,8 @@ const messages = {
     exportCSV: 'Export CSV',
     validate: 'Validate',
     invalidate: 'Invalidate',
+    archive: 'Archive',
+    unarchive: 'Unarchive',
     keys: {
       tab: 'Tab',
       tabAction: 'Go to next entry',

@@ -25,7 +25,7 @@ export const getMenuData = [
     title: 'Archive',
     key: 'archive',
     icon: 'fe fe-archive',
-    url: '/dashboard/documents',
+    url: '/dashboard/archive',
   },
   {
     category: true,

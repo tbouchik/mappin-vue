@@ -52,6 +52,16 @@ const router = new Router({
           component: () => import('./views/dashboard/documents/documents.vue'),
         },
         {
+          path: '/dashboard/archive',
+          name: 'archive',
+          meta: {
+            title: 'Archive',
+            authRequired: true,
+          },
+          props: true,
+          component: () => import('./views/dashboard/documents/archive.vue'),
+        },
+        {
           path: '/dashboard/clients',
           name: 'clients',
           meta: {

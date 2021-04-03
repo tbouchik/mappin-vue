@@ -104,7 +104,7 @@
       </a-button-group>
 
       &nbsp;	&nbsp;
-      <a-button-group>
+      <a-button-group v-if="!current.isArchived">
         <a-button v-if="currentStatusIsValidated"
                   type="primary"
                   @click="invalidateCurrent"
@@ -123,6 +123,14 @@
             </span>
             {{ $t('subbar.validate') }}
         </button>
+      </a-button-group>
+      <a-button-group v-if="current.isArchived">
+        <a-button v-if="currentStatusIsValidated"
+                  type="primary"
+                  @click="unarchiveCurrent"
+                  ghost>
+          {{ $t('subbar.unarchive') }}
+        </a-button>
       </a-button-group>
     </div>
     <div :class="$style.amount" class="mr-3 ml-auto d-none d-sm-flex">
@@ -466,7 +474,7 @@ export default {
     },
     validateCurrent() {
       const body = { status: 'validated' }
-      DocumentService.updateDocument(body, this.current.id)
+      DocumentService.updateDocument(body, this.current.id) // TODO factor repeted code
         .then(() => {
           DocumentService.fetchDocument(this.current.id)
             .then(doc => {
@@ -476,7 +484,17 @@ export default {
     },
     invalidateCurrent() {
       const body = { status: 'smelted' }
-      DocumentService.updateDocument(body, this.current.id)
+      DocumentService.updateDocument(body, this.current.id) // TODO factor repeted code
+        .then(() => {
+          DocumentService.fetchDocument(this.current.id)
+            .then(doc => {
+              this.$store.dispatch('UPDATE_DOCUMENT', doc)
+            })
+        })
+    },
+    unarchiveCurrent() {
+      const body = { isArchived: false }
+      DocumentService.updateDocument(body, this.current.id) // TODO factor repeted code
         .then(() => {
           DocumentService.fetchDocument(this.current.id)
             .then(doc => {

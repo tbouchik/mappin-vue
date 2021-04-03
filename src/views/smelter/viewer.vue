@@ -11,7 +11,7 @@
         <div class="row">
           <div class="col-md-5">
             <div class="sticky">
-              <template-viewer :filter="currentFilter" />
+              <template-viewer :filter="currentFilter" :isArchived="current.isArchived"/>
             </div>
           </div>
           <div v-if="documentIsPdf" class="col-md-7">

@@ -15,6 +15,7 @@
               :value="text"
               @change="e => handleChange(e.target.value, dataIndex, col)"
               :ref="hash(dataIndex,col)"
+              :disabled="isArchived"
             />
           </div>
           <div :key="col"  v-if="col==='Value' && !isActive(dataIndex, col)" @click="activateIndex(dataIndex, col)">
@@ -23,9 +24,10 @@
               :value="text"
               @change="e => handleChange(e.target.value, dataIndex, col)"
               :ref="hash(dataIndex,col)"
+              :disabled="isArchived"
             />
           </div>
-          <div :key="col"  v-if="col==='Imputation' && isActive(dataIndex, col)" @click="activateIndex(dataIndex, col)">
+          <div :key="col"  v-if="col==='Imputation' && isActive(dataIndex, col) && !isArchived" @click="activateIndex(dataIndex, col)">
             <template v-if="record.Imputation !== undefined && record.Imputation !== null">
               <vue-simple-suggest
                 @input="e => changeLibelle(e, dataIndex)"
@@ -41,7 +43,7 @@
               </vue-simple-suggest>
             </template>
           </div>
-          <div :key="col"  v-if="col==='Imputation' && !isActive(dataIndex, col)" @click="activateIndex(dataIndex, col)">
+          <div :key="col"  v-if="col==='Imputation' && !isActive(dataIndex, col) && !isArchived" @click="activateIndex(dataIndex, col)">
             <template v-if="record.Imputation !== undefined && record.Imputation !== null">
               <vue-simple-suggest
               :value="text"
@@ -49,6 +51,15 @@
               :filter-by-query="true"
               :ref="hash(dataIndex,col)">
           </vue-simple-suggest>
+            </template>
+          </div>
+          <div :key="col"  v-if="col==='Imputation' && isArchived" @click="activateIndex(dataIndex, col)">
+            <template v-if="record.Imputation !== undefined && record.Imputation !== null">
+              <a-input
+                style="margin: -5px 0"
+                :value="text"
+                :disabled="isArchived"
+              />
             </template>
           </div>
           <div :key="col"  v-if="col==='Libelle'" @click="activateIndex(dataIndex, col)">
@@ -123,11 +134,13 @@ export default {
     this.activateIndex(0, 'Value')
   },
   props: {
-    insideUploaderView: {
-      type: Boolean,
-    },
     filter: {
       required: true,
+    },
+    isArchived: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   computed: {
