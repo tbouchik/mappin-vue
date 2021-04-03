@@ -135,13 +135,7 @@
             <span slot="status" slot-scope="text">
               <a-tag
                 :key="text"
-                :color="
-                  text === 'pending'
-                    ? 'volcano'
-                    : text === 'smelted'
-                    ? 'geekblue'
-                    : 'green'
-                "
+                :color="getColor(text)"
               >
                 {{ text.toUpperCase() }}
               </a-tag>
@@ -492,6 +486,20 @@ export default {
           this.confirmDeletionLoading = false
           this.deletionModalVisible = false
         })
+    },
+    getColor(status) {
+      switch (status) {
+        case 'pending':
+          return 'orange'
+        case 'smelted':
+          return 'geekblue'
+        case 'validated':
+          return 'green'
+        case 'archived':
+          return 'grey'
+        case 'error':
+          return 'red'
+      }
     },
   },
 

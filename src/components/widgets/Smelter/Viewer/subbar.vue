@@ -81,13 +81,7 @@
     ></p>
     <div>
       <a-tag
-        :color="
-          current.status === 'pending'
-            ? 'volcano'
-            : current.status === 'smelted'
-            ? 'geekblue'
-            : 'green'
-        "
+        :color="getColor(current.status)"
       >
         {{ current.status }}
       </a-tag>
@@ -125,8 +119,7 @@
         </button>
       </a-button-group>
       <a-button-group v-if="current.isArchived">
-        <a-button v-if="currentStatusIsValidated"
-                  type="primary"
+        <a-button type="primary"
                   @click="unarchiveCurrent"
                   ghost>
           {{ $t('subbar.unarchive') }}
@@ -493,7 +486,7 @@ export default {
         })
     },
     unarchiveCurrent() {
-      const body = { isArchived: false }
+      const body = { isArchived: false, status: 'validated' }
       DocumentService.updateDocument(body, this.current.id) // TODO factor repeted code
         .then(() => {
           DocumentService.fetchDocument(this.current.id)
@@ -507,6 +500,20 @@ export default {
     },
     onDrawerClose() {
       this.drawerVisible = false
+    },
+    getColor(status) {
+      switch (status) {
+        case 'pending':
+          return 'orange'
+        case 'smelted':
+          return 'geekblue'
+        case 'validated':
+          return 'green'
+        case 'archived':
+          return 'grey'
+        case 'error':
+          return 'red'
+      }
     },
   },
   destroyed() {
