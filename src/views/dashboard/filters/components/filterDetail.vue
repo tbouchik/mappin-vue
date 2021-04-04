@@ -97,7 +97,7 @@
                       :disabled="form.getFieldValue('keys').length === 1"
                       @click="() => remove(index)"
                   />
-                  <div>
+                  <div v-if="k.type !== 'REF'">
                     <template v-for="tag in k.tags">
                       <a-tooltip v-if="tag.length > 20" :key="tag" :title="tag">
                         <a-tag :key="tag" :closable="true" color="purple" @close="() => handleTagClose(index, tag)">
