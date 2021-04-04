@@ -10,7 +10,7 @@
     </div>
         <div class="card">
           <div class="card-body">
-            <a-form :form="form" :label-col="{ span: 4 }" :wrapper-col="{ span: 12 }" @submit="handleSubmit">
+            <a-form :form="form" :label-col="{ span: 4 }" :wrapper-col="{ span: 12 }" @submit.prevent="handleSubmit">
               <a-form-item label="Name">
               <a-input
                   v-decorator="['name', { rules: [{ required: true, message: 'Please input your template name' }] }]"
@@ -78,6 +78,33 @@
                       :disabled="form.getFieldValue('keys').length === 1"
                       @click="() => remove(index)"
                   />
+                  <div>
+                    <template v-for="tag in k.tags">
+                      <a-tooltip v-if="tag.length > 20" :key="tag" :title="tag">
+                        <a-tag :key="tag" :closable="true" color="purple" @close="() => handleTagClose(index, tag)">
+                          {{ `${tag.slice(0, 20)}...` }}
+                        </a-tag>
+                      </a-tooltip>
+                      <a-tag v-else :key="tag" :closable="true" color="purple" @close="() => handleTagClose(index, tag)">
+                        {{ tag }}
+                      </a-tag>
+                    </template>
+                    <a-input
+                      v-if="tagInputIsActive(index)"
+                      type="text"
+                      size="small"
+                      :ref="hash(index)"
+                      :style="{ width: '78px' }"
+                      :value="inputValue"
+                      @change="handleTagInputChange"
+                      @blur="() => handleTagInputConfirm(index)"
+                      @keypress.enter.prevent="() => handleTagInputConfirm(index)"
+                    />
+                    <a-tag v-else style="background: #fff; borderStyle: dashed;"
+                      @click="() => showTagInput(index)">
+                      <a-icon type="plus" /> New Tag
+                    </a-tag>
+                  </div>
               </a-form-item>
         <a-form-item v-bind="formItemLayoutWithOutLabel">
         <a-button type="dashed" style="width: 60%" @click="add">
@@ -149,6 +176,8 @@ export default {
         },
       },
       names: [],
+      inputValue: '',
+      activatedTagIndex: -1,
     }
   },
   created() {
@@ -168,7 +197,7 @@ export default {
     },
 
     add() {
-      this.names.push({ type: null, value: null })
+      this.names.push({ type: null, value: null, isImputable: false, tags: [] })
     },
 
     handleSubmit(e) {
@@ -208,6 +237,35 @@ export default {
       let newNames = cloneDeep(this.names)
       newNames[index].isImputable = e.target.checked
       this.names = newNames
+    },
+    handleTagClose(index, removedTag) {
+      this.names[index].tags = this.names[index].tags.filter(tag => tag !== removedTag)
+    },
+    showTagInput(index) {
+      this.activatedTagIndex = index
+      this.$nextTick(function() {
+        console.log(this.$refs)
+        this.$refs[this.hash(index)][0].focus()
+      })
+    },
+    handleTagInputChange(e) {
+      e.preventDefault()
+      this.inputValue = e.target.value
+    },
+    handleTagInputConfirm(index) {
+      this.activatedTagIndex = -1
+      const inputValue = this.inputValue
+      this.inputValue = ''
+      let tags = this.names[index].tags
+      if (inputValue && tags.indexOf(inputValue) === -1) {
+        this.names[index].tags = [...tags, inputValue]
+      }
+    },
+    tagInputIsActive(index) {
+      return this.activatedTagIndex === index
+    },
+    hash(index) {
+      return `input_${index}`
     },
   },
 }
