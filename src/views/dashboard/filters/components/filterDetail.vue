@@ -16,7 +16,7 @@
             <span class="btn-addon">
               <i class="btn-addon-icon fe fe-trash-2" />
             </span>
-            Remove Template
+            {{ $t('template.delete') }}
           </button>
 
         </b-col>
