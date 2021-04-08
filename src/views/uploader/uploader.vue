@@ -21,7 +21,7 @@
               '0%': '#108ee9',
               '100%': 'red',
             }"
-            :percent="userCount"
+            :percent="creditRatio"
           />
         </div>
         <br>
@@ -138,8 +138,14 @@ export default {
       'clientTableLoading',
       'templateLoading',
       'userCount',
-      'canUpload',
+      'userLimit',
       'userId']),
+    canUpload: function() {
+      return this.userCount < this.userLimit
+    },
+    creditRatio: function () {
+      return parseInt((this.userCount / this.userLimit) * 100)
+    },
   },
   created() {
     this.$store.dispatch('ACTION_UPDATE_COUNTER', this.userId)

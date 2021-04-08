@@ -85,7 +85,6 @@ export default {
     loggedIn: state => !!state.user,
     userIsClient: state => !!state.user.user.isClient,
     userCount: state => state.user.user.counter,
-    userLimit: state => state.user.user.limit,
-    canUpload: state => { if (state.user.user.counter < 100) { return true } else { return false } },
+    userLimit: state => state.user.user.subscription.credits,
   },
 }
