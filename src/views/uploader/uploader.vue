@@ -141,6 +141,7 @@ export default {
       'userLimit',
       'userId']),
     canUpload: function() {
+      console.log(this.userCount, this.userLimit)
       return this.userCount < this.userLimit
     },
     creditRatio: function () {

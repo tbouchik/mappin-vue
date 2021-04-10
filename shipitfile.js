@@ -19,7 +19,7 @@ module.exports = function (shipit) {
       shallowClone: true,
     },
     production: {
-      servers: 'root@46.101.36.92',
+      servers: 'root@165.227.228.172',
       build: 'yarn run build',
     },
   })
