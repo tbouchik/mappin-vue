@@ -161,6 +161,22 @@ class DocumentService {
     }
   }
 
+  static updateMany(idsArray, body) {
+    try {
+      return axios.put(`/v1/documents/updateMany`, { idsArray, body })
+        .then(({ data }) => data)
+    } catch (error) {
+    }
+  }
+
+  static deleteMany(idsArray) {
+    try {
+      return axios.post(`/v1/documents/deleteMany`, { idsArray })
+        .then(({ data }) => data)
+    } catch (error) {
+    }
+  }
+
   static bulkExportCSV(queryParams) {
     const { client, page, limit, sort, name, filter, status } = queryParams
     if (typeof cancelToken !== typeof undefined) {

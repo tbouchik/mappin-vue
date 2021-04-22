@@ -115,7 +115,24 @@
       </div>
       <div class="card-body">
         <div class="air__utils__scrollTable">
+          <div style="margin-bottom: 16px">
+            <a-dropdown  :disabled="!hasSelectedDocuments">
+              <a-button>Actions</a-button>
+              <a-menu slot="overlay">
+                <a-menu-item @click="validateSelected" v-if="!isArchiveViz">
+                  <div>Valider</div>
+                </a-menu-item>
+                <a-menu-item @click="archiveSelected">
+                  <div>{{archiveOption}}</div>
+                </a-menu-item>
+                <a-menu-item @click="deleteSelected">
+                  <div>Supprimer</div>
+                </a-menu-item>
+              </a-menu>
+            </a-dropdown>
+          </div>
           <a-table
+            :row-selection="{ selectedRowKeys: selectedDocuments, onChange: onSelectChange }"
             :data-source="documentsList"
             :columns="columns"
             :pagination="tablePagination"
@@ -149,26 +166,13 @@
                 <i class="fe fe-edit mr-2" />
                 {{ $t('dashboard.document.view') }}
               </button>
-              <button @click="showModal(record)"
+              <button @click="showSingleDeleteModal(record)"
                        class="btn btn-sm btn-light">
                 <small>
                   <i class="fe fe-trash mr-2" />
                 </small>
                 {{ $t('dashboard.document.remove') }}
               </button>
-
-              <!-- <a-popconfirm title="Are you sure？"
-                            :confirm="confirm(record)"
-                            :cancel="cancel(record)">
-                  <a-icon slot="icon" type="question-circle-o" style="color: red" />
-                  <button  class="btn btn-sm btn-light">
-                  <small>
-                    <i class="fe fe-trash mr-2" />
-                  </small>
-                  Remove
-                   </button>
-              </a-popconfirm> -->
-
             </span>
           </a-table>
         </div>
@@ -176,12 +180,43 @@
     </div>
     <a-modal
       title="Delete Document"
-      :visible="deletionModalVisible"
-      :confirm-loading="confirmDeletionLoading"
+      :visible="singleDeletionModalVisible"
+      :confirm-loading="confirmLoading"
       okType="danger"
-      @ok="handleOk"
+      @ok="handleDeleteSingleDoc"
+      @cancel="handleCancelAction"
     >
-      <p>{{ deletionMessage }}</p>
+      <p>{{ singleDeletionMessage }}</p>
+    </a-modal>
+    <a-modal
+      title="Delete Documents"
+      :visible="bulkDeletionModalVisible"
+      :confirm-loading="confirmLoading"
+      okType="danger"
+      @ok="handleBulkDeleteDoc"
+      @cancel="handleCancelAction"
+    >
+      <p>{{ modalMessage }}</p>
+    </a-modal>
+    <a-modal
+      title="Archive Documents"
+      :visible="bulkArchiveModalVisible"
+      :confirm-loading="confirmLoading"
+      okType="danger"
+      @ok="handleBulkArchiveDoc"
+      @cancel="handleCancelAction"
+    >
+      <p>{{ modalMessage }}</p>
+    </a-modal>
+    <a-modal
+      title="Validate Document"
+      :visible="bulkValidateModalVisible"
+      :confirm-loading="confirmLoading"
+      okType="success"
+      @ok="handleBulkValidateDoc"
+      @cancel="handleCancelAction"
+    >
+      <p>{{ modalMessage }}</p>
     </a-modal>
   </div>
 </template>
@@ -242,11 +277,16 @@ export default {
       searchedTemplate: null,
       loading: false,
       validatorIsLoading: false,
-      confirmDeletionLoading: false,
-      deletionModalVisible: false,
+      confirmLoading: false,
+      singleDeletionModalVisible: false,
+      bulkDeletionModalVisible: false,
+      bulkArchiveModalVisible: false,
+      bulkValidateModalVisible: false,
       currentDeletableId: null,
       bulkCsvExportIsLoading: false,
-      deletionMessage: '',
+      singleDeletionMessage: '',
+      modalMessage: '',
+      selectedDocuments: [],
       limit: 10,
       page: 1,
       total: 10,
@@ -273,6 +313,9 @@ export default {
     searchedTemplate: function() {
       this.fetchDocuments()
     },
+    page: function() {
+      this.selectedDocuments = []
+    },
   },
   computed: {
     ...mapGetters([
@@ -280,6 +323,9 @@ export default {
       'filters',
       'docSmeltedCache',
     ]),
+    hasSelectedDocuments() {
+      return this.selectedDocuments.length > 0
+    },
     everythingIsValidated: function () {
       return this.docSmeltedCache.length === 0
     },
@@ -304,6 +350,9 @@ export default {
         total: this.total,
       }
     },
+    archiveOption: function() {
+      return this.isArchiveViz ? 'Désarchiver' : 'Archiver'
+    },
   },
   created() {
     this.fetchDocumentsOnCreated(this.clientId)
@@ -320,6 +369,10 @@ export default {
     }
   },
   methods: {
+    onSelectChange(selectedDocuments) {
+      console.log('selectedDocuments changed: ', selectedDocuments)
+      this.selectedDocuments = selectedDocuments
+    },
     setRegularDocumentFetching() {
       this.timeInterval = setInterval(() => {
         const paramsUsedInQuery = Object.assign({}, this.queryParams)
@@ -343,6 +396,11 @@ export default {
             this.validatorIsLoading = false
           })
       }, 10000)
+      DocumentService.fetchDocumentsCount(pick(this.queryParams, ['name', 'filter', 'status', 'isArchived']))
+        .then(data => {
+          this.total = data.count
+          this.$store.dispatch('ACTION_UPDATE_TOTAL_DOC_COUNT', this.total)
+        })
     },
     fetchDocumentsOnCreated(clientId) {
       this.loading = true
@@ -368,7 +426,7 @@ export default {
       this.validatorIsLoading = true
       DocumentService.fetchDocuments(this.queryParams)
         .then(documentsList => {
-          this.page = 1
+          this.page = this.queryParams.page || 1
           this.documentsList = documentsList.map((item, index) => { // TODO: Implement these properties in DB
             item.date = item.createdAt
             item.key = index
@@ -469,23 +527,82 @@ export default {
       this.searchedStatus = null
       this.searchedTemplate = null
     },
-    showModal(e) {
+    showSingleDeleteModal(e) {
       this.currentDeletableId = e.id
-      this.deletionMessage = `Are you sure to delete : ${e.name}`
-      this.deletionModalVisible = true
+      this.singleDeletionMessage = `Are you sure to delete : ${e.name}`
+      this.singleDeletionModalVisible = true
     },
-    handleOk() {
+    handleDeleteSingleDoc() {
       this.ModalText = 'Deleting the document... '
-      this.confirmDeletionLoading = true
+      this.confirmLoading = true
       DocumentService.deleteDocument(this.currentDeletableId)
         .then(id => {
           if (this.currentDeletableId) {
             this.documentsList = this.documentsList.filter(item => item.id !== this.currentDeletableId)
             this.$store.dispatch('REMOVE_DOCUMENT', id)
           }
-          this.confirmDeletionLoading = false
-          this.deletionModalVisible = false
+          this.confirmLoading = false
+          this.singleDeletionModalVisible = false
         })
+    },
+    deleteSelected() {
+      this.modalMessage = `Are you sure you want to delete the selected documents?\n Total selected: ${this.selectedDocuments.length} \n This action cannot be reverted.`
+      this.bulkDeletionModalVisible = true
+    },
+    handleBulkDeleteDoc() {
+      this.ModalText = 'Deleting... '
+      this.confirmLoading = true
+      const idsArray = this.selectedDocuments.map(i => this.documentsList[i].id)
+      DocumentService.deleteMany(idsArray)
+        .then(() => {
+          this.fetchDocuments()
+          this.confirmLoading = false
+          this.bulkDeletionModalVisible = false
+          this.selectedDocuments = []
+        })
+    },
+    archiveSelected() {
+      const archive = `Are you sure you want to archive these documents?\n Total selected: ${this.selectedDocuments.length}`
+      const dearchive = `Are you sure you want to dearchive these documents?\n Total selected: ${this.selectedDocuments.length}`
+      this.modalMessage = this.isArchiveViz ? dearchive : archive
+      this.bulkArchiveModalVisible = true
+    },
+    handleBulkArchiveDoc() {
+      this.ModalText = 'Archiving... '
+      this.confirmLoading = true
+      const idsArray = this.selectedDocuments.map(i => this.documentsList[i].id)
+      const archiveBody = this.isArchiveViz ? { isArchived: false, status: 'validated' } : { isArchived: true, status: 'archived' }
+      DocumentService.updateMany(idsArray, { ...archiveBody })
+        .then(() => {
+          this.fetchDocuments()
+          this.confirmLoading = false
+          this.bulkArchiveModalVisible = false
+          this.selectedDocuments = []
+        })
+    },
+    validateSelected() {
+      this.modalMessage = `Are you sure you want to validate these documents?\n Total selected: ${this.selectedDocuments.length}`
+      this.bulkValidateModalVisible = true
+    },
+    handleBulkValidateDoc() {
+      this.ModalText = 'Updating... '
+      this.confirmLoading = true
+      const idsArray = this.selectedDocuments.map(i => this.documentsList[i].id)
+      DocumentService.updateMany(idsArray, { status: 'validated' })
+        .then(() => {
+          this.fetchDocuments()
+          this.confirmLoading = false
+          this.bulkValidateModalVisible = false
+          this.selectedDocuments = []
+        })
+    },
+    handleCancelAction () {
+      this.singleDeletionModalVisible = false
+      this.bulkDeletionModalVisible = false
+      this.bulkArchiveModalVisible = false
+      this.bulkValidateModalVisible = false
+      this.confirmLoading = false
+      this.modalMessage = ''
     },
     getColor(status) {
       switch (status) {
