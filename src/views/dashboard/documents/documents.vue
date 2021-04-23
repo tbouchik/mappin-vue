@@ -179,7 +179,7 @@
       </div>
     </div>
     <a-modal
-      title="Delete Document"
+      :title=" $t('dashboard.document.modal.deleteSingleTitle')"
       :visible="singleDeletionModalVisible"
       :confirm-loading="confirmLoading"
       okType="danger"
@@ -189,7 +189,7 @@
       <p>{{ singleDeletionMessage }}</p>
     </a-modal>
     <a-modal
-      title="Delete Documents"
+      :title="$t('dashboard.document.modal.deleteBulkTitle')"
       :visible="bulkDeletionModalVisible"
       :confirm-loading="confirmLoading"
       okType="danger"
@@ -199,17 +199,17 @@
       <p>{{ modalMessage }}</p>
     </a-modal>
     <a-modal
-      title="Archive Documents"
+      :title="$t('dashboard.document.modal.archiveBulk')"
       :visible="bulkArchiveModalVisible"
       :confirm-loading="confirmLoading"
-      okType="danger"
+      okType="success"
       @ok="handleBulkArchiveDoc"
       @cancel="handleCancelAction"
     >
       <p>{{ modalMessage }}</p>
     </a-modal>
     <a-modal
-      title="Validate Document"
+      :title="$t('dashboard.document.modal.validateBulk')"
       :visible="bulkValidateModalVisible"
       :confirm-loading="confirmLoading"
       okType="success"
@@ -370,7 +370,6 @@ export default {
   },
   methods: {
     onSelectChange(selectedDocuments) {
-      console.log('selectedDocuments changed: ', selectedDocuments)
       this.selectedDocuments = selectedDocuments
     },
     setRegularDocumentFetching() {
@@ -529,11 +528,11 @@ export default {
     },
     showSingleDeleteModal(e) {
       this.currentDeletableId = e.id
-      this.singleDeletionMessage = `Are you sure to delete : ${e.name}`
+      this.singleDeletionMessage = `${this.$t('dashboard.document.modal.askSingleDelete')} ${e.name}`
       this.singleDeletionModalVisible = true
     },
     handleDeleteSingleDoc() {
-      this.ModalText = 'Deleting the document... '
+      this.ModalText = this.$t('dashboard.document.modal.singleDeleteLoading')
       this.confirmLoading = true
       DocumentService.deleteDocument(this.currentDeletableId)
         .then(id => {
@@ -546,11 +545,11 @@ export default {
         })
     },
     deleteSelected() {
-      this.modalMessage = `Are you sure you want to delete the selected documents?\n Total selected: ${this.selectedDocuments.length} \n This action cannot be reverted.`
+      this.modalMessage = `${this.$t('dashboard.document.modal.askBulkDelete')} ${this.selectedDocuments.length} \n ${this.$t('dashboard.document.modal.irreversibleAction')}`
       this.bulkDeletionModalVisible = true
     },
     handleBulkDeleteDoc() {
-      this.ModalText = 'Deleting... '
+      this.ModalText = this.$t('dashboard.document.modal.singleDeleteLoading')
       this.confirmLoading = true
       const idsArray = this.selectedDocuments.map(i => this.documentsList[i].id)
       DocumentService.deleteMany(idsArray)
@@ -562,13 +561,13 @@ export default {
         })
     },
     archiveSelected() {
-      const archive = `Are you sure you want to archive these documents?\n Total selected: ${this.selectedDocuments.length}`
-      const dearchive = `Are you sure you want to dearchive these documents?\n Total selected: ${this.selectedDocuments.length}`
+      const archive = `${this.$t('dashboard.document.modal.askBulkArchive')} ${this.selectedDocuments.length}`
+      const dearchive = `${this.$t('dashboard.document.modal.askBulkDearchive')} ${this.selectedDocuments.length}`
       this.modalMessage = this.isArchiveViz ? dearchive : archive
       this.bulkArchiveModalVisible = true
     },
     handleBulkArchiveDoc() {
-      this.ModalText = 'Archiving... '
+      this.ModalText = this.$t('dashboard.document.modal.archiveLoading')
       this.confirmLoading = true
       const idsArray = this.selectedDocuments.map(i => this.documentsList[i].id)
       const archiveBody = this.isArchiveViz ? { isArchived: false, status: 'validated' } : { isArchived: true, status: 'archived' }
@@ -581,11 +580,11 @@ export default {
         })
     },
     validateSelected() {
-      this.modalMessage = `Are you sure you want to validate these documents?\n Total selected: ${this.selectedDocuments.length}`
+      this.modalMessage = `${this.$t('dashboard.document.modal.askBulkValidate')} ${this.selectedDocuments.length}`
       this.bulkValidateModalVisible = true
     },
     handleBulkValidateDoc() {
-      this.ModalText = 'Updating... '
+      this.ModalText = this.$t('dashboard.document.modal.validateLoading')
       this.confirmLoading = true
       const idsArray = this.selectedDocuments.map(i => this.documentsList[i].id)
       DocumentService.updateMany(idsArray, { status: 'validated' })
