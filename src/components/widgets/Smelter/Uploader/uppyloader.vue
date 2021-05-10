@@ -1,10 +1,6 @@
 <template>
     <form>
-        <!-- <div class="row"> -->
-            <!-- <div class="col-2"></div> -->
-                        <div ref="dashboardContainer" ></div>
-            <!-- <div class="col-2"></div> -->
-        <!-- </div> -->
+      <div ref="dashboardContainer" ></div>
     </form>
 </template>
 
@@ -24,6 +20,10 @@ export default {
       type: Number,
       required: true,
       default: 100000000,
+    },
+    bankUpload: {
+      type: Boolean,
+      required: true,
     },
   },
   data() {
@@ -64,6 +64,7 @@ export default {
               name: files[fileID].meta.name ? files[fileID].meta.name : 'Not Specified',
               mimeType: files[fileID].type,
               alias: `${newName}.${ext}`,
+              isBankStatement: this.bankUpload,
               businessPurpose: files[fileID].meta.businessReason ? files[fileID].meta.businessReason : 'Not specified',
               extractionType: 'FORMS',
               metadata: {},

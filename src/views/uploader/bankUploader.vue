@@ -4,7 +4,7 @@
     <div class="air__utils__heading">
       <b-row>
         <b-col md="3" class="my-1">
-          <h5>{{ $t('upload.title') }}</h5>
+          <h5>Bank Statement Upload</h5>
         </b-col>
       </b-row>
     </div>
@@ -45,31 +45,11 @@
             </div>
           </div>
           </template>
-          <template v-if="steps[uploaderStep].title == 'Template'">
-            <br>
-            <a-input-search placeholder="Search Template" v-model="searchedTemplate" />
-            <br> <br> <br>
-            <div v-if="steps[uploaderStep].title == 'Template'">
-              <div class="demo-infinite-container ">
-                <a-list :data-source="filters"
-                        :loading="templateLoading">
-                  <a-list-item  slot="renderItem" slot-scope="item">
-                    <a-list-item-meta :description="item.description">
-                      <a slot="title">{{ item.name }}</a>
-                    </a-list-item-meta>
-                    <a-button type="primary" @click="selectFilter(item)" ghost>
-                      {{ $t('subbar.select') }}
-                    </a-button>
-                  </a-list-item>
-                </a-list>
-              </div>
-            </div>
-          </template>
           <div v-if="steps[uploaderStep].title == 'Files'">
             <a-row>
               <a-col :span="6"/>
               <a-col :span="12">
-                <smelter-uppy-loader :bankUpload="false" :maxFileSizeInBytes=10000000></smelter-uppy-loader>
+                <smelter-uppy-loader :bankUpload="true" :maxFileSizeInBytes=10000000></smelter-uppy-loader>
               </a-col>
               <a-col :span="6"/>
             </a-row>
@@ -81,7 +61,6 @@
         </a-button>
         <br><br>
       </div>
-
   </div>
 </template>
 <script>
@@ -98,13 +77,9 @@ export default {
       perPage: 5,
       nextIsEnabled: false,
       searchedClient: null,
-      searchedTemplate: null,
       steps: [
         {
           title: 'Client',
-        },
-        {
-          title: 'Template',
         },
         {
           title: 'Files',
@@ -118,13 +93,6 @@ export default {
         limit: 100,
         page: 1,
         name: this.searchedClient,
-      })
-    },
-    searchedTemplate: function() {
-      this.$store.dispatch('ACTION_FETCH_FILTERS', {
-        limit: 100,
-        page: 1,
-        name: this.searchedTemplate,
       })
     },
   },
@@ -154,11 +122,6 @@ export default {
       limit: 100,
       page: 1,
       name: this.searchedClient,
-    })
-    this.$store.dispatch('ACTION_FETCH_FILTERS', {
-      limit: 100,
-      page: 1,
-      name: this.searchedTemplate,
     })
   },
   destroyed() {

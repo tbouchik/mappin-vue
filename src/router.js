@@ -31,6 +31,16 @@ const router = new Router({
           component: () => import('./views/smelter/viewer.vue'),
         },
         {
+          path: '/smelter/bankupload',
+          name: 'bankupload',
+          meta: {
+            title: 'Smelter Bank Uploader',
+            authRequired: true,
+          },
+          props: true,
+          component: () => import('./views/uploader/bankUploader.vue'),
+        },
+        {
           path: '/smelter/upload',
           name: 'upload',
           meta: {
@@ -60,6 +70,16 @@ const router = new Router({
           },
           props: true,
           component: () => import('./views/dashboard/documents/archive.vue'),
+        },
+        {
+          path: '/dashboard/bankstatements',
+          name: 'bankstatements',
+          meta: {
+            title: 'Bank Statements',
+            authRequired: true,
+          },
+          props: true,
+          component: () => import('./views/dashboard/documents/bankStatements.vue'),
         },
         {
           path: '/dashboard/clients',

@@ -10,6 +10,12 @@ export const getMenuData = [
     url: '/dashboard/documents',
   },
   {
+    title: 'Bank Statements',
+    key: 'bankStatements',
+    icon: 'fe fe-book-open',
+    url: '/dashboard/bankStatements',
+  },
+  {
     title: 'Clients',
     key: 'clients',
     icon: 'fe fe-users',
@@ -32,7 +38,13 @@ export const getMenuData = [
     title: 'Actions',
   },
   {
-    title: 'Upload',
+    title: 'Upload Bank Statements',
+    key: 'bankupload',
+    icon: 'fe fe-upload',
+    url: '/smelter/bankupload',
+  },
+  {
+    title: 'Upload Invoices',
     key: 'upload',
     icon: 'fe fe-upload',
     url: '/smelter/upload',

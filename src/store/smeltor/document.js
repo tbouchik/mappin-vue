@@ -273,7 +273,7 @@ export default {
   },
   getters: {
     current: state => state.formattedDocument,
-    currentPageData: state => get(state, 'formattedDocument.metadata', {})['page_' + state.page],
+    currentPageData: state => get(state, 'formattedDocument.metadata.words', {})['page_' + state.page],
     currentPage: state => get(state, 'page'),
     documentsList: state => state.documentsList,
     documentsIdList: state => state.documentsIdList, // todo remove

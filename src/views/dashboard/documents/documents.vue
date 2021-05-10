@@ -225,6 +225,7 @@ import { mapGetters } from 'vuex'
 import JSZip from 'jszip'
 import { pick, isEqual, cloneDeep } from 'lodash'
 import DocumentService from '../../../services/documentService'
+import { invoiceColumns, bankColumns } from './columns'
 
 export default {
   name: 'Documents',
@@ -232,45 +233,6 @@ export default {
     return {
       documentsList: [],
       form: this.$form.createForm(this, { name: 'filter_form' }),
-      columns: [
-        {
-          title: this.$t('dashboard.document.name'),
-          dataIndex: 'name',
-          scopedSlots: {
-            customRender: 'customRender',
-          },
-        },
-        {
-          title: this.$t('dashboard.document.template'),
-          dataIndex: 'filter',
-          scopedSlots: {
-            customRender: 'customRenderComposed',
-          },
-        },
-        {
-          title: this.$t('dashboard.document.client'),
-          dataIndex: 'client',
-          scopedSlots: {
-            customRender: 'customRenderComposed',
-          },
-        },
-        {
-          title: this.$t('dashboard.document.status'),
-          dataIndex: 'status',
-          scopedSlots: {
-            customRender: 'status',
-          },
-        },
-        {
-          title: this.$t('dashboard.document.dateAdded'),
-          dataIndex: 'date',
-          scopedSlots: { customRender: 'date' },
-        },
-        {
-          title: this.$t('dashboard.document.action'),
-          scopedSlots: { customRender: 'action' },
-        },
-      ],
       timeInterval: null,
       searchedName: null,
       searchedStatus: null,
@@ -300,6 +262,11 @@ export default {
     isArchiveViz: {
       type: Boolean,
       required: false,
+      default: false,
+    },
+    isBankViz: {
+      type: Boolean,
+      required: true,
       default: false,
     },
   },
@@ -353,6 +320,12 @@ export default {
     archiveOption: function() {
       return this.isArchiveViz ? 'Désarchiver' : 'Archiver'
     },
+    columns: function() {
+      if (this.isBankViz) {
+        return this.setColumns(bankColumns)
+      }
+      return this.setColumns(invoiceColumns)
+    },
   },
   created() {
     this.fetchDocumentsOnCreated(this.clientId)
@@ -369,6 +342,18 @@ export default {
     }
   },
   methods: {
+    setColumns(baseColumns) {
+      return baseColumns.map((x) => {
+        let result = {
+          title: this.$t(x.title),
+          dataIndex: x.dataIndex,
+        }
+        if (x.customRender) {
+          result.scopedSlots = { customRender: x.customRender }
+        }
+        return result
+      })
+    },
     onSelectChange(selectedDocuments) {
       this.selectedDocuments = selectedDocuments
     },
