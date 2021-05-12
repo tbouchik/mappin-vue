@@ -12,6 +12,7 @@
           <div class="col-md-5">
             <div class="sticky">
               <template-viewer :filter="currentFilter" :isArchived="current.isArchived"/>
+              <!-- <statement-viewer :isArchived="current.isArchived"/> -->
             </div>
           </div>
           <div v-if="documentIsPdf" class="col-md-7">
@@ -37,6 +38,7 @@
 </template>
 <script>
 import TemplateViewer from '@/components/widgets/Smelter/Viewer/template.vue'
+// import StatementViewer from '@/components/widgets/Smelter/Viewer/statementViewer.vue'
 import SmelterPdfWindow from '@/components/widgets/Smelter/Window/pdfwindow.vue'
 import SmelterImageWindow from '@/components/widgets/Smelter/Window/imgwindow.vue'
 import SmelterSubbar from '@/components/widgets/Smelter/Viewer/subbar.vue'
@@ -50,6 +52,7 @@ export default {
     SmelterPdfWindow,
     SmelterImageWindow,
     TemplateViewer,
+    // StatementViewer,
   },
   data() {
     return {
