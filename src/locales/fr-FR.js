@@ -69,6 +69,8 @@ const messages = {
     shortcutsView: 'Voir les court-circuits',
     shortcutsTitle: 'Court-Circuits Clavier',
     exportCSV: 'Exporter en CSV',
+    splitH: 'Diviser l\'écran horizontalement',
+    splitV: 'Diviser l\'écran verticalement',
     validate: 'Valider',
     invalidate: 'Invalider',
     archive: 'Archiver',

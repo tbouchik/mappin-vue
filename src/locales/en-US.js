@@ -68,6 +68,8 @@ const messages = {
     shortcutsView: 'View Shortcuts',
     shortcutsTitle: 'Keyboard Shortcuts',
     exportCSV: 'Export CSV',
+    splitH: 'Split screen horizontally',
+    splitV: 'Split screen vertically',
     validate: 'Validate',
     invalidate: 'Invalidate',
     archive: 'Archive',

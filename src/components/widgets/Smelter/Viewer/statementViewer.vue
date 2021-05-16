@@ -4,6 +4,7 @@
       <a-table  :columns="columns"
                 :data-source="pageData"
                 :pagination=false
+                :scroll="{ x: 600 }"
                 bordered>
         <template v-for="col in ['Date', 'Designation', 'Imputation', 'Debit', 'Credit']" :slot="col"   slot-scope="text, record, dataIndex" style="background:blue">
           <div :key="col"  v-if="col==='Key'" @click="activateIndex(dataIndex, col)" >

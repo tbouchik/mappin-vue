@@ -1,7 +1,7 @@
 <template>
   <div :class="$style.subbar"
         >
-    <ul :class="$style.breadcrumbs" class="mr-4">
+    <ul :class="$style.breadcrumbs" class=" xs-1 sm-2 col-lg-1">
       <b-nav @click="showClientModal">
         <b-nav-item>{{ current.client.name }}</b-nav-item>
         <a-modal  v-model="clientModalVisible"
@@ -33,7 +33,7 @@
       </b-nav>
     </ul>
     <div :class="$style.divider" class="mr-4 d-none d-xl-block" />
-    <ul :class="$style.breadcrumbs" class="mr-4">
+    <ul :class="$style.breadcrumbs" class=" xs-1 sm-2 col-lg-1">
       <b-nav @click="showTemplateModal">
         <b-nav-item>{{ current.filter.name }}</b-nav-item>
         <a-modal  v-model="templateModalVisible"
@@ -65,7 +65,7 @@
       </b-nav>
     </ul>
     <div :class="$style.divider" class="mr-4 d-none d-xl-block" />
-    <ul :class="$style.breadcrumbs" class="mr-4">
+    <ul :class="$style.breadcrumbs" class=" xs-1 sm-2 col-lg-2" style="margin-left:10px; padding-right:0px;">
       <a-tooltip placement="topLeft" :title="current.name" arrowPointAtCenter>
       <li :class="$style.breadcrumb">
         <a
@@ -87,24 +87,37 @@
       </a-tag>
       <a-button-group>
         <a-tooltip placement="topLeft" :title="$t('subbar.exportCSV')" arrowPointAtCenter>
-          <a-button
-            type="primary"
-            icon="cloud-download"
-            @click="csvExport"
-            ghost
-          />
+
+          <button class="btn btn-outline-primary"
+           @click="csvExport" >
+            <span>
+              <i class=" fa fa-download" />
+            </span>
+          </button>
+        </a-tooltip>
+        <a-tooltip placement="topLeft" :title="$t('subbar.splitH')" style='margin-left : 10px' v-if="settings.viewerVerticalSplit">
+         <button class="btn btn-outline-primary" @click="changeScreenSplit">
+            <span>
+              <i class="fa fa-arrows-v" />
+            </span>
+          </button>
+        </a-tooltip>
+        <a-tooltip placement="topLeft" :title="$t('subbar.splitV')" style='margin-left : 10px' v-else>
+         <button class="btn btn-outline-primary" @click="changeScreenSplit">
+            <span>
+              <i class="fa fa-arrows-h" />
+            </span>
+          </button>
         </a-tooltip>
 
       </a-button-group>
 
-      &nbsp;	&nbsp;
-      <a-button-group v-if="!current.isArchived">
-        <a-button v-if="currentStatusIsValidated"
-                  type="primary"
-                  @click="invalidateCurrent"
-                  ghost>
+      <a-button-group v-if="!current.isArchived" style='margin-left : 10px;'>
+        <button v-if="currentStatusIsValidated"
+                  class="btn btn-outline-primary"
+                  @click="invalidateCurrent">
           {{ $t('subbar.invalidate') }}
-        </a-button>
+        </button>
         <button
             v-else
             :enabled="!currentStatusIsPending"
@@ -172,7 +185,7 @@
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { pick } from 'lodash'
 import DocumentService from '../../../../services/documentService'
 
@@ -211,6 +224,7 @@ export default {
     },
   },
   computed: {
+    ...mapState(['settings']),
     ...mapGetters([ 'documentsIdList',
       'docSmeltedCache',
       'docQueryParams',
@@ -514,6 +528,11 @@ export default {
         case 'error':
           return 'red'
       }
+    },
+    changeScreenSplit() {
+      const setting = 'viewerVerticalSplit'
+      const value = !this.settings[setting]
+      this.$store.commit('CHANGE_SETTING', { setting, value })
     },
   },
   destroyed() {

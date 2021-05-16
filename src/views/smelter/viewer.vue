@@ -8,22 +8,44 @@
       <div  class="container-fluid"
             v-shortkey="{up: ['tab'], down: ['shift', 'tab']}"
             @shortkey="updateActiveIndex">
-        <div class="row">
-          <div class="col-md-5">
-            <div class="sticky">
-              <template-viewer :filter="currentFilter" :isArchived="current.isArchived"/>
-              <!-- <statement-viewer :isArchived="current.isArchived"/> -->
+        <template v-if="settings.viewerVerticalSplit">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="sticky">
+                <!-- <template-viewer :filter="currentFilter" :isArchived="current.isArchived"/> -->
+                <statement-viewer :isArchived="current.isArchived"/>
+              </div>
+            </div>
+            <div v-if="documentIsPdf" class="col-md-6">
+              <div>
+              <smelter-pdf-window  :name="documentName" :currentPageData="currentPageData" />
+              </div>
+            </div>
+            <div v-else class="col-md-6 container-fluid">
+                <smelter-image-window  :name="documentName" :currentPageData="currentPageData" />
             </div>
           </div>
-          <div v-if="documentIsPdf" class="col-md-7">
+        </template>
+        <template v-else>
+         <div class="row">
+          <div class="col-md-12">
+            <div class="sticky">
+              <!-- <template-viewer :filter="currentFilter" :isArchived="current.isArchived"/> -->
+              <statement-viewer :isArchived="current.isArchived"/>
+            </div>
+          </div>
+         </div>
+         <div class="row">
+          <div v-if="documentIsPdf" class="col-md-12">
             <div>
             <smelter-pdf-window  :name="documentName" :currentPageData="currentPageData" />
             </div>
           </div>
-          <div v-else class="col-md-7 container-fluid">
+          <div v-else class="col-md-5 container-fluid">
               <smelter-image-window  :name="documentName" :currentPageData="currentPageData" />
           </div>
         </div>
+        </template>
       </div>
     </a-layout-content>
   </div>
@@ -38,12 +60,12 @@
 </template>
 <script>
 import TemplateViewer from '@/components/widgets/Smelter/Viewer/template.vue'
-// import StatementViewer from '@/components/widgets/Smelter/Viewer/statementViewer.vue'
+import StatementViewer from '@/components/widgets/Smelter/Viewer/statementViewer.vue'
 import SmelterPdfWindow from '@/components/widgets/Smelter/Window/pdfwindow.vue'
 import SmelterImageWindow from '@/components/widgets/Smelter/Window/imgwindow.vue'
 import SmelterSubbar from '@/components/widgets/Smelter/Viewer/subbar.vue'
 import DocumentService from '@/services/documentService.js'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { get } from 'lodash'
 
 export default {
@@ -52,7 +74,7 @@ export default {
     SmelterPdfWindow,
     SmelterImageWindow,
     TemplateViewer,
-    // StatementViewer,
+    StatementViewer
   },
   data() {
     return {
@@ -94,6 +116,7 @@ export default {
     },
   },
   computed: {
+    ...mapState(['settings']),
     ...mapGetters(['current', 'documentsIdList', 'currentPageData']),
     documentName: function() {
       return get(this.currentDocument, 'alias')

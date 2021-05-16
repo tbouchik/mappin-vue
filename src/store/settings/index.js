@@ -40,6 +40,7 @@ export default {
       isSquaredBorders: false,
       isBorderless: false,
       routerAnimation: 'slide-fadein-up', // none, slide-fadein-up, slide-fadein-right, fadein, zoom-fadein
+      viewerVerticalSplit: true,
     }),
   },
   mutations: {
