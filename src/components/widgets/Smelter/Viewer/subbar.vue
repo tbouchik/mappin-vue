@@ -32,8 +32,8 @@
         </a-modal>
       </b-nav>
     </ul>
-    <div :class="$style.divider" class="mr-4 d-none d-xl-block" />
-    <ul :class="$style.breadcrumbs" class=" xs-1 sm-2 col-lg-1">
+    <div :class="$style.divider" class="mr-4 d-none d-xl-block"  v-if="!isBankStatement"/>
+    <ul :class="$style.breadcrumbs" class=" xs-1 sm-2 col-lg-1" v-if="!isBankStatement">
       <b-nav @click="showTemplateModal">
         <b-nav-item>{{ current.filter.name }}</b-nav-item>
         <a-modal  v-model="templateModalVisible"
@@ -275,6 +275,10 @@ export default {
     },
     current: {
       type: Object,
+      required: true,
+    },
+    isBankStatement: {
+      type: Boolean,
       required: true,
     },
   },

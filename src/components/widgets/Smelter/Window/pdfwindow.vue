@@ -3,7 +3,7 @@
     <br />
     <div class="row">
       <div class="col-md-4"></div>
-      <div class="col-md-6">
+      <div class="col-md-5">
         <a-button-group>
           <a-button type="primary" id="prev-page">
             <a-icon type="left" />

@@ -2,7 +2,7 @@
 <div >
   <div v-if="currentIsReady" v-shortkey.push="['ctrl']" @shortkey="toggleCatMode">
     <a-layout-header>
-      <smelter-subbar :smeltedValidation="smeltedValidation" :current="currentDocument"/>
+      <smelter-subbar :smeltedValidation="smeltedValidation" :current="currentDocument" :isBankStatement="currentDocument.isBankStatement"/>
     </a-layout-header>
     <a-layout-content>
       <div  class="container-fluid"
@@ -12,8 +12,8 @@
           <div class="row">
             <div class="col-md-6">
               <div class="sticky">
-                <!-- <template-viewer :filter="currentFilter" :isArchived="current.isArchived"/> -->
-                <statement-viewer :isArchived="current.isArchived"/>
+                <template-viewer :filter="currentFilter" :isArchived="current.isArchived" v-if="!currentDocument.isBankStatement"/>
+                <statement-viewer :isArchived="current.isArchived" v-else/>
               </div>
             </div>
             <div v-if="documentIsPdf" class="col-md-6">
@@ -30,8 +30,8 @@
          <div class="row">
           <div class="col-md-12">
             <div class="sticky">
-              <!-- <template-viewer :filter="currentFilter" :isArchived="current.isArchived"/> -->
-              <statement-viewer :isArchived="current.isArchived"/>
+              <template-viewer :filter="currentFilter" :isArchived="current.isArchived" v-if="!currentDocument.isBankStatement"/>
+              <statement-viewer :isArchived="current.isArchived" v-else/>
             </div>
           </div>
          </div>
