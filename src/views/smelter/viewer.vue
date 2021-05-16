@@ -74,7 +74,7 @@ export default {
     SmelterPdfWindow,
     SmelterImageWindow,
     TemplateViewer,
-    StatementViewer
+    StatementViewer,
   },
   data() {
     return {
