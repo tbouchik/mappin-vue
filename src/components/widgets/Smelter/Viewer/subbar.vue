@@ -149,7 +149,6 @@
            <span class="icmn-keyboard"
            size="large"
            >
-
                 </span>
           </a-button>
         </a-tooltip>

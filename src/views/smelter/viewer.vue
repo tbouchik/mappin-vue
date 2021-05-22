@@ -12,8 +12,8 @@
           <div class="row">
             <div class="col-md-6">
               <div class="sticky">
-                <template-viewer :filter="currentFilter" :isArchived="current.isArchived" v-if="!currentDocument.isBankStatement"/>
-                <statement-viewer :isArchived="current.isArchived" v-else/>
+                <template-viewer :osmium="currenOsmium" :isArchived="current.isArchived" v-if="!currentDocument.isBankStatement"/>
+                <statement-viewer :osmium="currentBankOsmium" :isArchived="current.isArchived" v-else/>
               </div>
             </div>
             <div v-if="documentIsPdf" class="col-md-6">
@@ -30,8 +30,8 @@
          <div class="row">
           <div class="col-md-12">
             <div class="sticky">
-              <template-viewer :filter="currentFilter" :isArchived="current.isArchived" v-if="!currentDocument.isBankStatement"/>
-              <statement-viewer :isArchived="current.isArchived" v-else/>
+              <template-viewer :osmium="currenOsmium" :isArchived="current.isArchived" v-if="!currentDocument.isBankStatement"/>
+              <statement-viewer :osmium="currentBankOsmium" :isArchived="current.isArchived" v-else/>
             </div>
           </div>
          </div>
@@ -78,8 +78,9 @@ export default {
   },
   data() {
     return {
-      currentFilter: [],
+      currenOsmium: [],
       currentDocument: {},
+      currentBankOsmium: {},
     }
   },
   props: {
@@ -96,7 +97,8 @@ export default {
     DocumentService.fetchDocument(this.documentId).then(doc => {
       this.$store.dispatch('UPDATE_DOCUMENT', doc)
       this.currentDocument = doc
-      this.currentFilter = this.currentDocument.osmium
+      this.currenOsmium = this.currentDocument.osmium
+      this.currentBankOsmium = this.currentDocument.bankOsmium
     })
   },
   watch: {
@@ -108,11 +110,13 @@ export default {
       })
     },
     currentDocument: function() {
-      this.currentFilter = this.currentDocument.osmium
+      this.currentBankOsmium = this.currentDocument.bankOsmium
+      this.currenOsmium = this.currentDocument.osmium
     },
     current: function() {
       this.currentDocument = this.current
-      this.currentFilter = this.current.osmium
+      this.currentBankOsmium = this.currentDocument.bankOsmium
+      this.currenOsmium = this.current.osmium
     },
   },
   computed: {

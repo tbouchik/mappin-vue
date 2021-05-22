@@ -130,11 +130,11 @@ export default {
     }
   },
   created() {
-    this.pageData = this.filter.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation, Libelle: x.Libelle } })
+    this.pageData = this.osmium.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation, Libelle: x.Libelle } })
     this.activateIndex(0, 'Value')
   },
   props: {
-    filter: {
+    osmium: {
       required: true,
     },
     isArchived: {
@@ -147,8 +147,8 @@ export default {
     ...mapGetters(['currentPage', 'currentActiveIndex', 'currentActiveColumn', 'catMode']),
   },
   watch: {
-    filter: function () {
-      this.pageData = this.filter.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation, Libelle: x.Libelle } })
+    osmium: function () {
+      this.pageData = this.osmium.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation, Libelle: x.Libelle } })
     },
     currentActiveIndex: function() {
       if (this.currentActiveColumn === 'Value') {

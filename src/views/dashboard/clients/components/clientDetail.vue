@@ -50,20 +50,20 @@
     </div>
       <div class="card-body">
         <div class="air__utils__scrollTable">
-          <documents :clientId="clientId"></documents>
+          <docs :clientId="clientId"></docs>
         </div>
       </div>
     </div>
   </div>
 </template>
 <script>
-import Documents from '@/views/dashboard/documents/documents.vue'
+import Docs from '@/views/dashboard/documents/docs.vue'
 import ClientService from '@/services/clientService.js'
 import { Modal } from 'ant-design-vue'
 
 export default {
   components: {
-    Documents,
+    Docs,
     // eslint-disable-next-line
     Modal,
   },

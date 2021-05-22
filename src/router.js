@@ -59,7 +59,7 @@ const router = new Router({
             authRequired: true,
           },
           props: true,
-          component: () => import('./views/dashboard/documents/documents.vue'),
+          component: () => import('./views/dashboard/documents/docs.vue'),
         },
         {
           path: '/dashboard/archive',
@@ -70,16 +70,6 @@ const router = new Router({
           },
           props: true,
           component: () => import('./views/dashboard/documents/archive.vue'),
-        },
-        {
-          path: '/dashboard/bankstatements',
-          name: 'bankstatements',
-          meta: {
-            title: 'Bank Statements',
-            authRequired: true,
-          },
-          props: true,
-          component: () => import('./views/dashboard/documents/bankStatements.vue'),
         },
         {
           path: '/dashboard/clients',

@@ -10,12 +10,6 @@ export const getMenuData = [
     url: '/dashboard/documents',
   },
   {
-    title: 'Bank Statements',
-    key: 'bankStatements',
-    icon: 'fe fe-book-open',
-    url: '/dashboard/bankStatements',
-  },
-  {
     title: 'Clients',
     key: 'clients',
     icon: 'fe fe-users',

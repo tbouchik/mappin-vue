@@ -1,15 +1,14 @@
 <template>
-    <documents :isArchiveViz="true">
-    </documents>
+    <docs :isArchiveViz="true">
+    </docs>
 </template>
 
 <script>
-
-import Documents from './documents'
+import Docs from './docs'
 
 export default {
   components: {
-    Documents,
+    Docs,
   },
 }
 </script>

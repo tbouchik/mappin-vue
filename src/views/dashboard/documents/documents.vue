@@ -308,6 +308,7 @@ export default {
         filter: this.searchedTemplate,
         status: this.searchedStatus,
         isArchived: this.isArchiveViz,
+        isBankStatement: this.isBankViz,
       }
     },
     tablePagination: function () {
@@ -337,9 +338,7 @@ export default {
     }
   },
   destroyed() {
-    if (!this.clientId) {
-      clearInterval(this.timeInterval)
-    }
+    this.destroyPolling()
   },
   methods: {
     setColumns(baseColumns) {
@@ -380,7 +379,7 @@ export default {
             this.validatorIsLoading = false
           })
       }, 10000)
-      DocumentService.fetchDocumentsCount(pick(this.queryParams, ['name', 'filter', 'status', 'isArchived']))
+      DocumentService.fetchDocumentsCount(pick(this.queryParams, ['name', 'filter', 'status', 'isArchived', 'isBankStatement']))
         .then(data => {
           this.total = data.count
           this.$store.dispatch('ACTION_UPDATE_TOTAL_DOC_COUNT', this.total)
@@ -388,7 +387,7 @@ export default {
     },
     fetchDocumentsOnCreated(clientId) {
       this.loading = true
-      const queryParams = pick(this.queryParams, ['client', 'limit', 'page', 'isArchived'])
+      const queryParams = pick(this.queryParams, ['client', 'limit', 'page', 'isArchived', 'isBankStatement'])
       DocumentService.fetchDocuments(queryParams)
         .then(documentsList => {
           this.documentsList = documentsList.map((item, index) => { // TODO: Implement these properties in DB
@@ -419,7 +418,7 @@ export default {
           this.$store.dispatch('ACTION_UPDATE_DOCUMENTS_LIST', { documentsList, queryParams: this.queryParams })
           this.loading = false
         })
-      DocumentService.fetchDocumentsCount(pick(this.queryParams, ['name', 'filter', 'status', 'isArchived']))
+      DocumentService.fetchDocumentsCount(pick(this.queryParams, ['name', 'filter', 'status', 'isArchived', 'isBankStatement']))
         .then(data => {
           this.total = data.count
           this.$store.dispatch('ACTION_UPDATE_TOTAL_DOC_COUNT', this.total)
@@ -455,7 +454,11 @@ export default {
       })
     },
     goToUpload() {
-      this.$router.push({ name: 'upload' })
+      if (this.isBankViz) {
+        this.$router.push({ name: 'bankupload' })
+      } else {
+        this.$router.push({ name: 'upload' })
+      }
     },
     bulkExportToCSV() {
       this.bulkCsvExportIsLoading = true
@@ -501,7 +504,7 @@ export default {
           this.$store.dispatch('ACTION_UPDATE_DOCUMENTS_LIST', { documentsList, queryParams: this.queryParams })
           this.loading = false
         })
-      DocumentService.fetchDocumentsCount(pick(this.queryParams, ['client', 'name', 'filter', 'status', 'isArchived']))
+      DocumentService.fetchDocumentsCount(pick(this.queryParams, ['client', 'name', 'filter', 'status', 'isArchived', 'isBankStatement']))
         .then(data => {
           this.total = data.count
         })
@@ -600,6 +603,11 @@ export default {
           return 'grey'
         case 'error':
           return 'red'
+      }
+    },
+    destroyPolling() {
+      if (!this.clientId) {
+        clearInterval(this.timeInterval)
       }
     },
   },

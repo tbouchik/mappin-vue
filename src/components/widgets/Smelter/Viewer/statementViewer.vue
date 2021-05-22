@@ -5,8 +5,9 @@
                 :data-source="pageData"
                 :pagination=false
                 :scroll="{ x: 600 }"
+                :rowClassName="(record, index) => setColor(record, index)"
                 bordered>
-        <template v-for="col in ['Date', 'Designation', 'Imputation', 'Debit', 'Credit']" :slot="col"   slot-scope="text, record, dataIndex" style="background:blue">
+        <template v-for="col in ['Date', 'Designation', 'Compte', 'Debit', 'Credit']" :slot="col"   slot-scope="text, record, dataIndex" style="background:blue">
           <div :key="col"  v-if="col==='Key'" @click="activateIndex(dataIndex, col)" >
             {{text}}
           </div>
@@ -28,8 +29,8 @@
               :disabled="isArchived"
             />
           </div>
-          <div :key="col"  v-if="col==='Imputation' && isActive(dataIndex, col) && !isArchived" @click="activateIndex(dataIndex, col)">
-            <template v-if="record.Imputation !== undefined && record.Imputation !== null">
+          <div :key="col"  v-if="col==='Compte'" @click="activateIndex(dataIndex, col)">
+            <template v-if="record.Compte !== undefined && record.Compte !== null">
               <vue-simple-suggest
                 @input="e => changeLibelle(e, dataIndex)"
                 @hover="e => changeLibelle(e, dataIndex)"
@@ -42,25 +43,6 @@
                 :filter="suggestFilter"
                 :ref="hash(dataIndex,col)">
               </vue-simple-suggest>
-            </template>
-          </div>
-          <div :key="col"  v-if="col==='Imputation' && !isActive(dataIndex, col) && !isArchived" @click="activateIndex(dataIndex, col)">
-            <template v-if="record.Imputation !== undefined && record.Imputation !== null">
-              <vue-simple-suggest
-                :value="text"
-                :list="simpleSuggestionList"
-                :filter-by-query="true"
-                :ref="hash(dataIndex,col)">
-              </vue-simple-suggest>
-            </template>
-          </div>
-          <div :key="col"  v-if="col==='Imputation' && isArchived" @click="activateIndex(dataIndex, col)">
-            <template v-if="record.Imputation !== undefined && record.Imputation !== null">
-              <a-input
-                style="margin: -5px 0"
-                :value="text"
-                :disabled="isArchived"
-              />
             </template>
           </div>
         </template>
@@ -84,36 +66,35 @@ import { accountNumbers1,
 import labels from '../../../../assets/accounting/labels'
 import VueSimpleSuggest from 'vue-simple-suggest'
 import 'vue-simple-suggest/dist/styles.css' // Optional CSS
-import mock from './mock'
 const columns = [
   {
     title: 'Date',
     dataIndex: 'Date',
-    width: '20%',
+    width: '17%',
     scopedSlots: { customRender: 'Date' },
   },
   {
     title: 'Designation',
     dataIndex: 'Designation',
-    width: '30%',
+    width: '41%',
     scopedSlots: { customRender: 'Designation' },
   },
   {
-    title: 'Imputation',
-    dataIndex: 'Imputation',
-    width: '16%',
-    scopedSlots: { customRender: 'Imputation' },
+    title: 'Compte',
+    dataIndex: 'Compte',
+    width: '14%',
+    scopedSlots: { customRender: 'Compte' },
   },
   {
     title: 'Debit',
     dataIndex: 'Debit',
-    width: '17%',
+    width: '14%',
     scopedSlots: { customRender: 'Debit' },
   },
   {
     title: 'Credit',
     dataIndex: 'Credit',
-    width: '17%',
+    width: '14%',
     scopedSlots: { customRender: 'Credit' },
   },
 ]
@@ -133,9 +114,12 @@ export default {
     }
   },
   created() {
-    this.pageData = mock.map(x => { return { Date: x.Date, Designation: x.Designation, Imputation: x.Imputation, Debit: x.Debit, Credit: x.Credit } })
+    this.pageData = this.osmium['page_1'].map(x => { return { Date: x.Date, Designation: x.Designation, Compte: x.Compte, Debit: x.Debit, Credit: x.Credit } })
   },
   props: {
+    osmium: {
+      required: true,
+    },
     isArchived: {
       type: Boolean,
       required: false,
@@ -162,6 +146,15 @@ export default {
     // },
   },
   methods: {
+    setColor(record, index) {
+      console.log(record)
+      console.log(index)
+      if (index === 1) {
+        return 'aqua'
+      } else {
+        return ''
+      }
+    },
     switchEditMode() {
       this.editMode = !this.editMode
     },
@@ -206,4 +199,7 @@ export default {
 
 <style lang="scss" module>
 @import "./style.module.scss";
+.aqua {
+  background: aqua;
+}
 </style>
