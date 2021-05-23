@@ -18,6 +18,8 @@ const messages = {
   },
   dashboard: {
     document: {
+      invoiceTitle: 'Invoices',
+      bankTitle: 'Bank Statements',
       extractions: 'Your extractions',
       upload: 'Upload Documents',
       validate: 'Validate Smelted',

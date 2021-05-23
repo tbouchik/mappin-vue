@@ -34,7 +34,7 @@ class DocumentService {
   }
 
   static fetchNextSmeltedDocuments(queryParams) {
-    const { client, name, filter, skip, status, side, current } = queryParams
+    const { client, name, filter, skip, status, side, current, isBankStatement } = queryParams
     if (typeof cancelToken !== typeof undefined) {
       cancelToken.cancel('Operation canceled due to new request.')
     }
@@ -44,6 +44,7 @@ class DocumentService {
       client,
       side,
       current,
+      isBankStatement,
       isArchived: false,
     }
     if (name && name !== '') {

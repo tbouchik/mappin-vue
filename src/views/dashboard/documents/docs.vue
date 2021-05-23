@@ -1,5 +1,5 @@
 <template>
-    <a-tabs default-active-key="0">
+    <a-tabs default-active-key="0" @change="onChangeTab">
         <a-tab-pane v-for="pane in panes" :isArchiveViz="isArchiveViz" :clientId="clientId" :key="pane.key" :tab="pane.title" >
         <span slot="tab">
             <a-icon :type="pane.icon" />
@@ -12,6 +12,7 @@
 
 <script>
 import Documents from './documents'
+import DocumentService from '../../../services/documentService'
 
 export default {
   name: 'Docs',
@@ -40,6 +41,20 @@ export default {
     }
   },
   methods: {
+    onChangeTab(activeTab) {
+      const activeTabIdx = parseInt(activeTab)
+      const params = {
+        client: this.clientId,
+        isArchived: this.isArchiveViz,
+        isBankStatement: this.panes[activeTabIdx].bankViz,
+      }
+      DocumentService.fetchNextSmeltedDocuments(params)
+        .then(idsArray => {
+          this.$store.dispatch('ACTION_CACHE_SMELTED_IDS', { idsArray,
+            concat: false })
+          this.validatorIsLoading = false
+        })
+    },
   },
 }
 </script>

@@ -4,7 +4,8 @@
     <div class="air__utils__heading">
       <b-row>
         <b-col md="3" class="my-1">
-          <h5>Documents</h5>
+          <h5 v-if="isBankViz">{{ $t('dashboard.document.bankTitle') }}</h5>
+          <h5 v-else>{{ $t('dashboard.document.invoiceTitle') }}</h5>
         </b-col>
       </b-row>
     </div>
@@ -402,6 +403,12 @@ export default {
         .then(data => {
           this.total = data.count
           this.$store.dispatch('ACTION_UPDATE_TOTAL_DOC_COUNT', this.total)
+        })
+      DocumentService.fetchNextSmeltedDocuments(this.queryParams)
+        .then(idsArray => {
+          this.$store.dispatch('ACTION_CACHE_SMELTED_IDS', { idsArray,
+            concat: false })
+          this.validatorIsLoading = false
         })
     },
     fetchDocuments() {

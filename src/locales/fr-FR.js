@@ -19,6 +19,8 @@ const messages = {
   },
   dashboard: {
     document: {
+      invoiceTitle: 'Factures',
+      bankTitle: 'Relevés bancaires',
       extractions: 'Vos extractions',
       upload: 'Uploader',
       validate: 'Valider les extractions',
