@@ -3,19 +3,19 @@
     <br>
       <div style="margin-bottom: 16px">
         <a-dropdown :disabled="!hasSelectedStatements" >
-          <a-button>Actions</a-button>
+          <a-button>{{ $t('template.actions') }}</a-button>
           <a-menu slot="overlay">
             <a-menu-item @click="insertStatements(-1)" v-if="hasNoStatements">
-              <div>Insert line</div>
+              <div>{{ $t('template.insertLine') }}</div>
             </a-menu-item>
             <a-menu-item @click="insertStatements(0)" v-if="!hasNoStatements">
-              <div>Insert empty line above</div>
+              <div>{{ $t('template.insertAbove') }}</div>
             </a-menu-item>
             <a-menu-item @click="insertStatements(1)" v-if="!hasNoStatements">
-              <div>Insert empty line below</div>
+              <div>{{ $t('template.insertBelow') }}</div>
             </a-menu-item>
             <a-menu-item @click="deleteStatements" v-if="!hasNoStatements">
-              <div>Delete</div>
+              <div>{{ $t('template.deleteAction') }}</div>
             </a-menu-item>
           </a-menu>
         </a-dropdown>

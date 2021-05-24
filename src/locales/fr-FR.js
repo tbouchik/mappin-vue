@@ -6,6 +6,8 @@ const messages = {
     typeToSearch: 'Chercher...',
     actions: 'Actes',
     status: 'Statut',
+    panesInvoice: 'Factures',
+    panesStatement: 'Relevés Bancaires',
     profileMenu: {
       hello: 'Bonjour',
       company: 'Entreprise',
@@ -108,6 +110,11 @@ const messages = {
     typeSelect: 'Sélectionner le type: Achat ou Vente',
     addField: 'Nouvelle entrée',
     submit: 'Envoyer',
+    actions: 'Actions',
+    insertLine: 'Insérer une ligne',
+    insertBelow: 'Insérer une ligne en dessous',
+    insertAbove: 'Insérer une ligne au dessus',
+    deleteAction: 'Supprimer',
   },
   accounting: {
     expense: 'Achat',

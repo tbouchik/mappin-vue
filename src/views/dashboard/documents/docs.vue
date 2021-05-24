@@ -1,5 +1,5 @@
 <template>
-    <a-tabs default-active-key="0" @change="onChangeTab">
+    <a-tabs default-active-key="1" @change="onChangeTab">
         <a-tab-pane v-for="pane in panes" :isArchiveViz="isArchiveViz" :clientId="clientId" :key="pane.key" :tab="pane.title" >
         <span slot="tab">
             <a-icon :type="pane.icon" />
@@ -32,8 +32,8 @@ export default {
   },
   data() {
     const panes = [
-      { title: 'Invoices', key: '0', ref: 'invoices', icon: 'apple', bankViz: false },
-      { title: 'Bank Statements', key: '1', ref: 'statements', icon: 'android', bankViz: true },
+      { title: this.$t('topBar.panesInvoice'), key: '0', ref: 'invoices', icon: 'apple', bankViz: false },
+      { title: this.$t('topBar.panesStatement'), key: '1', ref: 'statements', icon: 'android', bankViz: true },
     ]
     return {
       activeKey: panes[0].key,

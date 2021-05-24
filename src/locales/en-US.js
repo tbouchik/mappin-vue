@@ -6,6 +6,8 @@ const messages = {
     typeToSearch: 'Start typing to search...',
     actions: 'Actions',
     status: 'Status',
+    panesInvoice: 'Invoices',
+    panesStatement: 'Bank Statements',
     profileMenu: {
       hello: 'Hello',
       company: 'Company',
@@ -107,6 +109,11 @@ const messages = {
     typeSelect: 'Select a type: Expense or Sale',
     addField: 'Add field',
     submit: 'Submit',
+    actions: 'Actions',
+    insertLine: 'Insert line',
+    insertBelow: 'Insert empty line below',
+    insertAbove: 'Insert empty line above',
+    deleteAction: 'Delete',
   },
   accounting: {
     expense: 'Expense',
