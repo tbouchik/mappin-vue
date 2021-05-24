@@ -13,7 +13,7 @@
             <div class="col-md-6">
               <div class="sticky">
                 <template-viewer :osmium="currenOsmium" :isArchived="current.isArchived" v-if="!currentDocument.isBankStatement"/>
-                <statement-viewer :osmium="currentBankOsmium" :isArchived="current.isArchived" v-else/>
+                <statement-viewer :bankOsmium="currentBankOsmium" :isArchived="current.isArchived" v-else/>
               </div>
             </div>
             <div v-if="documentIsPdf" class="col-md-6">
@@ -31,7 +31,7 @@
           <div class="col-md-12">
             <div class="sticky">
               <template-viewer :osmium="currenOsmium" :isArchived="current.isArchived" v-if="!currentDocument.isBankStatement"/>
-              <statement-viewer :osmium="currentBankOsmium" :isArchived="current.isArchived" v-else/>
+              <statement-viewer :bankOsmium="currentBankOsmium" :isArchived="current.isArchived" v-else/>
             </div>
           </div>
          </div>

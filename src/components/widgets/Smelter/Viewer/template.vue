@@ -196,7 +196,7 @@ export default {
         imputation: input,
         libelle: labels[parseInt(input)],
       }
-      this.$store.dispatch('ACTION_DO_IMPUTATION_CHANGES_TO_DOCUMENT', payload)
+      this.$store.dispatch('ACTION_DO_IMPUTATION_CHANGES_TO_INVOICE', payload)
     },
     suggestFilter(singleItem, query) {
       return singleItem.indexOf(query) === 0 && singleItem.length === query.length + 1

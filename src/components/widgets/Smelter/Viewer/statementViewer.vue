@@ -5,7 +5,6 @@
                 :data-source="pageData"
                 :pagination=false
                 :scroll="{ x: 600 }"
-                :rowClassName="(record, index) => setColor(record, index)"
                 bordered>
         <template v-for="col in ['Date', 'Designation', 'Compte', 'Debit', 'Credit']" :slot="col"   slot-scope="text, record, dataIndex" style="background:blue">
           <div :key="col"  v-if="col==='Key'" @click="activateIndex(dataIndex, col)" >
@@ -114,10 +113,11 @@ export default {
     }
   },
   created() {
-    this.pageData = this.osmium['page_1'].map(x => { return { Date: x.Date, Designation: x.Designation, Compte: x.Compte, Debit: x.Debit, Credit: x.Credit } })
+    this.pageData = this.bankOsmium[`page_${this.currentPage}`].map(x => { return { Date: x.Date, Designation: x.Designation, Compte: x.Compte, Debit: x.Debit, Credit: x.Credit } })
+    this.activateIndex(0, 'Date')
   },
   props: {
-    osmium: {
+    bankOsmium: {
       required: true,
     },
     isArchived: {
@@ -130,6 +130,9 @@ export default {
     ...mapGetters(['currentPage', 'currentActiveIndex', 'currentActiveColumn', 'catMode']),
   },
   watch: {
+    bankOsmium: function() {
+      this.pageData = this.bankOsmium[`page_${this.currentPage}`].map(x => { return { Date: x.Date, Designation: x.Designation, Compte: x.Compte, Debit: x.Debit, Credit: x.Credit } })
+    },
     // currentActiveIndex: function() {
     //   if (this.currentActiveColumn === 'Value') {
     //     this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
@@ -146,20 +149,11 @@ export default {
     // },
   },
   methods: {
-    setColor(record, index) {
-      console.log(record)
-      console.log(index)
-      if (index === 1) {
-        return 'aqua'
-      } else {
-        return ''
-      }
-    },
     switchEditMode() {
       this.editMode = !this.editMode
     },
     handleChange(value, itemIdx, column) {
-      this.$store.dispatch('ACTION_DO_CHANGES_TO_DOCUMENT', { value, itemIdx, column })
+      this.$store.dispatch('ACTION_MANUAL_CHANGES_TO_STATEMENT', { value, itemIdx, column })
     },
     activateIndex(idx, col) {
       this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', { idx, col })
@@ -181,11 +175,10 @@ export default {
     },
     updateImputation(input, idx) {
       const payload = {
-        itemIdx: idx,
         imputation: input,
-        libelle: labels[parseInt(input)],
       }
-      this.$store.dispatch('ACTION_DO_IMPUTATION_CHANGES_TO_DOCUMENT', payload)
+      console.log(payload)
+      this.$store.dispatch('ACTION_DO_IMPUTATION_CHANGES_TO_STATEMENT', payload)
     },
     suggestFilter(singleItem, query) {
       return singleItem.indexOf(query) === 0 && singleItem.length === query.length + 1

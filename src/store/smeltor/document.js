@@ -1,21 +1,23 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
-import { cloneDeep, get, pick } from 'lodash'
+import { cloneDeep, get, pick, pickBy } from 'lodash'
 import uuidv4 from 'uuid/v4'
 import moment from 'moment'
 Vue.use(Vuex)
 
 let cancelToken
 
-function saveDocToAPI(mbc, osmium, ggMetadata, imput, id) {
-  const updatedDocument = {
-    mbc: mbc,
-    imput: imput,
-    osmium: osmium,
-    ggMetadata: ggMetadata,
+function saveDocToAPI(mbc, osmium, ggMetadata, imput, isBankStatement, id) {
+  let updatedDocument = {
+    mbc: mbc || null,
+    imput: imput || null,
+    osmium: isBankStatement ? null : osmium,
+    bankOsmium: isBankStatement ? osmium : null,
+    ggMetadata: ggMetadata || null,
     status: 'validated',
   }
+  updatedDocument = pickBy(updatedDocument, (v, _) => { return !!v })
   if (typeof cancelToken !== typeof undefined) {
     cancelToken.cancel('Operation canceled due to new request.')
   }
@@ -154,7 +156,7 @@ export default {
         updateFormattedDoc.osmium[state.currentIdx].Value = newVal
       }
       state.formattedDocument = updateFormattedDoc
-      saveDocToAPI(Object.fromEntries(mbcData), updateFormattedDoc.osmium, updateFormattedDoc.ggMetadata, false, state.formattedDocument.id)
+      saveDocToAPI(Object.fromEntries(mbcData), updateFormattedDoc.osmium, updateFormattedDoc.ggMetadata, false, false, state.formattedDocument.id)
     },
     MUTATION_DO_CHANGES_TO_DOCUMENT(state, changeData) {
       let { value, itemIdx, column } = changeData
@@ -163,15 +165,44 @@ export default {
       let tempDoc = cloneDeep(state.formattedDocument)
       tempDoc.osmium[itemIdx][column] = formatValue(value, keyType, 'manual')
       state.formattedDocument = tempDoc
-      saveDocToAPI(Object.fromEntries(mbcData), state.formattedDocument.osmium, state.formattedDocument.ggMetadata, false, state.formattedDocument.id)
+      saveDocToAPI(Object.fromEntries(mbcData), state.formattedDocument.osmium, state.formattedDocument.ggMetadata, false, false, state.formattedDocument.id)
     },
-    MUTATION_DO_IMPUTATION_CHANGES_TO_DOCUMENT(state, changeData) {
+    MUTATION_AUTO_CHANGES_TO_STATEMENT(state, bbox) {
+      let updateFormattedDoc = cloneDeep(state.formattedDocument)
+      const newVal = bbox.Text
+      if (state.catMode) {
+        let appendix = ' '.concat(newVal)
+        let currentValue = updateFormattedDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol]
+        updateFormattedDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol] = currentValue ? currentValue.concat(appendix) : appendix.trim()
+      } else {
+        updateFormattedDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol] = newVal
+      }
+      state.formattedDocument = updateFormattedDoc
+      console.log(updateFormattedDoc.bankOsmium[`page_${state.page}`][state.currentIdx])
+      saveDocToAPI(null, updateFormattedDoc.bankOsmium, null, null, true, state.formattedDocument.id)
+    },
+    MUTATION_MANUAL_CHANGES_TO_STATEMENT(state, changeData) {
+      let { value } = changeData
+      let tempDoc = cloneDeep(state.formattedDocument)
+      tempDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol] = value
+      state.formattedDocument = tempDoc
+      console.log(state.formattedDocument.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol])
+      saveDocToAPI(null, state.formattedDocument.bankOsmium, null, null, true, state.formattedDocument.id)
+    },
+    MUTATION_DO_IMPUTATION_CHANGES_TO_STATEMENT(state, changeData) {
+      let { imputation } = changeData
+      let tempDoc = cloneDeep(state.formattedDocument)
+      tempDoc.bankOsmium[`page_${state.page}`][state.currentIdx]['Compte'] = imputation
+      state.formattedDocument = tempDoc
+      saveDocToAPI({}, state.formattedDocument.bankOsmium, null, null, true, state.formattedDocument.id)
+    },
+    MUTATION_DO_IMPUTATION_CHANGES_TO_INVOICE(state, changeData) {
       let { itemIdx, imputation, libelle } = changeData
       let tempDoc = cloneDeep(state.formattedDocument)
       tempDoc.osmium[itemIdx]['Imputation'] = imputation
       tempDoc.osmium[itemIdx]['Libelle'] = libelle
       state.formattedDocument = tempDoc
-      saveDocToAPI({}, state.formattedDocument.osmium, state.formattedDocument.ggMetadata, true, state.formattedDocument.id)
+      saveDocToAPI({}, state.formattedDocument.osmium, state.formattedDocument.ggMetadata, true, false, state.formattedDocument.id)
     },
     MUTATION_ADD_RECORD_AFTER_INDEX(state) {
       const newElement = {
@@ -267,8 +298,17 @@ export default {
     ACTION_CACHE_IDS({ commit }, payload) {
       commit('MUTATION_CACHE_IDS', payload)
     },
-    ACTION_DO_IMPUTATION_CHANGES_TO_DOCUMENT({ commit }, payload) {
-      commit('MUTATION_DO_IMPUTATION_CHANGES_TO_DOCUMENT', payload)
+    ACTION_DO_IMPUTATION_CHANGES_TO_INVOICE({ commit }, payload) {
+      commit('MUTATION_DO_IMPUTATION_CHANGES_TO_INVOICE', payload)
+    },
+    ACTION_DO_IMPUTATION_CHANGES_TO_STATEMENT({ commit }, payload) {
+      commit('MUTATION_DO_IMPUTATION_CHANGES_TO_STATEMENT', payload)
+    },
+    ACTION_AUTO_CHANGES_TO_STATEMENT({ commit }, bbox) {
+      commit('MUTATION_AUTO_CHANGES_TO_STATEMENT', bbox)
+    },
+    ACTION_MANUAL_CHANGES_TO_STATEMENT({ commit }, payload) {
+      commit('MUTATION_MANUAL_CHANGES_TO_STATEMENT', payload)
     },
   },
   getters: {
