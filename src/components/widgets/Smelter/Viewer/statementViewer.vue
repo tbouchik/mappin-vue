@@ -1,10 +1,30 @@
 <template>
   <div>
-  <br>
+    <br>
+      <div style="margin-bottom: 16px">
+        <a-dropdown :disabled="!hasSelectedStatements" >
+          <a-button>Actions</a-button>
+          <a-menu slot="overlay">
+            <a-menu-item @click="insertStatements(-1)" v-if="hasNoStatements">
+              <div>Insert line</div>
+            </a-menu-item>
+            <a-menu-item @click="insertStatements(0)" v-if="!hasNoStatements">
+              <div>Insert empty line above</div>
+            </a-menu-item>
+            <a-menu-item @click="insertStatements(1)" v-if="!hasNoStatements">
+              <div>Insert empty line below</div>
+            </a-menu-item>
+            <a-menu-item @click="deleteStatements" v-if="!hasNoStatements">
+              <div>Delete</div>
+            </a-menu-item>
+          </a-menu>
+        </a-dropdown>
+      </div>
       <a-table  :columns="columns"
                 :data-source="pageData"
                 :pagination=false
                 :scroll="{ x: 600 }"
+                :row-selection="{ selectedRowKeys: selectedStatements, onChange: onSelectChange }"
                 bordered>
         <template v-for="col in ['Date', 'Designation', 'Compte', 'Debit', 'Credit']" :slot="col"   slot-scope="text, record, dataIndex" style="background:blue">
           <div :key="col"  v-if="col==='Key'" @click="activateIndex(dataIndex, col)" >
@@ -36,7 +56,6 @@
                 @select="e => updateImputation(e, dataIndex)"
                 :value="text"
                 :max-suggestions="0"
-                :styles="autoCompleteStyle"
                 :list="simpleSuggestionList"
                 :filter-by-query="true"
                 :filter="suggestFilter"
@@ -107,9 +126,7 @@ export default {
       pageData: [],
       chosen: '',
       columns,
-      autoCompleteStyle: {
-        focus: 'c1',
-      },
+      selectedStatements: [],
     }
   },
   created() {
@@ -128,9 +145,19 @@ export default {
   },
   computed: {
     ...mapGetters(['currentPage', 'currentActiveIndex', 'currentActiveColumn', 'catMode']),
+    hasSelectedStatements() {
+      return this.selectedStatements.length > 0 || this.bankOsmium[`page_${this.currentPage}`].length === 0
+    },
+    hasNoStatements() {
+      return this.bankOsmium[`page_${this.currentPage}`].length === 0
+    },
   },
   watch: {
     bankOsmium: function() {
+      this.pageData = this.bankOsmium[`page_${this.currentPage}`].map(x => { return { Date: x.Date, Designation: x.Designation, Compte: x.Compte, Debit: x.Debit, Credit: x.Credit } })
+    },
+    currentPage: function() {
+      this.selectedStatements = []
       this.pageData = this.bankOsmium[`page_${this.currentPage}`].map(x => { return { Date: x.Date, Designation: x.Designation, Compte: x.Compte, Debit: x.Debit, Credit: x.Credit } })
     },
     // currentActiveIndex: function() {
@@ -177,11 +204,21 @@ export default {
       const payload = {
         imputation: input,
       }
-      console.log(payload)
       this.$store.dispatch('ACTION_DO_IMPUTATION_CHANGES_TO_STATEMENT', payload)
     },
     suggestFilter(singleItem, query) {
       return singleItem.indexOf(query) === 0 && singleItem.length === query.length + 1
+    },
+    onSelectChange(selectedStatements) {
+      this.selectedStatements = selectedStatements.sort((a, b) => a - b)
+    },
+    insertStatements(offset) {
+      this.$store.dispatch('ACTION_INSERT_STATEMENTS', { offset, selectedStatements: this.selectedStatements })
+      this.selectedStatements = []
+    },
+    deleteStatements() {
+      this.$store.dispatch('ACTION_DELETE_STATEMENTS', { selectedStatements: this.selectedStatements })
+      this.selectedStatements = []
     },
   },
   destroyed() {

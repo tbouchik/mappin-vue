@@ -196,6 +196,39 @@ export default {
       state.formattedDocument = tempDoc
       saveDocToAPI({}, state.formattedDocument.bankOsmium, null, null, true, state.formattedDocument.id)
     },
+    MUTATION_INSERT_STATEMENTS(state, changeData) {
+      let { offset, selectedStatements } = changeData
+      let tempDoc = cloneDeep(state.formattedDocument)
+      const emptyStatement = {
+        'Date': '',
+        'Designation': '',
+        'Debit': '',
+        'Credit': '',
+        'Compte': '',
+      }
+      let counter = 0
+      if (offset === -1) {
+        tempDoc.bankOsmium[`page_${state.page}`].push(emptyStatement)
+      } else {
+        selectedStatements.forEach(idx => {
+          tempDoc.bankOsmium[`page_${state.page}`].splice([idx + offset + counter], 0, emptyStatement)
+          counter++
+        })
+      }
+      state.formattedDocument = tempDoc
+      saveDocToAPI({}, state.formattedDocument.bankOsmium, null, null, true, state.formattedDocument.id)
+    },
+    MUTATION_DELETE_STATEMENTS(state, changeData) {
+      let { selectedStatements } = changeData
+      let tempDoc = cloneDeep(state.formattedDocument)
+      let counter = 0
+      selectedStatements.forEach(idx => {
+        tempDoc.bankOsmium[`page_${state.page}`].splice([idx - counter], 1)
+        counter++
+      })
+      state.formattedDocument = tempDoc
+      saveDocToAPI({}, state.formattedDocument.bankOsmium, null, null, true, state.formattedDocument.id)
+    },
     MUTATION_DO_IMPUTATION_CHANGES_TO_INVOICE(state, changeData) {
       let { itemIdx, imputation, libelle } = changeData
       let tempDoc = cloneDeep(state.formattedDocument)
@@ -309,6 +342,12 @@ export default {
     },
     ACTION_MANUAL_CHANGES_TO_STATEMENT({ commit }, payload) {
       commit('MUTATION_MANUAL_CHANGES_TO_STATEMENT', payload)
+    },
+    ACTION_INSERT_STATEMENTS({ commit }, payload) {
+      commit('MUTATION_INSERT_STATEMENTS', payload)
+    },
+    ACTION_DELETE_STATEMENTS({ commit }, payload) {
+      commit('MUTATION_DELETE_STATEMENTS', payload)
     },
   },
   getters: {
