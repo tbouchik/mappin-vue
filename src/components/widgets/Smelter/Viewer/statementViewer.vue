@@ -160,20 +160,20 @@ export default {
       this.selectedStatements = []
       this.pageData = this.bankOsmium[`page_${this.currentPage}`].map(x => { return { Date: x.Date, Designation: x.Designation, Compte: x.Compte, Debit: x.Debit, Credit: x.Credit } })
     },
-    // currentActiveIndex: function() {
-    //   if (this.currentActiveColumn === 'Value') {
-    //     this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
-    //   } else {
-    //     this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.children[0].children[0].focus()
-    //   }
-    // },
-    // currentActiveColumn: function() {
-    //   if (this.currentActiveColumn === 'Value') {
-    //     this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
-    //   } else {
-    //     this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.children[0].children[0].focus()
-    //   }
-    // },
+    currentActiveIndex: function() {
+      if (this.currentActiveColumn !== 'Compte') {
+        this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
+      } else {
+        this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.children[0].children[0].focus()
+      }
+    },
+    currentActiveColumn: function() {
+      if (this.currentActiveColumn !== 'Compte') {
+        this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
+      } else {
+        this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.children[0].children[0].focus()
+      }
+    },
   },
   methods: {
     switchEditMode() {

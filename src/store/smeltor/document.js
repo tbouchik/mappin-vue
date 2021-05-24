@@ -31,7 +31,7 @@ function saveDocToAPI(mbc, osmium, ggMetadata, imput, isBankStatement, id) {
   }
 }
 
-function getGraphNextMove(osmium, currentIdx, currentCol, move) {
+function getInvoiceGraphNextMove(osmium, currentIdx, currentCol, move) {
   const graphDepth = osmium.length
   if (move === 'inc') {
     const nextIndex = currentIdx < graphDepth - 1 ? currentIdx + 1 : 0
@@ -55,6 +55,37 @@ function getGraphNextMove(osmium, currentIdx, currentCol, move) {
         return { idx: previousIndex, col: 'Value' }
       }
     }
+  }
+}
+
+function getTableGraphNextMove(osmium, currentIdx, currentCol, move) {
+  const graphDepth = osmium.length
+  if (move === 'inc') {
+    const nextIndex = currentIdx < graphDepth - 1 ? currentIdx + 1 : 0
+    const adjacentColumn = getTableAdjacentColumn(currentCol, 1)
+    if (adjacentColumn === 'Date') {
+      return { idx: nextIndex, col: 'Date' }
+    }
+    return { idx: currentIdx, col: adjacentColumn }
+  } else {
+    const previousIndex = currentIdx > 0 ? currentIdx - 1 : graphDepth - 1
+    const adjacentColumn = getTableAdjacentColumn(currentCol, -1)
+    if (adjacentColumn === 'Credit') {
+      return { idx: previousIndex, col: 'Credit' }
+    }
+    return { idx: currentIdx, col: adjacentColumn }
+  }
+}
+
+function getTableAdjacentColumn(currentCol, move) {
+  const cols = ['Date', 'Designation', 'Compte', 'Debit', 'Credit']
+  const currentIdx = cols.findIndex(x => x === currentCol)
+  if (currentIdx + move > 4) {
+    return cols[0]
+  } else if (currentIdx + move < 0) {
+    return cols[4]
+  } else {
+    return cols[currentIdx + move]
   }
 }
 
@@ -137,7 +168,9 @@ export default {
         state.currentIdx = payload.idx
         state.currentCol = payload.col
       } else {
-        let nextCoords = getGraphNextMove(state.formattedDocument.osmium, state.currentIdx, state.currentCol, payload.move)
+        let nextCoords = state.formattedDocument.isBankStatement
+          ? getTableGraphNextMove(state.formattedDocument.bankOsmium[`page_${state.page}`], state.currentIdx, state.currentCol, payload.move)
+          : getInvoiceGraphNextMove(state.formattedDocument.osmium, state.currentIdx, state.currentCol, payload.move)
         state.currentIdx = nextCoords.idx
         state.currentCol = nextCoords.col
       }

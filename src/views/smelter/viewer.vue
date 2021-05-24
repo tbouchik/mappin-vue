@@ -106,7 +106,8 @@ export default {
       return DocumentService.fetchDocument(this.documentId).then(doc => {
         this.$store.dispatch('UPDATE_DOCUMENT', doc)
         this.currentDocument = doc
-        this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', { idx: 0, col: 'Value' })
+        const firstActiveCell = this.currentDocument.isBankStatement ? { idx: 0, col: 'Date' } : { idx: 0, col: 'Value' }
+        this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', firstActiveCell)
       })
     },
     currentDocument: function() {
