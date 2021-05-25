@@ -52,7 +52,7 @@ var pdfjsLib = require('pdfjs-dist')
 export default {
   name: 'SmelterPdfWindow',
   mounted: async function() {
-    this.renderPdf(this.currentPageData, this.$store)
+    this.renderPdf(this.currentPageData, this.$store, this.isBankStatement)
   },
   props: {
     name: {
@@ -61,10 +61,14 @@ export default {
     currentPageData: {
       required: true,
     },
+    isBankStatement: {
+      type: Boolean,
+      required: true,
+    },
   },
   watch: {
     name: async function() {
-      this.renderPdf(this.currentPageData, this.$store)
+      this.renderPdf(this.currentPageData, this.$store, this.isBankStatement)
     },
   },
   computed: {
@@ -74,7 +78,7 @@ export default {
     ...mapGetters(['current']),
   },
   methods: {
-    async renderPdf(currentPageData, store) {
+    async renderPdf(currentPageData, store, isBankStatement) {
       let pdfDoc = null
       let pageNum = 1
       let pageIsRendering = false
@@ -93,8 +97,10 @@ export default {
           let bottomBoundary = canvas.height * (parseFloat(textInfo.Top) + parseFloat(textInfo.Height))
           return (x > leftBoundary && x < rightBoundary) && (y > topBoundary && y < bottomBoundary)
         })
-        if (selectedTextSection[0] && selectedTextSection[0].Text) {
+        if (selectedTextSection[0] && selectedTextSection[0].Text && !isBankStatement) {
           store.dispatch('ACTION_UPDATE_ACTIVE_VALUE', selectedTextSection[0])
+        } else if (selectedTextSection[0] && selectedTextSection[0].Text && isBankStatement) {
+          store.dispatch('ACTION_AUTO_CHANGES_TO_STATEMENT', selectedTextSection[0])
         }
       })
 

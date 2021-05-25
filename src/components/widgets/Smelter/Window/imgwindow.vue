@@ -41,7 +41,7 @@ export default {
     }
   },
   mounted: function() {
-    this.renderImg(this.currentPageData, this.$store)
+    this.renderImg(this.currentPageData, this.$store, this.isBankStatement)
   },
   computed: {
     src: function() {
@@ -55,10 +55,14 @@ export default {
     currentPageData: {
       required: true,
     },
+    isBankStatement: {
+      type: Boolean,
+      required: true,
+    },
   },
   watch: {
     name: function() {
-      this.renderImg(this.currentPageData, this.$store)
+      this.renderImg(this.currentPageData, this.$store, this.isBankStatement)
     },
   },
   methods: {
@@ -84,7 +88,7 @@ export default {
         context.stroke()
       }
     },
-    renderImg(currentPageData, store) {
+    renderImg(currentPageData, store, isBankStatement) {
       let canvas = document.getElementById('can')
       let ctx = canvas.getContext('2d')
       canvas.addEventListener('click', function(event) {
@@ -97,8 +101,10 @@ export default {
           let bottomBoundary = canvas.height * (parseFloat(textInfo.Top) + parseFloat(textInfo.Height))
           return (x > leftBoundary && x < rightBoundary) && (y > topBoundary && y < bottomBoundary)
         })
-        if (selectedTextSection[0] && selectedTextSection[0].Text) {
+        if (selectedTextSection[0] && selectedTextSection[0].Text && !isBankStatement) {
           store.dispatch('ACTION_UPDATE_ACTIVE_VALUE', selectedTextSection[0])
+        } else if (selectedTextSection[0] && selectedTextSection[0].Text && !isBankStatement) {
+          store.dispatch('ACTION_AUTO_CHANGES_TO_STATEMENT', selectedTextSection[0])
         }
       })
       let img = document.getElementById('stub')

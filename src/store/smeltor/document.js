@@ -211,7 +211,6 @@ export default {
         updateFormattedDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol] = newVal
       }
       state.formattedDocument = updateFormattedDoc
-      console.log(updateFormattedDoc.bankOsmium[`page_${state.page}`][state.currentIdx])
       saveDocToAPI(null, updateFormattedDoc.bankOsmium, null, null, true, state.formattedDocument.id)
     },
     MUTATION_MANUAL_CHANGES_TO_STATEMENT(state, changeData) {

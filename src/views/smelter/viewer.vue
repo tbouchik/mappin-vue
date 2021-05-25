@@ -18,11 +18,11 @@
             </div>
             <div v-if="documentIsPdf" class="col-md-6">
               <div>
-              <smelter-pdf-window  :name="documentName" :currentPageData="currentPageData" />
+              <smelter-pdf-window  :name="documentName" :currentPageData="currentPageData" :isBankStatement="currentDocument.isBankStatement"/>
               </div>
             </div>
             <div v-else class="col-md-6 container-fluid">
-                <smelter-image-window  :name="documentName" :currentPageData="currentPageData" />
+                <smelter-image-window  :name="documentName" :currentPageData="currentPageData" :isBankStatement="currentDocument.isBankStatement"/>
             </div>
           </div>
         </template>
@@ -38,11 +38,11 @@
          <div class="row">
           <div v-if="documentIsPdf" class="col-md-12">
             <div>
-            <smelter-pdf-window  :name="documentName" :currentPageData="currentPageData" />
+            <smelter-pdf-window  :name="documentName" :currentPageData="currentPageData" :isBankStatement="currentDocument.isBankStatement"/>
             </div>
           </div>
           <div v-else class="col-md-5 container-fluid">
-              <smelter-image-window  :name="documentName" :currentPageData="currentPageData" />
+              <smelter-image-window  :name="documentName" :currentPageData="currentPageData" :isBankStatement="currentDocument.isBankStatement"/>
           </div>
         </div>
         </template>
