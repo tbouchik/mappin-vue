@@ -98,14 +98,14 @@
         <a-tooltip placement="topLeft" :title="$t('subbar.splitH')" style='margin-left : 10px' v-if="settings.viewerVerticalSplit">
          <button class="btn btn-outline-primary" @click="changeScreenSplit">
             <span>
-              <i class="fa fa-arrows-v" />
+              <i class="fa fa-arrows-h" />
             </span>
           </button>
         </a-tooltip>
         <a-tooltip placement="topLeft" :title="$t('subbar.splitV')" style='margin-left : 10px' v-else>
          <button class="btn btn-outline-primary" @click="changeScreenSplit">
             <span>
-              <i class="fa fa-arrows-h" />
+              <i class="fa fa-arrows-v" />
             </span>
           </button>
         </a-tooltip>
