@@ -8,12 +8,12 @@ Vue.use(Vuex)
 
 let cancelToken
 
-function saveDocToAPI(mbc, osmium, ggMetadata, imput, isBankStatement, id) {
+function saveDocToAPI(mbc, osmium, bankOsmium, ggMetadata, imput, id) {
   let updatedDocument = {
     mbc: mbc || null,
     imput: imput || null,
-    osmium: isBankStatement ? null : osmium,
-    bankOsmium: isBankStatement ? osmium : null,
+    osmium: osmium || null,
+    bankOsmium: bankOsmium || null,
     ggMetadata: ggMetadata || null,
     status: 'validated',
   }
@@ -29,6 +29,11 @@ function saveDocToAPI(mbc, osmium, ggMetadata, imput, isBankStatement, id) {
     }, { cancelToken: cancelToken.token }) // Pass the cancel token to the current request)
   } catch (error) {
   }
+}
+
+function getActivePane(columnName) {
+  const templateColumns = ['Key', 'Value', 'Imputation', 'Libelle']
+  return templateColumns.includes(columnName) ? 'templatePane' : 'statementPane'
 }
 
 function getInvoiceGraphNextMove(osmium, currentIdx, currentCol, move) {
@@ -134,6 +139,7 @@ export default {
     loading: false,
     queryParams: {},
     currentCol: 'Value',
+    currentPane: 'templatePane',
     smeltedCache: [],
     totalDocumentsCount: 0,
     documentsIdList: [],
@@ -165,10 +171,11 @@ export default {
     },
     MUTATION_UPDATE_INDEX(state, payload) {
       if (payload.idx !== undefined && payload.col !== undefined) {
+        state.currentPane = getActivePane(payload.col)
         state.currentIdx = payload.idx
         state.currentCol = payload.col
       } else {
-        let nextCoords = state.formattedDocument.isBankStatement
+        let nextCoords = state.currentPane === 'statementPane'
           ? getTableGraphNextMove(state.formattedDocument.bankOsmium[`page_${state.page}`], state.currentIdx, state.currentCol, payload.move)
           : getInvoiceGraphNextMove(state.formattedDocument.osmium, state.currentIdx, state.currentCol, payload.move)
         state.currentIdx = nextCoords.idx
@@ -189,16 +196,16 @@ export default {
         updateFormattedDoc.osmium[state.currentIdx].Value = newVal
       }
       state.formattedDocument = updateFormattedDoc
-      saveDocToAPI(Object.fromEntries(mbcData), updateFormattedDoc.osmium, updateFormattedDoc.ggMetadata, false, false, state.formattedDocument.id)
+      saveDocToAPI(Object.fromEntries(mbcData), updateFormattedDoc.osmium, null, updateFormattedDoc.ggMetadata, false, state.formattedDocument.id)
     },
     MUTATION_DO_CHANGES_TO_DOCUMENT(state, changeData) {
-      let { value, itemIdx, column } = changeData
+      let { value } = changeData
       let mbcData = new Map()
-      const keyType = state.formattedDocument.filter.keys[itemIdx].type
+      const keyType = state.formattedDocument.filter.keys[state.currentIdx].type
       let tempDoc = cloneDeep(state.formattedDocument)
-      tempDoc.osmium[itemIdx][column] = formatValue(value, keyType, 'manual')
+      tempDoc.osmium[state.currentIdx][state.currentCol] = formatValue(value, keyType, 'manual')
       state.formattedDocument = tempDoc
-      saveDocToAPI(Object.fromEntries(mbcData), state.formattedDocument.osmium, state.formattedDocument.ggMetadata, false, false, state.formattedDocument.id)
+      saveDocToAPI(Object.fromEntries(mbcData), state.formattedDocument.osmium, null, state.formattedDocument.ggMetadata, false, state.formattedDocument.id)
     },
     MUTATION_AUTO_CHANGES_TO_STATEMENT(state, bbox) {
       let updateFormattedDoc = cloneDeep(state.formattedDocument)
@@ -211,7 +218,7 @@ export default {
         updateFormattedDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol] = newVal
       }
       state.formattedDocument = updateFormattedDoc
-      saveDocToAPI(null, updateFormattedDoc.bankOsmium, null, null, true, state.formattedDocument.id)
+      saveDocToAPI(null, null, updateFormattedDoc.bankOsmium, null, null, state.formattedDocument.id)
     },
     MUTATION_MANUAL_CHANGES_TO_STATEMENT(state, changeData) {
       let { value } = changeData
@@ -219,14 +226,22 @@ export default {
       tempDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol] = value
       state.formattedDocument = tempDoc
       console.log(state.formattedDocument.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol])
-      saveDocToAPI(null, state.formattedDocument.bankOsmium, null, null, true, state.formattedDocument.id)
+      saveDocToAPI(null, null, state.formattedDocument.bankOsmium, null, null, state.formattedDocument.id)
     },
     MUTATION_DO_IMPUTATION_CHANGES_TO_STATEMENT(state, changeData) {
       let { imputation } = changeData
       let tempDoc = cloneDeep(state.formattedDocument)
       tempDoc.bankOsmium[`page_${state.page}`][state.currentIdx]['Compte'] = imputation
       state.formattedDocument = tempDoc
-      saveDocToAPI({}, state.formattedDocument.bankOsmium, null, null, true, state.formattedDocument.id)
+      saveDocToAPI({}, null, state.formattedDocument.bankOsmium, null, null, state.formattedDocument.id)
+    },
+    MUTATION_DO_IMPUTATION_CHANGES_TO_INVOICE(state, changeData) {
+      let { imputation, libelle } = changeData
+      let tempDoc = cloneDeep(state.formattedDocument)
+      tempDoc.osmium[state.currentIdx]['Imputation'] = imputation
+      tempDoc.osmium[state.currentIdx]['Libelle'] = libelle
+      state.formattedDocument = tempDoc
+      saveDocToAPI({}, state.formattedDocument.osmium, null, state.formattedDocument.ggMetadata, true, state.formattedDocument.id)
     },
     MUTATION_INSERT_STATEMENTS(state, changeData) {
       let { offset, selectedStatements } = changeData
@@ -248,7 +263,7 @@ export default {
         })
       }
       state.formattedDocument = tempDoc
-      saveDocToAPI({}, state.formattedDocument.bankOsmium, null, null, true, state.formattedDocument.id)
+      saveDocToAPI({}, null, state.formattedDocument.bankOsmium, null, null, state.formattedDocument.id)
     },
     MUTATION_DELETE_STATEMENTS(state, changeData) {
       let { selectedStatements } = changeData
@@ -259,15 +274,7 @@ export default {
         counter++
       })
       state.formattedDocument = tempDoc
-      saveDocToAPI({}, state.formattedDocument.bankOsmium, null, null, true, state.formattedDocument.id)
-    },
-    MUTATION_DO_IMPUTATION_CHANGES_TO_INVOICE(state, changeData) {
-      let { itemIdx, imputation, libelle } = changeData
-      let tempDoc = cloneDeep(state.formattedDocument)
-      tempDoc.osmium[itemIdx]['Imputation'] = imputation
-      tempDoc.osmium[itemIdx]['Libelle'] = libelle
-      state.formattedDocument = tempDoc
-      saveDocToAPI({}, state.formattedDocument.osmium, state.formattedDocument.ggMetadata, true, false, state.formattedDocument.id)
+      saveDocToAPI({}, null, state.formattedDocument.bankOsmium, null, null, state.formattedDocument.id)
     },
     MUTATION_ADD_RECORD_AFTER_INDEX(state) {
       const newElement = {
@@ -366,14 +373,26 @@ export default {
     ACTION_DO_IMPUTATION_CHANGES_TO_INVOICE({ commit }, payload) {
       commit('MUTATION_DO_IMPUTATION_CHANGES_TO_INVOICE', payload)
     },
-    ACTION_DO_IMPUTATION_CHANGES_TO_STATEMENT({ commit }, payload) {
-      commit('MUTATION_DO_IMPUTATION_CHANGES_TO_STATEMENT', payload)
+    ACTION_DO_IMPUTATION_CHANGES_TO_STATEMENT({ state, commit }, payload) {
+      if (state.currentPane === 'statementPane') {
+        commit('MUTATION_DO_IMPUTATION_CHANGES_TO_STATEMENT', payload)
+      } else {
+        commit('MUTATION_DO_IMPUTATION_CHANGES_TO_INVOICE', payload)
+      }
     },
-    ACTION_AUTO_CHANGES_TO_STATEMENT({ commit }, bbox) {
-      commit('MUTATION_AUTO_CHANGES_TO_STATEMENT', bbox)
+    ACTION_AUTO_CHANGES_TO_STATEMENT({ state, commit }, bbox) {
+      if (state.currentPane === 'statementPane') {
+        commit('MUTATION_AUTO_CHANGES_TO_STATEMENT', bbox)
+      } else {
+        commit('MUTATION_UPDATE_ACTIVE_VALUE', bbox)
+      }
     },
-    ACTION_MANUAL_CHANGES_TO_STATEMENT({ commit }, payload) {
-      commit('MUTATION_MANUAL_CHANGES_TO_STATEMENT', payload)
+    ACTION_MANUAL_CHANGES_TO_STATEMENT({ state, commit }, payload) {
+      if (state.currentPane === 'statementPane') {
+        commit('MUTATION_MANUAL_CHANGES_TO_STATEMENT', payload)
+      } else {
+        commit('MUTATION_DO_CHANGES_TO_DOCUMENT', payload)
+      }
     },
     ACTION_INSERT_STATEMENTS({ commit }, payload) {
       commit('MUTATION_INSERT_STATEMENTS', payload)
@@ -393,6 +412,7 @@ export default {
     }).map(x => x.id),
     currentActiveIndex: state => state.currentIdx,
     currentActiveColumn: state => state.currentCol,
+    currentActivePane: state => state.currentPane,
     catMode: state => state.catMode,
     docTableLoading: state => state.loading, // TODO: eliminate
     docQueryParams: state => state.queryParams,

@@ -36,7 +36,7 @@
       <div class="col-12">
         <div class="card">
           <div class="card-body">
-            <canvas id="pdf-render"></canvas>
+            <canvas id="pdf-render" @click="updateOsmium"></canvas>
           </div>
         </div>
       </div>
@@ -52,7 +52,7 @@ var pdfjsLib = require('pdfjs-dist')
 export default {
   name: 'SmelterPdfWindow',
   mounted: async function() {
-    this.renderPdf(this.currentPageData, this.$store, this.isBankStatement)
+    this.renderPdf()
   },
   props: {
     name: {
@@ -68,7 +68,7 @@ export default {
   },
   watch: {
     name: async function() {
-      this.renderPdf(this.currentPageData, this.$store, this.isBankStatement)
+      this.renderPdf()
     },
   },
   computed: {
@@ -78,7 +78,24 @@ export default {
     ...mapGetters(['current']),
   },
   methods: {
-    async renderPdf(currentPageData, store, isBankStatement) {
+    updateOsmium(event) {
+      let x = event.layerX
+      let y = event.layerY
+      const canvas = document.querySelector('#pdf-render')
+      let selectedTextSection = this.currentPageData.filter((textInfo) => {
+        let leftBoundary = canvas.width * textInfo.Left
+        let topBoundary = canvas.height * textInfo.Top
+        let rightBoundary = canvas.width * (parseFloat(textInfo.Left) + parseFloat(textInfo.Width))
+        let bottomBoundary = canvas.height * (parseFloat(textInfo.Top) + parseFloat(textInfo.Height))
+        return (x > leftBoundary && x < rightBoundary) && (y > topBoundary && y < bottomBoundary)
+      })
+      if (selectedTextSection[0] && selectedTextSection[0].Text && !this.isBankStatement) {
+        this.$store.dispatch('ACTION_UPDATE_ACTIVE_VALUE', selectedTextSection[0])
+      } else if (selectedTextSection[0] && selectedTextSection[0].Text && this.isBankStatement) {
+        this.$store.dispatch('ACTION_AUTO_CHANGES_TO_STATEMENT', selectedTextSection[0])
+      }
+    },
+    async renderPdf() {
       let pdfDoc = null
       let pageNum = 1
       let pageIsRendering = false
@@ -87,22 +104,6 @@ export default {
 
       const canvas = document.querySelector('#pdf-render')
       const ctx = canvas.getContext('2d')
-      canvas.addEventListener('click', function(event) {
-        let x = event.layerX
-        let y = event.layerY
-        let selectedTextSection = currentPageData.filter((textInfo) => {
-          let leftBoundary = canvas.width * textInfo.Left
-          let topBoundary = canvas.height * textInfo.Top
-          let rightBoundary = canvas.width * (parseFloat(textInfo.Left) + parseFloat(textInfo.Width))
-          let bottomBoundary = canvas.height * (parseFloat(textInfo.Top) + parseFloat(textInfo.Height))
-          return (x > leftBoundary && x < rightBoundary) && (y > topBoundary && y < bottomBoundary)
-        })
-        if (selectedTextSection[0] && selectedTextSection[0].Text && !isBankStatement) {
-          store.dispatch('ACTION_UPDATE_ACTIVE_VALUE', selectedTextSection[0])
-        } else if (selectedTextSection[0] && selectedTextSection[0].Text && isBankStatement) {
-          store.dispatch('ACTION_AUTO_CHANGES_TO_STATEMENT', selectedTextSection[0])
-        }
-      })
 
       // Render the page
       const renderPage = num => {

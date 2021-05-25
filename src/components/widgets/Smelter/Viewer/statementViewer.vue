@@ -131,7 +131,6 @@ export default {
   },
   created() {
     this.pageData = this.bankOsmium[`page_${this.currentPage}`].map(x => { return { Date: x.Date, Designation: x.Designation, Compte: x.Compte, Debit: x.Debit, Credit: x.Credit } })
-    this.activateIndex(0, 'Date')
   },
   props: {
     bankOsmium: {
@@ -144,7 +143,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['currentPage', 'currentActiveIndex', 'currentActiveColumn', 'catMode']),
+    ...mapGetters(['currentPage', 'currentActiveIndex', 'currentActivePane', 'currentActiveColumn', 'catMode']),
     hasSelectedStatements() {
       return this.selectedStatements.length > 0 || this.bankOsmium[`page_${this.currentPage}`].length === 0
     },
@@ -161,17 +160,21 @@ export default {
       this.pageData = this.bankOsmium[`page_${this.currentPage}`].map(x => { return { Date: x.Date, Designation: x.Designation, Compte: x.Compte, Debit: x.Debit, Credit: x.Credit } })
     },
     currentActiveIndex: function() {
-      if (this.currentActiveColumn !== 'Compte') {
-        this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
-      } else {
-        this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.children[0].children[0].focus()
+      if (this.currentActivePane === 'statementPane') {
+        if (this.currentActiveColumn !== 'Compte') {
+          this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
+        } else {
+          this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.children[0].children[0].focus()
+        }
       }
     },
     currentActiveColumn: function() {
-      if (this.currentActiveColumn !== 'Compte') {
-        this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
-      } else {
-        this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.children[0].children[0].focus()
+      if (this.currentActivePane === 'statementPane') {
+        if (this.currentActiveColumn !== 'Compte') {
+          this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
+        } else {
+          this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.children[0].children[0].focus()
+        }
       }
     },
   },
@@ -186,7 +189,7 @@ export default {
       this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', { idx, col })
     },
     isActive(dataIndex, column) {
-      return dataIndex === this.currentActiveIndex && column === this.currentActiveColumn
+      return dataIndex === this.currentActiveIndex && column === this.currentActiveColumn && this.currentActivePane === 'statementPane'
     },
     toggleCatMode() {
       this.$store.dispatch('ACTION_TOGGLE_CATMODE')
@@ -203,6 +206,7 @@ export default {
     updateImputation(input, idx) {
       const payload = {
         imputation: input,
+        libelle: labels[parseInt(input)],
       }
       this.$store.dispatch('ACTION_DO_IMPUTATION_CHANGES_TO_STATEMENT', payload)
     },

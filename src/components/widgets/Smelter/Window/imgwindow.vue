@@ -17,7 +17,7 @@
     <div class="col-12">
       <div class="card">
         <div class="card-body">
-          <canvas id="can"></canvas>
+          <canvas id="can" @click="updateOsmium"></canvas>
         </div>
       </div>
     </div>
@@ -41,7 +41,7 @@ export default {
     }
   },
   mounted: function() {
-    this.renderImg(this.currentPageData, this.$store, this.isBankStatement)
+    this.renderImg()
   },
   computed: {
     src: function() {
@@ -62,10 +62,27 @@ export default {
   },
   watch: {
     name: function() {
-      this.renderImg(this.currentPageData, this.$store, this.isBankStatement)
+      this.renderImg()
     },
   },
   methods: {
+    updateOsmium(event) {
+      let x = event.layerX
+      let y = event.layerY
+      const canvas = document.getElementById('can')
+      let selectedTextSection = this.currentPageData.filter((textInfo) => {
+        let leftBoundary = canvas.width * textInfo.Left
+        let topBoundary = canvas.height * textInfo.Top
+        let rightBoundary = canvas.width * (parseFloat(textInfo.Left) + parseFloat(textInfo.Width))
+        let bottomBoundary = canvas.height * (parseFloat(textInfo.Top) + parseFloat(textInfo.Height))
+        return (x > leftBoundary && x < rightBoundary) && (y > topBoundary && y < bottomBoundary)
+      })
+      if (selectedTextSection[0] && selectedTextSection[0].Text && !this.isBankStatement) {
+        this.$store.dispatch('ACTION_UPDATE_ACTIVE_VALUE', selectedTextSection[0])
+      } else if (selectedTextSection[0] && selectedTextSection[0].Text && !this.isBankStatement) {
+        this.$store.dispatch('ACTION_AUTO_CHANGES_TO_STATEMENT', selectedTextSection[0])
+      }
+    },
     drawbackground(canvas, context, onload) {
       var imagePaper = new Image(canvas.width, canvas.height)
       imagePaper.onload = function() {
@@ -88,25 +105,9 @@ export default {
         context.stroke()
       }
     },
-    renderImg(currentPageData, store, isBankStatement) {
+    renderImg() {
       let canvas = document.getElementById('can')
       let ctx = canvas.getContext('2d')
-      canvas.addEventListener('click', function(event) {
-        let x = event.layerX
-        let y = event.layerY
-        let selectedTextSection = currentPageData.filter((textInfo) => {
-          let leftBoundary = canvas.width * textInfo.Left
-          let topBoundary = canvas.height * textInfo.Top
-          let rightBoundary = canvas.width * (parseFloat(textInfo.Left) + parseFloat(textInfo.Width))
-          let bottomBoundary = canvas.height * (parseFloat(textInfo.Top) + parseFloat(textInfo.Height))
-          return (x > leftBoundary && x < rightBoundary) && (y > topBoundary && y < bottomBoundary)
-        })
-        if (selectedTextSection[0] && selectedTextSection[0].Text && !isBankStatement) {
-          store.dispatch('ACTION_UPDATE_ACTIVE_VALUE', selectedTextSection[0])
-        } else if (selectedTextSection[0] && selectedTextSection[0].Text && !isBankStatement) {
-          store.dispatch('ACTION_AUTO_CHANGES_TO_STATEMENT', selectedTextSection[0])
-        }
-      })
       let img = document.getElementById('stub')
       img.onload = function() {
         let imgWidth = img.naturalWidth

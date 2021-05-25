@@ -144,24 +144,28 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['currentPage', 'currentActiveIndex', 'currentActiveColumn', 'catMode']),
+    ...mapGetters(['currentPage', 'currentActiveIndex', 'currentActivePane', 'currentActiveColumn', 'catMode']),
   },
   watch: {
     osmium: function () {
       this.pageData = this.osmium.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation, Libelle: x.Libelle } })
     },
     currentActiveIndex: function() {
-      if (this.currentActiveColumn === 'Value') {
-        this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
-      } else {
-        this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.children[0].children[0].focus()
+      if (this.currentActivePane === 'templatePane') {
+        if (this.currentActiveColumn === 'Value') {
+          this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
+        } else {
+          this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.children[0].children[0].focus()
+        }
       }
     },
     currentActiveColumn: function() {
-      if (this.currentActiveColumn === 'Value') {
-        this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
-      } else {
-        this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.children[0].children[0].focus()
+      if (this.currentActivePane === 'templatePane') {
+        if (this.currentActiveColumn === 'Value') {
+          this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
+        } else {
+          this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.children[0].children[0].focus()
+        }
       }
     },
   },
@@ -176,7 +180,7 @@ export default {
       this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', { idx, col })
     },
     isActive(dataIndex, column) {
-      return dataIndex === this.currentActiveIndex && column === this.currentActiveColumn
+      return dataIndex === this.currentActiveIndex && column === this.currentActiveColumn && this.currentActivePane === 'templatePane'
     },
     toggleCatMode() {
       this.$store.dispatch('ACTION_TOGGLE_CATMODE')

@@ -13,7 +13,14 @@
             <div class="col-md-6">
               <div class="sticky">
                 <template-viewer :osmium="currenOsmium" :isArchived="current.isArchived" v-if="!currentDocument.isBankStatement"/>
-                <statement-viewer :bankOsmium="currentBankOsmium" :isArchived="current.isArchived" v-else/>
+                <a-collapse class="top-5" default-active-key="1" :bordered="true" v-else>
+                  <a-collapse-panel key="1" header="En-tête">
+                    <template-viewer :osmium="currenOsmium" :isArchived="current.isArchived"/>
+                  </a-collapse-panel>
+                  <a-collapse-panel key="2" header="Détails du relevé" :disabled="false">
+                    <statement-viewer :bankOsmium="currentBankOsmium" :isArchived="current.isArchived"/>
+                  </a-collapse-panel>
+                </a-collapse>
               </div>
             </div>
             <div v-if="documentIsPdf" class="col-md-6">
@@ -154,7 +161,7 @@ export default {
 div.sticky {
   position: -webkit-sticky; /* Safari */
   position: sticky;
-  top: 10px;
+  top: 25px;
 }
 .center {
   text-align: center;
@@ -163,6 +170,9 @@ div.sticky {
   margin-bottom: 20px;
   padding: 30px 50px;
   margin: 20px 0;
+}
+.top-5 {
+  margin-top: 2%;
 }
 
 </style>
