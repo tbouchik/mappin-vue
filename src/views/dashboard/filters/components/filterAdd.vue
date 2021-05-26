@@ -45,14 +45,14 @@
                   <a-input
                       :value= k.value
                       placeholder="key name"
-                      style="width: 50%; margin-right: 8px"
+                      style="width: 40%; margin-right: 8px"
                       @change="e => handleChange(e, index)"
 
                   />
                   <a-select
                     :value=k.type
                     style="width: 10%; margin-right: 4px"
-                    placeholder="Select a type for this key"
+                    placeholder="type"
                     @change="e => handleTypeChange(e, index)"
                   >
                     <a-select-option value="REF">
@@ -66,6 +66,34 @@
                     </a-select-option>
                     <a-select-option value="DATE">
                       DATE
+                    </a-select-option>
+                  </a-select>
+                  <a-select
+                    :value=k.role
+                    style="width: 10%; margin-right: 4px"
+                    placeholder="role"
+                    @change="e => handleRoleChange(e, index)"
+                  >
+                    <a-select-option value="TOTAL_HT">
+                      Total HT
+                    </a-select-option>
+                    <a-select-option value="TOTAL_TTC">
+                      Total TTC
+                    </a-select-option>
+                    <a-select-option value="VENDOR">
+                      Fournisseur
+                    </a-select-option>
+                    <a-select-option value="VAT">
+                      TVA
+                    </a-select-option>
+                    <a-select-option value="DATE_FROM">
+                      Date début
+                    </a-select-option>
+                    <a-select-option value="DATE_TO">
+                      Date fin
+                    </a-select-option>
+                    <a-select-option value="BANK_NAME">
+                      Banque
                     </a-select-option>
                   </a-select>
                   <a-checkbox @change="e => imputationChange(e, index)" :checked="k.isImputable"  style="color:black">
@@ -197,7 +225,7 @@ export default {
     },
 
     add() {
-      this.names.push({ type: null, value: null, isImputable: false, tags: [] })
+      this.names.push({ type: undefined, value: null, isImputable: false, tags: [] })
     },
 
     handleSubmit(e) {
@@ -228,7 +256,11 @@ export default {
       newNames[index].type = e
       this.names = newNames
     },
-
+    handleRoleChange(e, index) {
+      let newNames = cloneDeep(this.names)
+      newNames[index].role = e
+      this.names = newNames
+    },
     goToFilterDashboard() {
       this.$router.push({ name: 'filters' })
     },
