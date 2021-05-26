@@ -32,13 +32,7 @@ export const getMenuData = [
     title: 'Actions',
   },
   {
-    title: 'Upload Bank Statements',
-    key: 'bankupload',
-    icon: 'fe fe-upload',
-    url: '/smelter/bankupload',
-  },
-  {
-    title: 'Upload Invoices',
+    title: 'Upload',
     key: 'upload',
     icon: 'fe fe-upload',
     url: '/smelter/upload',

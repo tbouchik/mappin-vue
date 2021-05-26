@@ -1,22 +1,22 @@
 <template>
   <div>
-    <br>
+    <br />
     <div class="air__utils__heading">
       <b-row>
         <b-col md="3" class="my-1">
-          <h5>{{ $t('upload.title') }}</h5>
+          <h5>{{ $t("upload.title") }}</h5>
         </b-col>
       </b-row>
     </div>
-      <a-steps :current="uploaderStep">
-        <a-step v-for="item in steps" :key="item.title" :title="item.title" />
-      </a-steps>
-      <br>
-      <div>
-        <template v-if="steps[uploaderStep].title == 'Client'">
-        <div>
-          {{ $t('upload.credits') }}:
-        <a-progress
+    <a-steps :current="uploaderStep">
+      <a-step v-for="item in steps" :key="item.title" :title="item.title" />
+    </a-steps>
+    <br />
+    <div>
+      <template v-if="steps[uploaderStep].title == 'UploadType'">
+        <div style="margin-bottom:1%">
+          Upload Type:
+          <a-progress
             :stroke-color="{
               '0%': '#108ee9',
               '100%': 'red',
@@ -24,64 +24,159 @@
             :percent="creditRatio"
           />
         </div>
-        <br>
-        <a-input-search :placeholder="$t('upload.searchClient')" v-model="searchedClient" />
-        <br> <br> <br>
-
-          <div v-if="steps[uploaderStep].title == 'Client'">
-            <div class="demo-infinite-container ">
-              <a-list :data-source="clients"
-                      :loading="clientTableLoading">
-                <a-list-item  slot="renderItem" slot-scope="item">
-                  <a-list-item-meta :description="item.email">
-                    <a slot="title">{{ item.name }} | </a>
-                    <a slot="title"> {{ item.company }}</a>
-                  </a-list-item-meta>
-                  <a-button type="primary" @click="selectClient(item)" :disabled="!canUpload" ghost>
-                    {{ $t('subbar.select') }}
-                  </a-button>
-                </a-list-item>
-              </a-list>
-            </div>
-          </div>
-          </template>
-          <template v-if="steps[uploaderStep].title == 'Template'">
-            <br>
-            <a-input-search placeholder="Search Template" v-model="searchedTemplate" />
-            <br> <br> <br>
-            <div v-if="steps[uploaderStep].title == 'Template'">
-              <div class="demo-infinite-container ">
-                <a-list :data-source="filters"
-                        :loading="templateLoading">
-                  <a-list-item  slot="renderItem" slot-scope="item">
-                    <a-list-item-meta :description="item.description">
-                      <a slot="title">{{ item.name }}</a>
-                    </a-list-item-meta>
-                    <a-button type="primary" @click="selectFilter(item)" ghost>
-                      {{ $t('subbar.select') }}
-                    </a-button>
-                  </a-list-item>
-                </a-list>
+        <div class="row">
+          <div class="col-xl-6 col-lg-12">
+            <div class="card">
+              <div class="card-body">
+                <div class="text-center">
+                  <p class="text-dark font-size-48 font-weight-bold mb-2">
+                    Relevé bancaire
+                  </p>
+                  <p class="text-uppercase text-muted mb-3"></p>
+                  <p class="mb-4">
+                    Vous souhaitez uploader uniquement des relevés bancaires. <br>
+                    Le format PDF est préférable pour ce type d'upload.
+                  </p>
+                  <a-button
+                    class="mr-2 mb-2"
+                    type="primary"
+                    @click="() => selectBankUploadType(true)"
+                    ghost
+                    >Choisir</a-button
+                  >
+                </div>
               </div>
             </div>
-          </template>
-          <div v-if="steps[uploaderStep].title == 'Files'">
-            <a-row>
-              <a-col :span="6"/>
-              <a-col :span="12">
-                <smelter-uppy-loader :bankUpload="false" :maxFileSizeInBytes=10000000></smelter-uppy-loader>
-              </a-col>
-              <a-col :span="6"/>
-            </a-row>
           </div>
-      </div>
-      <div class="steps-action">
-        <a-button v-if="uploaderStep > 0" style="margin-left: 8px" @click="prev">
-          {{ $t('subbar.previous') }}
-        </a-button>
-        <br><br>
-      </div>
+          <div class="col-xl-6 col-lg-12">
+            <div class="card">
+              <div class="card-body">
+                <div class="text-center">
+                  <p class="text-dark font-size-48 font-weight-bold mb-2">
+                    Factures
+                  </p>
+                  <p class="text-uppercase text-muted mb-3"></p>
+                  <p class="mb-4">
+                    Vous souhaitez uploader uniquement des factures. <br>
+                    Formats acceptés (PDF, JPG, PNG)
+                  </p>
+                  <a-button
+                    class="mr-2 mb-2"
+                    type="primary"
+                    @click="() => selectBankUploadType(false)"
+                    ghost
+                    >Choisir</a-button
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
 
+      <template v-if="steps[uploaderStep].title == 'Client'">
+        <div style="margin-bottom:1%">
+          Upload Type:
+          <a-progress
+            :stroke-color="{
+              '0%': '#108ee9',
+              '100%': 'red',
+            }"
+            :percent="creditRatio"
+          />
+        </div>
+        <br />
+        <a-input-search
+          :placeholder="$t('upload.searchClient')"
+          v-model="searchedClient"
+        />
+        <br />
+        <br />
+        <br />
+
+        <div v-if="steps[uploaderStep].title == 'Client'">
+          <div class="demo-infinite-container">
+            <a-list :data-source="clients" :loading="clientTableLoading">
+              <a-list-item slot="renderItem" slot-scope="item">
+                <a-list-item-meta :description="item.email">
+                  <a slot="title">{{ item.name }} | </a>
+                  <a slot="title"> {{ item.company }}</a>
+                </a-list-item-meta>
+                <a-button
+                  type="primary"
+                  @click="selectClient(item)"
+                  :disabled="!canUpload"
+                  ghost
+                >
+                  {{ $t("subbar.select") }}
+                </a-button>
+              </a-list-item>
+            </a-list>
+          </div>
+        </div>
+      </template>
+      <template v-if="steps[uploaderStep].title == 'Template'">
+        <div style="margin-bottom:1%">
+          Upload Type:
+          <a-progress
+            :stroke-color="{
+              '0%': '#108ee9',
+              '100%': 'red',
+            }"
+            :percent="creditRatio"
+          />
+        </div>
+        <a-input-search
+          placeholder="Search Template"
+          v-model="searchedTemplate"
+        />
+        <br />
+        <br />
+        <br />
+        <div v-if="steps[uploaderStep].title == 'Template'">
+          <div class="demo-infinite-container">
+            <a-list :data-source="filters" :loading="templateLoading">
+              <a-list-item slot="renderItem" slot-scope="item">
+                <a-list-item-meta :description="item.description">
+                  <a slot="title">{{ item.name }}</a>
+                </a-list-item-meta>
+                <a-button type="primary" @click="selectFilter(item)" ghost>
+                  {{ $t("subbar.select") }}
+                </a-button>
+              </a-list-item>
+            </a-list>
+          </div>
+        </div>
+      </template>
+      <div v-if="steps[uploaderStep].title == 'Files'">
+        <div style="margin-bottom:1%">
+          Upload Type:
+          <a-progress
+            :stroke-color="{
+              '0%': '#108ee9',
+              '100%': 'red',
+            }"
+            :percent="creditRatio"
+          />
+        </div>
+        <a-row>
+          <a-col :span="6" />
+          <a-col :span="12">
+            <smelter-uppy-loader
+              :bankUpload="isBankUpload"
+              :maxFileSizeInBytes="10000000"
+            ></smelter-uppy-loader>
+          </a-col>
+          <a-col :span="6" />
+        </a-row>
+      </div>
+    </div>
+    <div class="steps-action">
+      <a-button v-if="uploaderStep > 0" style="margin-left: 8px" @click="prev">
+        {{ $t("subbar.previous") }}
+      </a-button>
+      <br /><br />
+    </div>
   </div>
 </template>
 <script>
@@ -92,14 +187,18 @@ export default {
   components: {
     SmelterUppyLoader,
   },
-  data: function() {
+  data: function () {
     return {
       clientsComponentReadMode: true,
       perPage: 5,
       nextIsEnabled: false,
       searchedClient: null,
       searchedTemplate: null,
+      isBankUpload: false,
       steps: [
+        {
+          title: 'UploadType',
+        },
         {
           title: 'Client',
         },
@@ -113,14 +212,14 @@ export default {
     }
   },
   watch: {
-    searchedClient: function() {
+    searchedClient: function () {
       this.$store.dispatch('ACTION_FETCH_CLIENTS', {
         limit: 100,
         page: 1,
         name: this.searchedClient,
       })
     },
-    searchedTemplate: function() {
+    searchedTemplate: function () {
       this.$store.dispatch('ACTION_FETCH_FILTERS', {
         limit: 100,
         page: 1,
@@ -129,7 +228,8 @@ export default {
     },
   },
   computed: {
-    ...mapGetters([ 'uploaderStep',
+    ...mapGetters([
+      'uploaderStep',
       'uploaderClient',
       'uploaderFilter',
       'uploaderNextIsEnabled',
@@ -139,8 +239,9 @@ export default {
       'templateLoading',
       'userCount',
       'userLimit',
-      'userId']),
-    canUpload: function() {
+      'userId',
+    ]),
+    canUpload: function () {
       console.log(this.userCount, this.userLimit)
       return this.userCount < this.userLimit
     },
@@ -174,6 +275,10 @@ export default {
     },
     selectClient(item) {
       this.$store.dispatch('ACTION_SELECT_UPLOADER_CLIENT', item)
+      this.$store.dispatch('ACTION_INCREMENT_UPLOADER_INDEX')
+    },
+    selectBankUploadType(isBankUpload) {
+      this.isBankUpload = isBankUpload
       this.$store.dispatch('ACTION_INCREMENT_UPLOADER_INDEX')
     },
   },

@@ -461,11 +461,7 @@ export default {
       })
     },
     goToUpload() {
-      if (this.isBankViz) {
-        this.$router.push({ name: 'bankupload' })
-      } else {
-        this.$router.push({ name: 'upload' })
-      }
+      this.$router.push({ name: 'upload' })
     },
     bulkExportToCSV() {
       this.bulkCsvExportIsLoading = true

@@ -31,16 +31,6 @@ const router = new Router({
           component: () => import('./views/smelter/viewer.vue'),
         },
         {
-          path: '/smelter/bankupload',
-          name: 'bankupload',
-          meta: {
-            title: 'Smelter Bank Uploader',
-            authRequired: true,
-          },
-          props: true,
-          component: () => import('./views/uploader/bankUploader.vue'),
-        },
-        {
           path: '/smelter/upload',
           name: 'upload',
           meta: {
