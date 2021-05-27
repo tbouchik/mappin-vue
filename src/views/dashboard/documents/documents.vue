@@ -464,10 +464,16 @@ export default {
       this.$router.push({ name: 'upload' })
     },
     bulkExportToCSV() {
+      if (this.isBankViz) {
+        this.bulkExportBankStatementsToCSV()
+      } else {
+        this.bulkExportInvoicesToCSV()
+      }
+    },
+    bulkExportInvoicesToCSV() {
       this.bulkCsvExportIsLoading = true
       let zip = JSZip()
       let downloadQueryParams = cloneDeep(this.queryParams)
-      downloadQueryParams.status = 'validated'
       DocumentService.bulkExportCSV(downloadQueryParams)
         .then((templateAggregates) => {
           templateAggregates.map((templateAggregate) => {
@@ -481,6 +487,32 @@ export default {
             })
             templateCsvContent += arrData.join('\n').replace(/(^\[)|(\]$)/gm, '')
             zip.file(`${templateAggregate.template}.csv`, templateCsvContent)
+            this.bulkCsvExportIsLoading = false
+          })
+          zip
+            .generateAsync({
+              type: 'base64',
+            })
+            .then(function (content) {
+              window.location.href = 'data:application/zip;base64,' + content
+            })
+        })
+    },
+    bulkExportBankStatementsToCSV() {
+      this.bulkCsvExportIsLoading = true
+      let zip = JSZip()
+      let downloadQueryParams = cloneDeep(this.queryParams)
+      DocumentService.bulkBankExportCSV(downloadQueryParams)
+        .then((docsData) => {
+          docsData.map((docData) => {
+            let templateCsvContent = ''
+            let arrData = []
+            arrData.push(docData.header.join(';'))
+            docData.content.map((entrySegments) => {
+              arrData.push(entrySegments.join(';'))
+            })
+            templateCsvContent += arrData.join('\n').replace(/(^\[)|(\]$)/gm, '')
+            zip.file(`${docData.title}.csv`, templateCsvContent)
             this.bulkCsvExportIsLoading = false
           })
           zip

@@ -182,7 +182,7 @@ class DocumentService {
   }
 
   static bulkExportCSV(queryParams) {
-    const { client, page, limit, sort, name, filter, status } = queryParams
+    const { client, page, limit, sort, name, filter } = queryParams
     if (typeof cancelToken !== typeof undefined) {
       cancelToken.cancel('Operation canceled due to new request.')
     }
@@ -194,19 +194,48 @@ class DocumentService {
       sort,
       isArchived: false,
       isBankStatement: false,
+      status: 'validated',
       page: page - 1,
     }
     if (name && name !== '') {
       params.name = name
-    }
-    if (status) {
-      params.status = status
     }
     if (filter) {
       params.filter = filter
     }
     try {
       return axios.get(`/v1/documents/export`, { params }, { cancelToken: cancelToken.token })
+        .then(
+          ({ data }) => data
+        )
+    } catch (error) {
+    }
+  }
+
+  static bulkBankExportCSV(queryParams) {
+    const { client, page, limit, sort, name, filter } = queryParams
+    if (typeof cancelToken !== typeof undefined) {
+      cancelToken.cancel('Operation canceled due to new request.')
+    }
+    // Save the cancel token for the current request
+    cancelToken = axios.CancelToken.source()
+    const params = {
+      client,
+      limit,
+      sort,
+      isArchived: false,
+      isBankStatement: true,
+      status: 'validated',
+      page: page - 1,
+    }
+    if (name && name !== '') {
+      params.name = name
+    }
+    if (filter) {
+      params.filter = filter
+    }
+    try {
+      return axios.get(`/v1/documents/statementsdownload`, { params }, { cancelToken: cancelToken.token })
         .then(
           ({ data }) => data
         )
