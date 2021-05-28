@@ -70,7 +70,7 @@
                   <a-select
                     :value=k.type
                     style="width: 15%; margin-right: 4px"
-                    placeholder="type"
+                    placeholder="Type"
                     :disabled="isSmartTemplate"
                     @change="e => handleTypeChange(e, index)"
                   >
@@ -87,34 +87,15 @@
                       DATE
                     </a-select-option>
                   </a-select>
-                  <a-select
+                  <a-cascader
+                    :options="roleOptions"
                     :value=k.role
-                    style="width: 20%; margin-right: 4px"
-                    placeholder="role"
+                    :display-render="displayRender"
+                    expand-trigger="hover"
+                    placeholder="Role"
+                    style="width: 10%; margin-right: 4px"
                     @change="e => handleRoleChange(e, index)"
-                  >
-                    <a-select-option value="TOTAL_HT">
-                      Total HT
-                    </a-select-option>
-                    <a-select-option value="TOTAL_TTC">
-                      Total TTC
-                    </a-select-option>
-                    <a-select-option value="VENDOR">
-                      Fournisseur
-                    </a-select-option>
-                    <a-select-option value="VAT">
-                      TVA
-                    </a-select-option>
-                    <a-select-option value="DATE_FROM">
-                      Date début
-                    </a-select-option>
-                    <a-select-option value="DATE_TO">
-                      Date fin
-                    </a-select-option>
-                    <a-select-option value="BANK_NAME">
-                      Banque
-                    </a-select-option>
-                  </a-select>
+                  />
                   <a-checkbox @change="e => imputationChange(e, index)" :checked="k.isImputable"  style="color:black">
                     IMPUTABLE
                   </a-checkbox>
@@ -208,6 +189,52 @@ export default {
           sm: { span: 20 },
         },
       },
+      roleOptions: [
+        {
+          value: 'BANK',
+          label: 'Relevé bancaires',
+          children: [
+            {
+              value: 'BANK_NAME',
+              label: 'Nom de la banque',
+            },
+            {
+              value: 'DATE_FROM',
+              label: 'Date début',
+            },
+            {
+              value: 'DATE_TO',
+              label: 'Date fin',
+            },
+          ],
+        },
+        {
+          value: 'INVOICE',
+          label: 'Factures',
+          children: [
+            {
+              value: 'TOTAL_HT',
+              label: 'Total HT',
+            },
+            {
+              value: 'TOTAL_TTC',
+              label: 'Total TTC',
+            },
+            {
+              value: 'VENDOR',
+              label: 'Fournisseur',
+            },
+            {
+              value: 'VAT',
+              label: 'TVA',
+            },
+          ],
+        },
+        {
+          value: 'N/A',
+          label: 'Aucun',
+        },
+      ],
       formItemLayoutWithOutLabel: {
         wrapperCol: {
           xs: { span: 24, offset: 0 },
@@ -295,8 +322,15 @@ export default {
     },
     handleRoleChange(e, index) {
       let newNames = cloneDeep(this.names)
-      newNames[index].role = e
+      if (e[e.length - 1] === 'N/A') {
+        newNames[index].role = undefined
+      } else {
+        newNames[index].role = e
+      }
       this.names = newNames
+    },
+    displayRender({ labels }) {
+      return labels[labels.length - 1]
     },
     goToFilterDashboard() {
       this.$router.push({ name: 'filters' })
