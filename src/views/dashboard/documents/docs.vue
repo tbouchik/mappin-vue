@@ -1,5 +1,5 @@
 <template>
-    <a-tabs default-active-key="1" @change="onChangeTab">
+    <a-tabs :default-active-key="currentActivePaneId" @change="onChangeTab">
         <a-tab-pane v-for="pane in panes" :isArchiveViz="isArchiveViz" :clientId="clientId" :key="pane.key" :tab="pane.title" >
         <span slot="tab">
             <a-icon :type="pane.icon" />
@@ -13,7 +13,7 @@
 <script>
 import Documents from './documents'
 import DocumentService from '../../../services/documentService'
-
+import { mapGetters } from 'vuex'
 export default {
   name: 'Docs',
   components: {
@@ -29,6 +29,12 @@ export default {
       required: false,
       default: false,
     },
+  },
+  computed: {
+    ...mapGetters(['currentActivePaneId']),
+  },
+  created() {
+    console.log(this.currentActivePaneId)
   },
   data() {
     const panes = [
@@ -54,6 +60,9 @@ export default {
             concat: false })
           this.validatorIsLoading = false
         })
+      const setting = 'currentActivePane'
+      const value = activeTab
+      this.$store.commit('CHANGE_SETTING', { setting, value })
     },
   },
 }

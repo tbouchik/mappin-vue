@@ -41,6 +41,7 @@ export default {
       isBorderless: false,
       routerAnimation: 'slide-fadein-up', // none, slide-fadein-up, slide-fadein-right, fadein, zoom-fadein
       viewerVerticalSplit: true,
+      currentActivePane: '0',
     }),
   },
   mutations: {
@@ -82,5 +83,6 @@ export default {
   actions: {},
   getters: {
     state: state => state,
+    currentActivePaneId: state => state.currentActivePane,
   },
 }
