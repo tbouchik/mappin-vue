@@ -22,6 +22,8 @@ const messages = {
   dashboard: {
     document: {
       invoiceTitle: 'Factures',
+      vendor: 'Fournisseur',
+      bank: 'Banque',
       bankTitle: 'Relevés bancaires',
       extractions: 'Vos extractions',
       upload: 'Uploader',

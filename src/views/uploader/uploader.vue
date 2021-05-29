@@ -42,7 +42,7 @@
                     type="primary"
                     @click="() => selectBankUploadType(true)"
                     ghost
-                    >Choisir</a-button
+                    >Sélectionner</a-button
                   >
                 </div>
               </div>
@@ -65,7 +65,7 @@
                     type="primary"
                     @click="() => selectBankUploadType(false)"
                     ghost
-                    >Choisir</a-button
+                    >Sélectionner</a-button
                   >
                 </div>
               </div>

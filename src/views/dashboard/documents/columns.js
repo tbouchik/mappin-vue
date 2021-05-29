@@ -5,6 +5,11 @@ let invoiceColumns = [
     customRender: 'customRender',
   },
   {
+    title: 'dashboard.document.vendor',
+    dataIndex: 'vendor',
+    customRender: 'customRender',
+  },
+  {
     title: 'dashboard.document.template',
     dataIndex: 'filter',
     customRender: 'customRenderComposed',
@@ -34,6 +39,11 @@ let bankColumns = [
   {
     title: 'dashboard.document.name',
     dataIndex: 'name',
+    customRender: 'customRender',
+  },
+  {
+    title: 'dashboard.document.bank',
+    dataIndex: 'bankEntity',
     customRender: 'customRender',
   },
   {
