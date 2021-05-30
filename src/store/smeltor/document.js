@@ -112,10 +112,12 @@ function getUpdatedDocumentRoles (role, value) {
         result.bankEntity = value
         break
       case 'DATE_FROM':
-        result.dateBeg = value
+        moment.locale('fr')
+        result.dateBeg = moment(value, 'DD/MM/YYYY').toDate()
         break
       case 'DATE_TO':
-        result.dateEnd = value
+        moment.locale('fr')
+        result.dateEnd = moment(value, 'DD/MM/YYYY').toDate()
         break
       case 'TOTAL_HT':
         result.totalHt = value
@@ -138,7 +140,7 @@ function parseDate (value) {
   if (!value) return ''
   let parsedInput = ''
   try {
-    moment.locale('en-US')
+    moment.locale('fr')
     parsedInput = moment(value, ['D MMMM YYYY', 'DD MMMM YYYY', 'D MMM YYYY', 'DD MMM YYYY', 'D MMMM YY', 'DD MMMM YY', 'D MMM YY', 'DD MMM YY', 'DD/MM/YYYY', 'DD-MM-YYYY', 'dddd, MMMM Do YYYY', 'dddd [the] Do [of] MMMM', 'YYYY-MM-DD', 'MMM DD, YYYY']).format('DD/MM/YYYY')
   } catch (error) {
     console.log('erroe', error)

@@ -25,6 +25,12 @@ Vue.filter('timestamp', function (value) {
   return moment(value).format('DD/MM/YYYY h:mm A')
 })
 
+Vue.filter('statementDate', function (value) {
+  if (!value) return ''
+  moment.locale('fr')
+  return moment(value).format('DD/MM/YYYY')
+})
+
 Vue.filter('shortened', function (value) {
   if (!value) return ''
   else if (value.length > 17) {

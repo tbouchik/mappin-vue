@@ -47,6 +47,16 @@ let bankColumns = [
     customRender: 'customRender',
   },
   {
+    title: 'dashboard.document.dateFrom',
+    dataIndex: 'dateBeg',
+    customRender: 'dateBeg',
+  },
+  {
+    title: 'dashboard.document.dateTo',
+    dataIndex: 'dateEnd',
+    customRender: 'dateEnd',
+  },
+  {
     title: 'dashboard.document.client',
     dataIndex: 'client',
     customRender: 'customRenderComposed',
