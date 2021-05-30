@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
+import labels from '../../assets/accounting/labels'
 import { cloneDeep, get, pick, pickBy } from 'lodash'
 import uuidv4 from 'uuid/v4'
 import moment from 'moment'
@@ -64,6 +65,20 @@ function getInvoiceGraphNextMove(osmium, currentIdx, currentCol, move) {
       }
     }
   }
+}
+function trimImputationQuery(query) {
+  const pattern = /^.[^0]+/
+  const trimedQuery = pattern.exec(query)[0] || query
+  return trimedQuery
+}
+
+function changeDisplayedLibelle(col, osmiumItem) {
+  let result = 'Libellé d\'Imputation'
+  if (col === 'Imputation') {
+    const trimedImputation = trimImputationQuery(osmiumItem.Imputation)
+    result = labels[parseInt(trimedImputation)]
+  }
+  return result
 }
 
 function getTableGraphNextMove(osmium, currentIdx, currentCol, move) {
@@ -175,6 +190,7 @@ export default {
     queryParams: {},
     currentCol: 'Value',
     currentPane: 'templatePane',
+    currentLibelle: 'Libellé d\'Imputation',
     smeltedCache: [],
     totalDocumentsCount: 0,
     documentsIdList: [],
@@ -215,6 +231,7 @@ export default {
           : getInvoiceGraphNextMove(state.formattedDocument.osmium, state.currentIdx, state.currentCol, payload.move)
         state.currentIdx = nextCoords.idx
         state.currentCol = nextCoords.col
+        state.currentLibelle = changeDisplayedLibelle(state.currentCol, state.formattedDocument.osmium[state.currentIdx])
       }
     },
     MUTATION_DO_AUTO_CHANGES_TO_INVOICE(state, bbox) {
@@ -250,13 +267,12 @@ export default {
       saveDocToAPI(Object.fromEntries(mbcData), state.formattedDocument, options)
     },
     MUTATION_DO_IMPUTATION_CHANGES_TO_INVOICE(state, changeData) {
-      let { imputation, libelle } = changeData
+      let { imputation, itemIdx } = changeData
       let tempDoc = cloneDeep(state.formattedDocument)
-      tempDoc.osmium[state.currentIdx]['Imputation'] = imputation
-      tempDoc.osmium[state.currentIdx]['Libelle'] = libelle
+      tempDoc.osmium[itemIdx]['Imputation'] = imputation
       state.formattedDocument = tempDoc
       let options = { imput: true, bankOsmiumChanged: false, keyAttributes: null }
-      saveDocToAPI({}, state.formattedDocument.osmium, options)
+      saveDocToAPI({}, state.formattedDocument, options)
     },
     MUTATION_AUTO_CHANGES_TO_STATEMENT(state, bbox) {
       let updateFormattedDoc = cloneDeep(state.formattedDocument)
@@ -368,6 +384,10 @@ export default {
         state.documentsIdList = payload.idsArray.map(x => x.id).concat(state.documentsIdList)
       }
     },
+    MUTATION_CHANGE_LIBELLE(state, imputation) {
+      const trimedImputation = trimImputationQuery(imputation)
+      state.currentLibelle = labels[parseInt(trimedImputation)]
+    },
   },
   actions: {
     UPDATE_DOCUMENT({ commit }, document) {
@@ -448,6 +468,9 @@ export default {
     ACTION_DELETE_STATEMENTS({ commit }, payload) {
       commit('MUTATION_DELETE_STATEMENTS', payload)
     },
+    ACTION_CHANGE_LIBELLE({ commit }, libelle) {
+      commit('MUTATION_CHANGE_LIBELLE', libelle)
+    },
   },
   getters: {
     current: state => state.formattedDocument,
@@ -467,5 +490,7 @@ export default {
     docSmeltedCache: state => state.smeltedCache,
     docPagination: state => pick(state.queryParams, ['page', 'limit']),
     totalDocumentsCount: state => state.totalDocumentsCount, // TODO REMOVE IF NOT USABLE IN SUBBAR
+    showImputationAlert: state => state.currentCol === 'Imputation' && state.currentPane === 'templatePane',
+    currentImputationAlert: state => state.currentLibelle,
   },
 }

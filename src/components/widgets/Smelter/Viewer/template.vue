@@ -1,5 +1,10 @@
 <template>
   <div>
+    <br>
+    <div v-if="showImputationAlert">
+        <a-alert  :message="currentImputationAlert" type="info" close-text="Fermer" />
+    </div>
+
   <br>
       <a-table  :columns="columns"
                 :data-source="pageData"
@@ -30,11 +35,14 @@
           <div :key="col"  v-if="col==='Imputation' && isActive(dataIndex, col) && !isArchived" @click="activateIndex(dataIndex, col)">
             <template v-if="record.Imputation !== undefined && record.Imputation !== null">
               <vue-simple-suggest
-                @input="e => changeLibelle(e, dataIndex)"
-                @hover="e => changeLibelle(e, dataIndex)"
+                @input="e => changeLibelle(e)"
+                @hover="e => changeLibelle(e)"
                 @select="e => updateImputation(e, dataIndex)"
+                @blur="e => updateImputationFromBlur(e, dataIndex)"
+                @request-start="e => changeLibelle(e)"
                 :value="text"
                 :max-suggestions="0"
+                :min-length="1"
                 :styles="autoCompleteStyle"
                 :list="simpleSuggestionList"
                 :filter-by-query="true"
@@ -82,8 +90,7 @@ import { accountNumbers1,
   accountNumbers7,
   accountNumbers8,
   accountNumbers9,
-  accountNumbers0 } from '../../../../assets/accounting/accounts'
-import labels from '../../../../assets/accounting/labels'
+  accountNumbers0 } from '../../../../assets/accounting/imputations'
 import VueSimpleSuggest from 'vue-simple-suggest'
 import 'vue-simple-suggest/dist/styles.css' // Optional CSS
 
@@ -144,7 +151,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['currentPage', 'currentActiveIndex', 'currentActivePane', 'currentActiveColumn', 'catMode']),
+    ...mapGetters(['currentPage', 'currentActiveIndex', 'currentActivePane', 'currentActiveColumn', 'catMode', 'showImputationAlert', 'currentImputationAlert']),
   },
   watch: {
     osmium: function () {
@@ -191,19 +198,36 @@ export default {
     hash(idx, col) {
       return `${idx}_${col}`
     },
-    changeLibelle(input, idx) {
-      this.pageData[idx].Libelle = labels[parseInt(input)]
+    changeLibelle(input) {
+      this.$store.dispatch('ACTION_CHANGE_LIBELLE', input)
     },
     updateImputation(input, idx) {
+      this.$store.dispatch('ACTION_CHANGE_LIBELLE', input)
       const payload = {
         itemIdx: idx,
         imputation: input,
-        libelle: labels[parseInt(input)],
       }
       this.$store.dispatch('ACTION_DO_IMPUTATION_CHANGES_TO_INVOICE', payload)
     },
+    removeEndingZeros(input) {
+      let result
+      if (input && input.length) {
+        result = input.replace(/0*$/, '')
+      }
+      return result
+    },
     suggestFilter(singleItem, query) {
-      return singleItem.indexOf(query) === 0 && singleItem.length === query.length + 1
+      const pattern = /^.[^0]+/
+      const trimedQuery = pattern.exec(query)[0] || query
+      const trimedItem = this.removeEndingZeros(singleItem)
+      return trimedItem.indexOf(trimedQuery) === 0 && trimedItem.length === trimedQuery.length + 1
+    },
+    updateImputationFromBlur(e, idx) {
+      const payload = {
+        itemIdx: idx,
+        imputation: e.target.value,
+      }
+      this.$store.dispatch('ACTION_DO_IMPUTATION_CHANGES_TO_INVOICE', payload)
     },
   },
   destroyed() {
