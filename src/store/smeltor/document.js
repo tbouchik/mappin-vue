@@ -251,6 +251,13 @@ export default {
         updateFormattedDoc.osmium[state.currentIdx].Value = newVal
       }
       const updatedDocumentRoleAttributes = getUpdatedDocumentRoles(keyRole, newVal)
+      if (keyRole && keyRole.length && keyRole[keyRole.length - 1] === 'VENDOR') {
+        updateFormattedDoc.osmium.forEach((x) => {
+          if (x.Imputation !== null) {
+            x.Libelle = newVal
+          }
+        })
+      }
       state.formattedDocument = updateFormattedDoc
       let options = { imput: false, bankOsmiumChanged: false, keyAttributes: updatedDocumentRoleAttributes }
       saveDocToAPI(Object.fromEntries(mbcData), updateFormattedDoc, options)
@@ -263,8 +270,15 @@ export default {
       let tempDoc = cloneDeep(state.formattedDocument)
       const newVal = formatValue(value, keyType, 'manual')
       tempDoc.osmium[state.currentIdx][state.currentCol] = newVal
-      state.formattedDocument = tempDoc
       const updatedDocumentRoleAttributes = getUpdatedDocumentRoles(keyRole, newVal)
+      if (keyRole && keyRole.length && keyRole[keyRole.length - 1] === 'VENDOR') {
+        tempDoc.osmium.forEach((x) => {
+          if (x.Imputation !== null) {
+            x.Libelle = newVal
+          }
+        })
+      }
+      state.formattedDocument = tempDoc
       let options = { imput: false, bankOsmiumChanged: false, keyAttributes: updatedDocumentRoleAttributes }
       saveDocToAPI(Object.fromEntries(mbcData), state.formattedDocument, options)
     },
