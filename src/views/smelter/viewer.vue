@@ -13,7 +13,7 @@
             <div class="col-md-6">
               <div class="sticky">
                 <template-viewer :osmium="currenOsmium" :isArchived="current.isArchived" v-if="!currentDocument.isBankStatement"/>
-                <a-collapse class="top-5" default-active-key="1" :bordered="true" v-else>
+                <a-collapse class="top-5" :activeKey="[1, 2]" :bordered="true" v-else>
                   <a-collapse-panel key="1" header="En-tête">
                     <template-viewer :osmium="currenOsmium" :isArchived="current.isArchived"/>
                   </a-collapse-panel>
@@ -38,7 +38,7 @@
           <div class="col-md-12">
             <div class="sticky">
               <template-viewer :osmium="currenOsmium" :isArchived="current.isArchived" v-if="!currentDocument.isBankStatement"/>
-              <a-collapse class="top-5" default-active-key="1" :bordered="true" v-else>
+              <a-collapse class="top-5" :activeKey="[1, 2]" :bordered="true" v-else>
                   <a-collapse-panel key="1" header="En-tête">
                     <template-viewer :osmium="currenOsmium" :isArchived="current.isArchived"/>
                   </a-collapse-panel>

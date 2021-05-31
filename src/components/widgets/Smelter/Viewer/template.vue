@@ -4,7 +4,6 @@
     <div v-if="showImputationAlert">
         <a-alert  :message="currentImputationAlert" type="info" close-text="Fermer" />
     </div>
-
   <br>
       <a-table  :columns="columns"
                 :data-source="pageData"
@@ -41,7 +40,7 @@
                 @blur="e => updateImputationFromBlur(e, dataIndex)"
                 @request-start="e => changeLibelle(e)"
                 :value="text"
-                :max-suggestions="0"
+                :max-suggestions="10"
                 :min-length="1"
                 :styles="autoCompleteStyle"
                 :list="simpleSuggestionList"
@@ -217,10 +216,10 @@ export default {
       return result
     },
     suggestFilter(singleItem, query) {
-      const pattern = /^.[^0]+/
-      const trimedQuery = pattern.exec(query)[0] || query
+      const pattern = /([^0]+[0][^0]+|^.[^0]+)/
+      const trimedQuery = pattern.exec(query) ? pattern.exec(query)[0] : query
       const trimedItem = this.removeEndingZeros(singleItem)
-      return trimedItem.indexOf(trimedQuery) === 0 && trimedItem.length === trimedQuery.length + 1
+      return trimedQuery.length && trimedItem.indexOf(trimedQuery) === 0 && trimedItem.length - trimedQuery.length <= 2
     },
     updateImputationFromBlur(e, idx) {
       const payload = {

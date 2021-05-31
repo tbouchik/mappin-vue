@@ -20,6 +20,11 @@
           </a-menu>
         </a-dropdown>
       </div>
+      <br>
+      <div v-if="showImputationAlert">
+          <a-alert  :message="currentImputationAlert" type="info" close-text="Fermer" />
+      </div>
+      <br>
       <a-table  :columns="columns"
                 :data-source="pageData"
                 :pagination=false
@@ -48,17 +53,29 @@
               :disabled="isArchived"
             />
           </div>
-          <div :key="col"  v-if="col==='Compte'" @click="activateIndex(dataIndex, col)">
+          <div :key="col"  v-if="col==='Compte' && isActive(dataIndex, col)" @click="activateIndex(dataIndex, col)">
             <template v-if="record.Compte !== undefined && record.Compte !== null">
               <vue-simple-suggest
-                @input="e => changeLibelle(e, dataIndex)"
-                @hover="e => changeLibelle(e, dataIndex)"
+                @input="e => changeLibelle(e)"
+                @hover="e => changeLibelle(e)"
+                @blur="e => updateImputationFromBlur(e, dataIndex)"
+                @request-start="e => changeLibelle(e)"
                 @select="e => updateImputation(e, dataIndex)"
                 :value="text"
-                :max-suggestions="0"
+                :max-suggestions="10"
                 :list="simpleSuggestionList"
                 :filter-by-query="true"
                 :filter="suggestFilter"
+                :ref="hash(dataIndex,col)">
+              </vue-simple-suggest>
+            </template>
+          </div>
+          <div :key="col"  v-if="col==='Compte' && !isActive(dataIndex, col)" @click="activateIndex(dataIndex, col)">
+            <template v-if="record.Compte !== undefined && record.Compte !== null">
+              <vue-simple-suggest
+                :value="text"
+                :list="simpleSuggestionList"
+                :filter-by-query="true"
                 :ref="hash(dataIndex,col)">
               </vue-simple-suggest>
             </template>
@@ -80,7 +97,7 @@ import { accountNumbers1,
   accountNumbers7,
   accountNumbers8,
   accountNumbers9,
-  accountNumbers0 } from '../../../../assets/accounting/accounts'
+  accountNumbers0 } from '../../../../assets/accounting/imputations'
 import labels from '../../../../assets/accounting/labels'
 import VueSimpleSuggest from 'vue-simple-suggest'
 import 'vue-simple-suggest/dist/styles.css' // Optional CSS
@@ -143,7 +160,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['currentPage', 'currentActiveIndex', 'currentActivePane', 'currentActiveColumn', 'catMode']),
+    ...mapGetters(['currentPage', 'currentActiveIndex', 'currentActivePane', 'currentActiveColumn', 'catMode', 'showImputationAlert', 'currentImputationAlert']),
     hasSelectedStatements() {
       return this.selectedStatements.length > 0 || this.bankOsmium[`page_${this.currentPage}`].length === 0
     },
@@ -200,18 +217,37 @@ export default {
     hash(idx, col) {
       return `${idx}_${col}`
     },
-    changeLibelle(input, idx) {
-      this.pageData[idx].Libelle = labels[parseInt(input)]
+    changeLibelle(input) {
+      this.$store.dispatch('ACTION_CHANGE_LIBELLE', input)
     },
     updateImputation(input, idx) {
+      this.$store.dispatch('ACTION_CHANGE_LIBELLE', input)
       const payload = {
         imputation: input,
+        itemIdx: idx,
         libelle: labels[parseInt(input)],
       }
       this.$store.dispatch('ACTION_DO_IMPUTATION_CHANGES_TO_STATEMENT', payload)
     },
+    removeEndingZeros(input) {
+      let result
+      if (input && input.length) {
+        result = input.replace(/0*$/, '')
+      }
+      return result
+    },
     suggestFilter(singleItem, query) {
-      return singleItem.indexOf(query) === 0 && singleItem.length === query.length + 1
+      const pattern = /([^0]+[0][^0]+|^.[^0]+)/
+      const trimedQuery = pattern.exec(query) ? pattern.exec(query)[0] : query
+      const trimedItem = this.removeEndingZeros(singleItem)
+      return trimedQuery.length && trimedItem.indexOf(trimedQuery) === 0 && trimedItem.length - trimedQuery.length <= 2
+    },
+    updateImputationFromBlur(e, idx) {
+      const payload = {
+        itemIdx: idx,
+        imputation: e.target.value,
+      }
+      this.$store.dispatch('ACTION_DO_IMPUTATION_CHANGES_TO_STATEMENT', payload)
     },
     onSelectChange(selectedStatements) {
       this.selectedStatements = selectedStatements.sort((a, b) => a - b)

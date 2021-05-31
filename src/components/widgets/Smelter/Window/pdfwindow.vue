@@ -183,6 +183,9 @@ export default {
       pdfjsLib
         .getDocument(`/media/${this.name}`)
         .promise.then(pdfDoc_ => {
+          if (pdfDoc) {
+            pdfDoc.destroy()
+          }
           pdfDoc = pdfDoc_
           document.querySelector('#page-count').textContent = pdfDoc.numPages
           renderPage(pageNum)

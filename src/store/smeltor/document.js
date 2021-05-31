@@ -67,15 +67,15 @@ function getInvoiceGraphNextMove(osmium, currentIdx, currentCol, move) {
   }
 }
 function trimImputationQuery(query) {
-  const pattern = /^.[^0]+/
-  const trimedQuery = pattern.exec(query)[0] || query
+  const pattern = /([^0]+[0][^0]+|^.[^0]+)/ // 19109002 matches with => 19109 | 12189001 matches with => 12189 |
+  const trimedQuery = pattern.exec(query) ? pattern.exec(query)[0] : query
   return trimedQuery
 }
 
 function changeDisplayedLibelle(col, osmiumItem) {
   let result = 'Libellé d\'Imputation'
-  if (col === 'Imputation') {
-    const trimedImputation = trimImputationQuery(osmiumItem.Imputation)
+  if (col === 'Imputation' || col === 'Compte') {
+    const trimedImputation = trimImputationQuery(osmiumItem[col])
     result = labels[parseInt(trimedImputation)]
   }
   return result
@@ -231,7 +231,9 @@ export default {
           : getInvoiceGraphNextMove(state.formattedDocument.osmium, state.currentIdx, state.currentCol, payload.move)
         state.currentIdx = nextCoords.idx
         state.currentCol = nextCoords.col
-        state.currentLibelle = changeDisplayedLibelle(state.currentCol, state.formattedDocument.osmium[state.currentIdx])
+        state.currentLibelle = state.currentPane === 'statementPane'
+          ? changeDisplayedLibelle(state.currentCol, state.formattedDocument.bankOsmium[`page_${state.page}`][state.currentIdx])
+          : changeDisplayedLibelle(state.currentCol, state.formattedDocument.osmium[state.currentIdx])
       }
     },
     MUTATION_DO_AUTO_CHANGES_TO_INVOICE(state, bbox) {
@@ -298,9 +300,9 @@ export default {
       saveDocToAPI(null, state.formattedDocument, options)
     },
     MUTATION_DO_IMPUTATION_CHANGES_TO_STATEMENT(state, changeData) {
-      let { imputation } = changeData
+      let { imputation, itemIdx } = changeData
       let tempDoc = cloneDeep(state.formattedDocument)
-      tempDoc.bankOsmium[`page_${state.page}`][state.currentIdx]['Compte'] = imputation
+      tempDoc.bankOsmium[`page_${state.page}`][itemIdx]['Compte'] = imputation
       state.formattedDocument = tempDoc
       let options = { imput: false, bankOsmiumChanged: true, keyAttributes: null }
       saveDocToAPI({}, state.formattedDocument, options)
@@ -490,7 +492,7 @@ export default {
     docSmeltedCache: state => state.smeltedCache,
     docPagination: state => pick(state.queryParams, ['page', 'limit']),
     totalDocumentsCount: state => state.totalDocumentsCount, // TODO REMOVE IF NOT USABLE IN SUBBAR
-    showImputationAlert: state => state.currentCol === 'Imputation' && state.currentPane === 'templatePane',
+    showImputationAlert: state => (state.currentCol === 'Imputation' || state.currentCol === 'Compte') && state.currentLibelle,
     currentImputationAlert: state => state.currentLibelle,
   },
 }
