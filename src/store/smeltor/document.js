@@ -119,34 +119,42 @@ function filterAlpha (str) {
   return str
 }
 
-function getUpdatedDocumentRoles (role, value) {
+function getUpdatedDocumentRoles (props) {
+  let { keyRole, keyType, newVal } = props
   let result = {}
-  if (role && role.constructor === Array && role.length > 0) {
-    switch (role[role.length - 1]) {
+  let momentInstanceDate = moment()
+  if (keyRole && keyRole.constructor === Array && keyRole.length > 0) {
+    switch (keyRole[keyRole.length - 1]) {
       case 'BANK_NAME':
-        result.bankEntity = value
+        result.bankEntity = newVal
         break
       case 'DATE_FROM':
         moment.locale('fr')
-        result.dateBeg = moment(value, 'DD/MM/YYYY').toDate()
+        momentInstanceDate = moment(newVal, 'DD/MM/YYYY')
+        result.dateBeg = momentInstanceDate._isValid ? momentInstanceDate.toDate() : null
         break
       case 'DATE_TO':
         moment.locale('fr')
-        result.dateEnd = moment(value, 'DD/MM/YYYY').toDate()
+        momentInstanceDate = moment(newVal, 'DD/MM/YYYY')
+        result.dateEnd = momentInstanceDate._isValid ? momentInstanceDate.toDate() : null
         break
       case 'TOTAL_HT':
-        result.totalHt = value
+        result.totalHt = newVal
         break
       case 'TOTAL_TTC':
-        result.totalTtc = value
+        result.totalTtc = newVal
         break
       case 'VENDOR':
-        result.vendor = value
+        result.vendor = newVal
         break
       case 'VAT':
-        result.vat = value
+        result.vat = newVal
         break
     }
+  }
+  if (keyType === 'DATE') {
+    momentInstanceDate = moment(newVal, 'DD/MM/YYYY')
+    result.invoiceDate = momentInstanceDate._isValid ? momentInstanceDate.toDate() : null
   }
   return result
 }
@@ -250,7 +258,7 @@ export default {
       } else {
         updateFormattedDoc.osmium[state.currentIdx].Value = newVal
       }
-      const updatedDocumentRoleAttributes = getUpdatedDocumentRoles(keyRole, newVal)
+      const updatedDocumentRoleAttributes = getUpdatedDocumentRoles({ keyRole, keyType, newVal })
       if (keyRole && keyRole.length && keyRole[keyRole.length - 1] === 'VENDOR') {
         updateFormattedDoc.osmium.forEach((x) => {
           if (x.Imputation !== null) {
@@ -270,7 +278,7 @@ export default {
       let tempDoc = cloneDeep(state.formattedDocument)
       const newVal = formatValue(value, keyType, 'manual')
       tempDoc.osmium[state.currentIdx][state.currentCol] = newVal
-      const updatedDocumentRoleAttributes = getUpdatedDocumentRoles(keyRole, newVal)
+      const updatedDocumentRoleAttributes = getUpdatedDocumentRoles({ keyRole, keyType, newVal })
       if (keyRole && keyRole.length && keyRole[keyRole.length - 1] === 'VENDOR') {
         tempDoc.osmium.forEach((x) => {
           if (x.Imputation !== null) {

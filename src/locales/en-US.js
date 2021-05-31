@@ -23,6 +23,7 @@ const messages = {
       invoiceTitle: 'Invoices',
       vendor: 'Vendor',
       bank: 'Bank',
+      invoiceDate: 'Invoice Date',
       dateFrom: 'Start Date',
       dateTo: 'End Date',
       bankTitle: 'Bank Statements',

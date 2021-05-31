@@ -24,6 +24,7 @@ const messages = {
       invoiceTitle: 'Factures',
       vendor: 'Fournisseur',
       bank: 'Banque',
+      invoiceDate: 'Date Facturation',
       dateFrom: 'Date Début',
       dateTo: 'Date Fin',
       bankTitle: 'Relevés bancaires',

@@ -150,6 +150,7 @@
               <template>{{ text.name }}</template>
             </template>
             <span slot="date" slot-scope="text">{{ text | timestamp }}</span>
+            <span slot="invoiceDate" slot-scope="text">{{ text | statementDate }}</span>
             <span slot="dateEnd" slot-scope="text">{{ text | statementDate }}</span>
             <span slot="dateBeg" slot-scope="text">{{ text | statementDate }}</span>
             <span slot="status" slot-scope="text">

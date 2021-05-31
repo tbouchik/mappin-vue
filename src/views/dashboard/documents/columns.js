@@ -10,6 +10,11 @@ let invoiceColumns = [
     customRender: 'customRender',
   },
   {
+    title: 'dashboard.document.invoiceDate',
+    dataIndex: 'invoiceDate',
+    customRender: 'invoiceDate',
+  },
+  {
     title: 'dashboard.document.template',
     dataIndex: 'filter',
     customRender: 'customRenderComposed',
