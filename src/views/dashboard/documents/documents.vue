@@ -92,21 +92,31 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-              <a-form-item label="Fournisseur">
+              <a-form-item label="Fournisseur" v-if="!isBankViz">
                 <a-input
                 v-decorator="[
                   'searchedVendor',
                   {
-                    rules: [{ required: false, message: 'Choisissez la relation d\'ordre' }],
+                    rules: [{ required: false, message: 'Entrez le nom du fournisseur' }],
                   },
                 ]"
                 @input="e => debounceFilterSearchedItem(e, 'vendor')" placeholder="Entrez le nom du fournisseur"/>
               </a-form-item>
+              <a-form-item label="Nom de la Banque" v-else>
+                <a-input
+                v-decorator="[
+                  'searchedBankEntity',
+                  {
+                    rules: [{ required: false, message: 'Entrez le nom du banque' }],
+                  },
+                ]"
+                @input="e => debounceFilterSearchedItem(e, 'bankEntity')" placeholder="Entrez le nom du banque"/>
+              </a-form-item>
             </a-col>
         </a-row>
         <a-row :gutter="16">
-          <a-col :span="12">
-            <a-form-item :label="$t('dashboard.document.template')">
+          <a-col :span="12" v-if="!isBankViz">
+            <a-form-item :label="$t('dashboard.document.template')" >
                 <a-select
                   @change="e => handleFilterDropdownChange(e, 'template')"
                   v-decorator="[
@@ -144,7 +154,7 @@
               </a-form-item>
           </a-col>
         </a-row>
-        <a-row>
+        <a-row v-if="!isBankViz">
           <a-col :span="8">
             <a-form-item label="TVA">
               <a-input
@@ -160,7 +170,7 @@
             </a-form-item>
           </a-col>
         </a-row>
-        <a-row :gutter="16">
+        <a-row :gutter="16" v-if="!isBankViz">
           <a-col :span="12">
             <a-form-item label="Total HT">
               <a-input
@@ -200,7 +210,7 @@
             </a-form-item>
           </a-col>
           </a-row>
-          <a-row :gutter="16">
+          <a-row :gutter="16" v-if="!isBankViz">
           <a-col :span="12">
             <a-form-item label="Total TTC">
               <a-input
@@ -241,7 +251,7 @@
           </a-col>
           </a-row>
         <a-row :gutter="16">
-          <a-form-item label="Date Facturation">
+          <a-form-item label="Période">
             <a-range-picker
               v-decorator="[
                   'searchedDates',
@@ -256,7 +266,7 @@
             />
           </a-form-item>
         </a-row>
-        <a-row :gutter="16">
+        <!-- <a-row :gutter="16">
           <a-col :span="24">
             <a-form-item label="Contient">
               <a-textarea
@@ -271,7 +281,7 @@
               />
             </a-form-item>
           </a-col>
-        </a-row>
+        </a-row> -->
       </a-form>
       <div
         :style="{
@@ -425,6 +435,7 @@ export default {
       totalTtcOperator: null,
       searchedVat: null,
       searchedVendor: null,
+      searchedBankEntity: null,
       searchedWord: null,
       searchedDates: [],
       loading: false,
@@ -451,6 +462,7 @@ export default {
     this.form = this.$form.createForm(this)
     this.form.getFieldDecorator('searchedName', { initialValue: '', preserve: true })
     this.form.getFieldDecorator('searchedVendor', { initialValue: '', preserve: true })
+    this.form.getFieldDecorator('searchedBankEntity', { initialValue: '', preserve: true })
     this.form.getFieldDecorator('searchedTemplate', { initialValue: '', preserve: true })
     this.form.getFieldDecorator('searchedStatus', { initialValue: '', preserve: true })
     this.form.getFieldDecorator('searchedVat', { initialValue: '', preserve: true })
@@ -524,6 +536,7 @@ export default {
         totalTtc: this.searchedTotalTtc,
         totalTtcOperator: this.totalTtcOperator,
         vat: this.searchedVat,
+        bankEntity: this.searchedBankEntity,
         vendor: this.searchedVendor,
         contains: this.searchedWord,
         dates: this.searchedDates,
@@ -586,6 +599,9 @@ export default {
           case 'vendor':
             this.searchedVendor = event.target.value
             break
+          case 'bankEntity':
+            this.searchedBankEntity = event.target.value
+            break
           case 'vat':
             this.searchedVat = event.target.value
             break
@@ -616,12 +632,15 @@ export default {
         totalTtcOperator: null,
         searchedVat: '',
         searchedVendor: '',
+        searchedBankEntity: '',
         searchedWord: '',
-        searchedDates: null,
+        searchedDates: [],
       })
+      this.searchedDates = []
+      this.fetchDocuments()
     },
     onDateChange(value, dateString) {
-      this.searchedDates = value.map(x => x.toDate())
+      this.searchedDates = value.map(x => x.toDate().setHours(0, 0, 0, 0))
       this.fetchDocuments()
     },
     onDateOk(value) {

@@ -134,12 +134,12 @@ function getUpdatedDocumentRoles (props) {
         moment.locale('fr')
         parseDateRange(newVal)
         momentInstanceDate = moment(newVal, 'DD/MM/YYYY')
-        result.dateBeg = momentInstanceDate._isValid ? momentInstanceDate.toDate() : null
+        result.dateBeg = momentInstanceDate._isValid ? momentInstanceDate.toDate().setHours(0, 0, 0, 0) : null
         break
       case 'DATE_TO':
         moment.locale('fr')
         momentInstanceDate = moment(newVal, 'DD/MM/YYYY')
-        result.dateEnd = momentInstanceDate._isValid ? momentInstanceDate.toDate() : null
+        result.dateEnd = momentInstanceDate._isValid ? momentInstanceDate.toDate().setHours(0, 0, 0, 0) : null
         break
       case 'TOTAL_HT':
         result.totalHt = newVal
@@ -157,7 +157,7 @@ function getUpdatedDocumentRoles (props) {
   }
   if (keyType === 'DATE') {
     momentInstanceDate = moment(newVal, 'DD/MM/YYYY')
-    result.invoiceDate = momentInstanceDate._isValid ? momentInstanceDate.toDate() : null
+    result.invoiceDate = momentInstanceDate._isValid ? momentInstanceDate.toDate().setHours(0, 0, 0, 0) : null
   }
   return result
 }
