@@ -1,6 +1,10 @@
 import axios from 'axios'
-
+import { pickBy, omit } from 'lodash'
 let cancelToken
+
+function filterParams(queryParams) {
+  return pickBy(queryParams, (v, _) => { return typeof v === 'number' || !!v })
+}
 class DocumentService {
   static updateDocument(body, documentId) {
     return axios.patch(`/v1/documents/${documentId}`, {
@@ -34,31 +38,13 @@ class DocumentService {
   }
 
   static fetchNextSmeltedDocuments(queryParams) {
-    const { client, name, filter, skip, status, side, current, isBankStatement } = queryParams
+    let params = omit(filterParams(queryParams), ['limit', 'page', 'isArchived'])
+    params.isArchived = false
     if (typeof cancelToken !== typeof undefined) {
       cancelToken.cancel('Operation canceled due to new request.')
     }
     // Save the cancel token for the current request
     cancelToken = axios.CancelToken.source()
-    const params = {
-      client,
-      side,
-      current,
-      isBankStatement,
-      isArchived: false,
-    }
-    if (name && name !== '') {
-      params.name = name
-    }
-    if (filter) {
-      params.filter = filter
-    }
-    if (skip) {
-      params.skip = skip
-    }
-    if (status) {
-      params.status = status
-    }
     try {
       return axios.get(`/v1/documents/nextsmelted`, { params }, { cancelToken: cancelToken.token })
         .then(
@@ -69,30 +55,12 @@ class DocumentService {
   }
 
   static fetchNextDocuments(queryParams) {
-    const { client, limit, sort, name, filter, status, side, current, isArchived, isBankStatement } = queryParams
+    let params = omit(filterParams(queryParams), ['page'])
     if (typeof cancelToken !== typeof undefined) {
       cancelToken.cancel('Operation canceled due to new request.')
     }
     // Save the cancel token for the current request
     cancelToken = axios.CancelToken.source()
-    const params = {
-      client,
-      limit,
-      sort,
-      side,
-      current,
-      isArchived,
-      isBankStatement,
-    }
-    if (name && name !== '') {
-      params.name = name
-    }
-    if (status) {
-      params.status = status
-    }
-    if (filter) {
-      params.filter = filter
-    }
     try {
       return axios.get(`/v1/documents/next`, { params }, { cancelToken: cancelToken.token })
         .then(
@@ -103,29 +71,13 @@ class DocumentService {
   }
 
   static fetchDocuments(queryParams) {
-    const { client, page, limit, sort, name, filter, status, isArchived, isBankStatement } = queryParams
+    let params = omit(filterParams(queryParams), ['page'])
+    params.page = queryParams.page - 1
     if (typeof cancelToken !== typeof undefined) {
       cancelToken.cancel('Operation canceled due to new request.')
     }
     // Save the cancel token for the current request
     cancelToken = axios.CancelToken.source()
-    const params = {
-      client,
-      limit,
-      isArchived,
-      isBankStatement,
-      sort,
-      page: page - 1,
-    }
-    if (name && name !== '') {
-      params.name = name
-    }
-    if (status) {
-      params.status = status
-    }
-    if (filter) {
-      params.filter = filter
-    }
     try {
       return axios.get(`/v1/documents`, { params }, { cancelToken: cancelToken.token })
         .then(
@@ -136,21 +88,7 @@ class DocumentService {
   }
 
   static fetchDocumentsCount(queryParams) {
-    const { client, name, status, filter, isArchived, isBankStatement } = queryParams
-    const params = {
-      client,
-      isArchived,
-      isBankStatement,
-    }
-    if (name && name !== '') {
-      params.name = name
-    }
-    if (status) {
-      params.status = status
-    }
-    if (filter) {
-      params.filter = filter
-    }
+    let params = omit(filterParams(queryParams), ['limit', 'page'])
     return axios.get('/v1/documents/count', { params })
       .then(
         ({ data }) => data
@@ -182,27 +120,19 @@ class DocumentService {
   }
 
   static bulkExportCSV(queryParams) {
-    const { client, page, limit, sort, name, filter } = queryParams
+    let params = filterParams(queryParams)
+    const fixedParams = {
+      isArchived: false,
+      isBankStatement: false,
+      status: 'validated',
+      page: queryParams.page - 1, // TODO for export should maybe ignore page, and export all
+    }
+    Object.assign(params, fixedParams)
     if (typeof cancelToken !== typeof undefined) {
       cancelToken.cancel('Operation canceled due to new request.')
     }
     // Save the cancel token for the current request
     cancelToken = axios.CancelToken.source()
-    const params = {
-      client,
-      limit,
-      sort,
-      isArchived: false,
-      isBankStatement: false,
-      status: 'validated',
-      page: page - 1,
-    }
-    if (name && name !== '') {
-      params.name = name
-    }
-    if (filter) {
-      params.filter = filter
-    }
     try {
       return axios.get(`/v1/documents/export`, { params }, { cancelToken: cancelToken.token })
         .then(
@@ -213,27 +143,19 @@ class DocumentService {
   }
 
   static bulkBankExportCSV(queryParams) {
-    const { client, page, limit, sort, name, filter } = queryParams
+    let params = filterParams(queryParams)
+    const fixedParams = {
+      isArchived: false,
+      isBankStatement: true,
+      status: 'validated',
+      page: queryParams.page - 1,
+    }
+    Object.assign(params, fixedParams)
     if (typeof cancelToken !== typeof undefined) {
       cancelToken.cancel('Operation canceled due to new request.')
     }
     // Save the cancel token for the current request
     cancelToken = axios.CancelToken.source()
-    const params = {
-      client,
-      limit,
-      sort,
-      isArchived: false,
-      isBankStatement: true,
-      status: 'validated',
-      page: page - 1,
-    }
-    if (name && name !== '') {
-      params.name = name
-    }
-    if (filter) {
-      params.filter = filter
-    }
     try {
       return axios.get(`/v1/documents/statementsdownload`, { params }, { cancelToken: cancelToken.token })
         .then(

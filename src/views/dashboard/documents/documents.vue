@@ -70,23 +70,51 @@
       </div>
       <br />
       <div v-if="!clientViz" class="card-body">
-        <a-collapse expand-icon-position="right" style="background: #eef3fc">
-          <a-collapse-panel key="1" :header=" $t('dashboard.document.filterSettings') ">
-            <br>
-            <a-form
-              :form="form"
-              :label-col="{ span: 5 }"
-              :wrapper-col="{ span: 12 }"
-            >
-              <a-form-item :label="$t('dashboard.document.name')">
+        <a-button type="primary" @click="showDrawer"> <a-icon type="plus" /> {{$t('dashboard.document.filterSettings') }}</a-button>
+        <a-drawer
+          :title="$t('dashboard.document.filterSettings')"
+          :width="720"
+          :visible="visible"
+          :body-style="{ paddingBottom: '80px' }"
+          @close="onDrawerClose"
+        >
+      <a-form :form="form" layout="vertical" hide-required-mark>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="Nom de fichier">
+              <a-input v-decorator="[
+                  'searchedName',
+                  {
+                    rules: [{ required: false, message: 'Choisissez la relation d\'ordre' }],
+                  },
+                ]"
+                  @input="e => debounceFilterSearchedItem(e, 'name')" placeholder="Entrez le nom du fichier"/>
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+              <a-form-item label="Fournisseur">
                 <a-input
-                  :placeholder="$t('dashboard.document.placeholder.name')"
-                  v-model="searchedName"
-                />
+                v-decorator="[
+                  'searchedVendor',
+                  {
+                    rules: [{ required: false, message: 'Choisissez la relation d\'ordre' }],
+                  },
+                ]"
+                @input="e => debounceFilterSearchedItem(e, 'vendor')" placeholder="Entrez le nom du fournisseur"/>
               </a-form-item>
-              <a-form-item :label="$t('dashboard.document.template')">
+            </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item :label="$t('dashboard.document.template')">
                 <a-select
-                  v-model="searchedTemplate"
+                  @change="e => handleFilterDropdownChange(e, 'template')"
+                  v-decorator="[
+                  'searchedTemplate',
+                  {
+                    rules: [{ required: false, message: 'Choisissez la relation d\'ordre' }],
+                  },
+                ]"
                   :placeholder="$t('dashboard.document.placeholder.template')"
                 >
                   <template v-for="(template, index) in filters">
@@ -94,9 +122,17 @@
                   </template>
                 </a-select>
               </a-form-item>
-              <a-form-item v-if="isArchiveViz !== true" :label="$t('dashboard.document.status')">
+          </a-col>
+          <a-col :span="12">
+            <a-form-item :span="12" v-if="isArchiveViz !== true" :label="$t('dashboard.document.status')">
                 <a-select
-                  v-model="searchedStatus"
+                  @change="e => handleFilterDropdownChange(e, 'status')"
+                  v-decorator="[
+                  'searchedStatus',
+                  {
+                    rules: [{ required: false, message: 'Choisissez la relation d\'ordre' }],
+                  },
+                ]"
                   :placeholder="$t('dashboard.document.placeholder.status')"
                 >
                   <template>
@@ -106,13 +142,155 @@
                   </template>
                 </a-select>
               </a-form-item>
-              <a-form-item :wrapper-col="{ span: 12, offset: 5 }">
-                <a-button type="primary" @click="resetFilterSettings" ghost> {{ $t('dashboard.document.resetSettings') }} </a-button>
-              </a-form-item>
-            </a-form>
-            <a-icon slot="extra" type="filter" />
-          </a-collapse-panel>
-        </a-collapse>
+          </a-col>
+        </a-row>
+        <a-row>
+          <a-col :span="8">
+            <a-form-item label="TVA">
+              <a-input
+                v-decorator="[
+                'searchedVat',
+                  {
+                    rules: [{ required: false, message: 'Entrez le montant de TVA' }],
+                  },
+                ]"
+                placeholder="Entrez le montant de TVA"
+                @input="e => debounceFilterSearchedItem(e, 'vat')"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="Total HT">
+              <a-input
+                v-decorator="[
+                'searchedTotalHt',
+                  {
+                    rules: [{ required: false, message: 'Entrez le montant Hors Taxes' }],
+                  },
+                ]"
+                placeholder="Entrez le montant Hors Taxes"
+                @input="e => debounceFilterSearchedItem(e, 'totalHt')"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="Operation">
+              <a-select
+                v-decorator="[
+                  'totalHtOperator',
+                  {
+                    rules: [{ required: false, message: 'Choisissez la relation d\'ordre' }],
+                  },
+                ]"
+                placeholder="Choisissez la relation d'ordre"
+                @change="e => handleFilterDropdownChange(e, 'hto')"
+              >
+                <a-select-option value="gt">
+                  Supérieur à
+                </a-select-option>
+                <a-select-option value="lt">
+                  Inférieur à
+                </a-select-option>
+                <a-select-option value="eq">
+                  Égale à
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          </a-row>
+          <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="Total TTC">
+              <a-input
+                v-decorator="[
+                  'searchedTotalTtc',
+                  {
+                    rules: [{ required: false, message: 'Entrez le montant TTC' }],
+                  },
+                ]"
+                placeholder="Entrez le montant TTC"
+                @input="e => debounceFilterSearchedItem(e, 'totalTtc')"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="Operation">
+              <a-select
+                v-decorator="[
+                  'totalTtcOperator',
+                  {
+                    rules: [{ required: false, message: 'Choisissez la relation d\'ordre' }],
+                  },
+                ]"
+                placeholder="Choisissez la relation d'ordre"
+                @change="e => handleFilterDropdownChange(e, 'ttco')"
+              >
+                <a-select-option value="gt">
+                  Supérieur à
+                </a-select-option>
+                <a-select-option value="lt">
+                  Inférieur à
+                </a-select-option>
+                <a-select-option value="eq">
+                  Égale à
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          </a-row>
+        <a-row :gutter="16">
+          <a-form-item label="Date Facturation">
+            <a-range-picker
+              v-decorator="[
+                  'searchedDates',
+                  {
+                    rules: [{ required: false, message: 'Choisissez une ou plusieurs dates' }],
+                  },
+                ]"
+              format="DD/MM/YYYY"
+              :placeholder="['Date de début', 'Date de fin']"
+              @change="onDateChange"
+              @ok="onDateOk"
+            />
+          </a-form-item>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="24">
+            <a-form-item label="Contient">
+              <a-textarea
+                v-decorator="[
+                  'searchedWord',
+                  {
+                    rules: [{ required: false, message: 'Entrez un mot contenu dans la facture' }],
+                  },
+                ]"
+                :rows="1"
+                placeholder="Entrez un mot contenu dans la facture"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+      </a-form>
+      <div
+        :style="{
+          position: 'absolute',
+          right: 0,
+          bottom: 0,
+          width: '100%',
+          borderTop: '1px solid #e9e9e9',
+          padding: '10px 16px',
+          background: '#fff',
+          textAlign: 'right',
+          zIndex: 1,
+        }"
+      >
+        <a-button type="primary" @click="onDrawerClose" ghost>
+          Réinitialiser
+        </a-button>
+      </div>
+    </a-drawer>
       </div>
       <div class="card-body">
         <div class="air__utils__scrollTable">
@@ -236,11 +414,19 @@ export default {
   data: function () {
     return {
       documentsList: [],
-      form: this.$form.createForm(this, { name: 'filter_form' }),
+      visible: false,
       timeInterval: null,
       searchedName: null,
-      searchedStatus: null,
-      searchedTemplate: null,
+      searchedStatus: '',
+      searchedTemplate: '',
+      searchedTotalHt: null,
+      totalHtOperator: null,
+      searchedTotalTtc: null,
+      totalTtcOperator: null,
+      searchedVat: null,
+      searchedVendor: null,
+      searchedWord: null,
+      searchedDates: [],
       loading: false,
       validatorIsLoading: false,
       confirmLoading: false,
@@ -256,7 +442,24 @@ export default {
       limit: 10,
       page: 1,
       total: 10,
+      debounce: null,
+      typing: null,
+      message: null,
     }
+  },
+  beforeCreate() {
+    this.form = this.$form.createForm(this)
+    this.form.getFieldDecorator('searchedName', { initialValue: '', preserve: true })
+    this.form.getFieldDecorator('searchedVendor', { initialValue: '', preserve: true })
+    this.form.getFieldDecorator('searchedTemplate', { initialValue: '', preserve: true })
+    this.form.getFieldDecorator('searchedStatus', { initialValue: '', preserve: true })
+    this.form.getFieldDecorator('searchedVat', { initialValue: '', preserve: true })
+    this.form.getFieldDecorator('searchedTotalHt', { initialValue: null, preserve: true })
+    this.form.getFieldDecorator('totalHtOperator', { initialValue: null, preserve: true })
+    this.form.getFieldDecorator('searchedTotalTtc', { initialValue: null, preserve: true })
+    this.form.getFieldDecorator('totalTtcOperator', { initialValue: null, preserve: true })
+    this.form.getFieldDecorator('searchedDates', { initialValue: null, preserve: true })
+    this.form.getFieldDecorator('searchedWord', { initialValue: '', preserve: true })
   },
   props: {
     clientId: {
@@ -275,7 +478,10 @@ export default {
     },
   },
   watch: {
-    searchedName: function() {
+    totalTtcOperator: function() {
+      this.fetchDocuments()
+    },
+    totalHtOperator: function() {
       this.fetchDocuments()
     },
     searchedStatus: function() {
@@ -313,6 +519,14 @@ export default {
         status: this.searchedStatus,
         isArchived: this.isArchiveViz,
         isBankStatement: this.isBankViz,
+        totalHt: this.searchedTotalHt,
+        totalHtOperator: this.totalHtOperator,
+        totalTtc: this.searchedTotalTtc,
+        totalTtcOperator: this.totalTtcOperator,
+        vat: this.searchedVat,
+        vendor: this.searchedVendor,
+        contains: this.searchedWord,
+        dates: this.searchedDates,
       }
     },
     tablePagination: function () {
@@ -345,6 +559,74 @@ export default {
     this.destroyPolling()
   },
   methods: {
+    handleFilterDropdownChange(e, field) {
+      switch (field) {
+        case 'status':
+          this.searchedStatus = e
+          break
+        case 'template':
+          this.searchedTemplate = e
+          break
+        case 'ttco':
+          this.totalTtcOperator = e
+          break
+        case 'hto':
+          this.totalHtOperator = e
+          break
+      }
+      this.fetchDocuments()
+    },
+    debounceFilterSearchedItem(event, field) {
+      clearTimeout(this.debounce)
+      this.debounce = setTimeout(() => {
+        switch (field) {
+          case 'name':
+            this.searchedName = event.target.value
+            break
+          case 'vendor':
+            this.searchedVendor = event.target.value
+            break
+          case 'vat':
+            this.searchedVat = event.target.value
+            break
+          case 'totalHt':
+            this.searchedTotalHt = parseFloat(event.target.value)
+            break
+          case 'totalTtc':
+            this.searchedTotalTtc = parseFloat(event.target.value)
+            break
+          case 'word':
+            this.searchedWord = event.target.value
+        }
+        this.fetchDocuments()
+      }, 600)
+    },
+    showDrawer() {
+      this.visible = true
+    },
+    onDrawerClose() {
+      this.visible = false
+      this.form.setFieldsValue({
+        searchedName: '',
+        searchedTemplate: '',
+        searchedStatus: '',
+        searchedTotalHt: null,
+        totalHtOperator: null,
+        searchedTotalTtc: null,
+        totalTtcOperator: null,
+        searchedVat: '',
+        searchedVendor: '',
+        searchedWord: '',
+        searchedDates: null,
+      })
+    },
+    onDateChange(value, dateString) {
+      this.searchedDates = value.map(x => x.toDate())
+      this.fetchDocuments()
+    },
+    onDateOk(value) {
+      console.log('onOk: ', value)
+    },
     setColumns(baseColumns) {
       return baseColumns.map((x) => {
         let result = {
@@ -439,15 +721,6 @@ export default {
             concat: false })
           this.validatorIsLoading = false
         })
-    },
-    handleSearch(selectedKeys, confirm, dataIndex) {
-      confirm()
-      this.searchText = selectedKeys[0]
-      this.searchedTemplate = dataIndex
-    },
-    handleReset(clearFilters) {
-      clearFilters()
-      this.searchText = ''
     },
     view(record) {
       this.$router.push({ name: 'viewer', params: { documentId: record.id } })
@@ -546,11 +819,6 @@ export default {
         .then(data => {
           this.total = data.count
         })
-    },
-    resetFilterSettings() {
-      this.searchedName = ''
-      this.searchedStatus = null
-      this.searchedTemplate = null
     },
     showSingleDeleteModal(e) {
       this.currentDeletableId = e.id
