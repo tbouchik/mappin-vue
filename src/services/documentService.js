@@ -3,7 +3,7 @@ import { pickBy, omit } from 'lodash'
 let cancelToken
 
 function filterParams(queryParams) {
-  return pickBy(queryParams, (v, _) => { return typeof v === 'number' || !!v })
+  return pickBy(queryParams, (v, _) => { return typeof v === 'number' || typeof v === 'boolean' || !!v })
 }
 class DocumentService {
   static updateDocument(body, documentId) {

@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
+import dateFormats from '../helpers'
 import labels from '../../assets/accounting/labels'
 import { cloneDeep, get, pick, pickBy } from 'lodash'
 import uuidv4 from 'uuid/v4'
@@ -21,7 +22,7 @@ function saveDocToAPI(mbc, document, { imput, bankOsmiumChanged, keyAttributes }
   if (keyAttributes) {
     Object.assign(updatedDocument, keyAttributes)
   }
-  updatedDocument = pickBy(updatedDocument, (v, _) => { return !!v })
+  updatedDocument = pickBy(updatedDocument, (v, _) => { return typeof v === 'number' || typeof v === 'boolean' || !!v })
   if (typeof cancelToken !== typeof undefined) {
     cancelToken.cancel('Operation canceled due to new request.')
   }
@@ -66,20 +67,6 @@ function getInvoiceGraphNextMove(osmium, currentIdx, currentCol, move) {
     }
   }
 }
-function trimImputationQuery(query) {
-  const pattern = /([^0]+[0][^0]+|^.[^0]+)/ // 19109002 matches with => 19109 | 12189001 matches with => 12189 |
-  const trimedQuery = pattern.exec(query) ? pattern.exec(query)[0] : query
-  return trimedQuery
-}
-
-function changeDisplayedLibelle(col, osmiumItem) {
-  let result = 'Libellé d\'Imputation'
-  if (col === 'Imputation' || col === 'Compte') {
-    const trimedImputation = trimImputationQuery(osmiumItem[col])
-    result = labels[parseInt(trimedImputation)]
-  }
-  return result
-}
 
 function getTableGraphNextMove(osmium, currentIdx, currentCol, move) {
   const graphDepth = osmium.length
@@ -98,6 +85,21 @@ function getTableGraphNextMove(osmium, currentIdx, currentCol, move) {
     }
     return { idx: currentIdx, col: adjacentColumn }
   }
+}
+
+function trimImputationQuery(query) {
+  const pattern = /([^0]+[0][^0]+|^.[^0]+)/ // 19109002 matches with => 19109 | 12189001 matches with => 12189 |
+  const trimedQuery = pattern.exec(query) ? pattern.exec(query)[0] : query
+  return trimedQuery
+}
+
+function changeDisplayedLibelle(col, osmiumItem) {
+  let result = 'Libellé d\'Imputation'
+  if (col === 'Imputation' || col === 'Compte') {
+    const trimedImputation = trimImputationQuery(osmiumItem[col])
+    result = labels[parseInt(trimedImputation)]
+  }
+  return result
 }
 
 function getTableAdjacentColumn(currentCol, move) {
@@ -130,6 +132,7 @@ function getUpdatedDocumentRoles (props) {
         break
       case 'DATE_FROM':
         moment.locale('fr')
+        parseDateRange(newVal)
         momentInstanceDate = moment(newVal, 'DD/MM/YYYY')
         result.dateBeg = momentInstanceDate._isValid ? momentInstanceDate.toDate() : null
         break
@@ -164,21 +167,46 @@ function parseDate (value) {
   let parsedInput = ''
   try {
     moment.locale('fr')
-    parsedInput = moment(value, ['D MMMM YYYY', 'DD MMMM YYYY', 'D MMM YYYY', 'DD MMM YYYY', 'D MMMM YY', 'DD MMMM YY', 'D MMM YY', 'DD MMM YY', 'DD/MM/YYYY', 'DD-MM-YYYY', 'dddd, MMMM Do YYYY', 'dddd [the] Do [of] MMMM', 'YYYY-MM-DD', 'MMM DD, YYYY']).format('DD/MM/YYYY')
+    parsedInput = moment(value, dateFormats).format('DD/MM/YYYY')
   } catch (error) {
     console.log('erroe', error)
   }
   return parsedInput
 }
 
-function formatValue (value, keyType, entryType) {
+function parseDateRange (value, side) {
+  let result = { value: '', hasRange: false }
+  const pattern = /(du)(.*)(au)(.*)/gi
+  const matches = [...value.matchAll(pattern)]
+  if (matches && matches.length && matches[0].length >= 5) {
+    const duIdx = matches[0].findIndex(x => x.trim() === 'du')
+    const auIdx = matches[0].findIndex(x => x.trim() === 'au')
+    if (side === 'DATE_FROM' && duIdx + 1 < matches[0].length) {
+      result.value = matches[0][duIdx + 1]
+      result.hasRange = true
+      return result
+    } else if (side === 'DATE_TO' && auIdx + 1 < matches[0].length) {
+      result.value = matches[0][auIdx + 1]
+      result.hasRange = true
+      return result
+    }
+  }
+  return result
+}
+
+function formatValue (value, keyType, keyRole, entryType) {
   let parsedValue = null
   switch (keyType) {
     case 'NUMBER':
       parsedValue = filterAlpha(value)
       break
     case 'DATE':
-      parsedValue = entryType === 'auto' ? parseDate(value) : value
+      if (keyRole && keyRole.length && (keyRole[keyRole.length - 1] === 'DATE_FROM' || keyRole[keyRole.length - 1] === 'DATE_TO')) {
+        let parseResult = parseDateRange(value, keyRole[keyRole.length - 1])
+        parsedValue = entryType === 'auto' ? (parseResult.hasRange ? parseResult.value : value) : value
+      } else {
+        parsedValue = entryType === 'auto' ? parseDate(value) : value
+      }
       break
     default:
       parsedValue = value
@@ -248,7 +276,7 @@ export default {
       let updateFormattedDoc = cloneDeep(state.formattedDocument)
       const keyType = state.formattedDocument.filter.keys[state.currentIdx].type
       const keyRole = state.formattedDocument.filter.keys[state.currentIdx].role
-      const newVal = formatValue(bbox.Text, keyType, 'auto')
+      const newVal = formatValue(bbox.Text, keyType, keyRole, 'auto')
       let mbcData = new Map()
       mbcData.set(updateFormattedDoc.osmium[state.currentIdx].Key, bbox)
       if (state.catMode) {
@@ -276,7 +304,7 @@ export default {
       const keyType = state.formattedDocument.filter.keys[state.currentIdx].type
       const keyRole = state.formattedDocument.filter.keys[state.currentIdx].role
       let tempDoc = cloneDeep(state.formattedDocument)
-      const newVal = formatValue(value, keyType, 'manual')
+      const newVal = formatValue(value, keyType, keyRole, 'manual')
       tempDoc.osmium[state.currentIdx][state.currentCol] = newVal
       const updatedDocumentRoleAttributes = getUpdatedDocumentRoles({ keyRole, keyType, newVal })
       if (keyRole && keyRole.length && keyRole[keyRole.length - 1] === 'VENDOR') {
