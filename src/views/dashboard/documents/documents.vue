@@ -16,12 +16,12 @@
         </div>
         <div class="d-flex flex-column justify-content-center">
           <button class="btn btn-primary btn-with-addon"
-                  @click="goToUpload"
+                  @click="showDrawer"
           >
             <span class="btn-addon">
-              <i class="btn-addon-icon fe fe-upload" />
+              <i class="btn-addon-icon fe fe-filter" />
             </span>
-            {{ $t('dashboard.document.upload') }}
+            {{$t('dashboard.document.filterSettings') }}
           </button>
         </div>
         &nbsp;	&nbsp;
@@ -44,17 +44,28 @@
             {{ $t('dashboard.document.validate') }}
           </button>
         </div>
-
       </div>
-      <div v-if="clientViz" class="card-header card-header-flex row">
-        <div class="d-flex flex-column justify-content-center col-2">
-          <button
-            type="button"
-            class="btn btn-success btn-with-addon mr-auto text-nowrap d-none d-md-block"
-            :disabled="!documentsList.length||bulkCsvExportIsLoading"
-            @click="() => bulkExportToCSV()"
+      <div v-else-if="clientViz" class="card-header card-header-flex row">
+        <div class="d-flex flex-column justify-content-center mr-auto col-4">
+          <h5 class="mb-0">{{ $t('dashboard.document.extractions') }}</h5>
+        </div>
+        <div class="d-flex flex-column justify-content-center">
+          <button class="btn btn-primary btn-with-addon"
+                  @click="showDrawer"
           >
-            <span v-if="!bulkCsvExportIsLoading" class="btn-addon">
+            <span class="btn-addon">
+              <i class="btn-addon-icon fe fe-filter" />
+            </span>
+            {{$t('dashboard.document.filterSettings') }}
+          </button>
+        </div>
+        &nbsp;	&nbsp;
+        <div class="d-flex flex-column justify-content-center">
+          <button class="btn btn-success btn-with-addon"
+                  :disabled="!documentsList.length||bulkCsvExportIsLoading"
+                  @click="() => bulkExportToCSV()"
+          >
+           <span v-if="!bulkCsvExportIsLoading" class="btn-addon">
               <i class="btn-addon-icon fe fe-download-cloud" />
             </span>
             <span v-if="bulkCsvExportIsLoading" class="btn-addon" style>
@@ -64,13 +75,12 @@
                 </div>
               </i>
             </span>
-            {{ $t('dashboard.document.bulkDownload') }}
+             {{ $t('dashboard.document.bulkDownload') }}
           </button>
         </div>
       </div>
       <br />
-      <div v-if="!clientViz" class="card-body">
-        <a-button type="primary" @click="showDrawer"> <a-icon type="plus" /> {{$t('dashboard.document.filterSettings') }}</a-button>
+      <div class="card-body">
         <a-drawer
           :title="$t('dashboard.document.filterSettings')"
           :width="720"
@@ -754,9 +764,6 @@ export default {
         name: 'viewer',
         params: { documentId: this.smeltedIdList[0], smeltedValidation: true },
       })
-    },
-    goToUpload() {
-      this.$router.push({ name: 'upload' })
     },
     bulkExportToCSV() {
       if (this.isBankViz) {
