@@ -1,7 +1,7 @@
 <template>
   <div>
     <br>
-    <div v-if="showImputationAlert">
+    <div v-if="showImputationAlert && currentActivePane==='templatePane'">
         <a-alert  :message="currentImputationAlert" type="info" close-text="Fermer" />
     </div>
   <br>

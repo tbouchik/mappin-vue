@@ -11,9 +11,9 @@
         <template v-if="settings.viewerVerticalSplit">
           <div class="row">
             <div class="col-md-6">
-              <div class="sticky">
-                <template-viewer :osmium="currenOsmium" :isArchived="current.isArchived" v-if="!currentDocument.isBankStatement"/>
-                <a-collapse class="top-5" :activeKey="[1, 2]" :bordered="true" v-else>
+              <div :class="{ sticky: !isBankViz }">
+                <template-viewer ref="statement" :osmium="currenOsmium" :isArchived="current.isArchived" v-if="!currentDocument.isBankStatement"/>
+                <a-collapse ref="statement"  class="top-5" :activeKey="[1, 2]" :bordered="true" v-else>
                   <a-collapse-panel key="1" header="En-tête">
                     <template-viewer :osmium="currenOsmium" :isArchived="current.isArchived"/>
                   </a-collapse-panel>
@@ -23,12 +23,12 @@
                 </a-collapse>
               </div>
             </div>
-            <div v-if="documentIsPdf" class="col-md-6">
-              <div>
+            <div ref="window1" v-if="documentIsPdf"  class="col-md-6">
+              <div :class="{ sticky: isBankViz }">
               <smelter-pdf-window  :name="documentName" :currentPageData="currentPageData" :isBankStatement="currentDocument.isBankStatement"/>
               </div>
             </div>
-            <div v-else class="col-md-6 container-fluid">
+            <div ref="window2" v-else class="col-md-6 container-fluid">
                 <smelter-image-window  :name="documentName" :currentPageData="currentPageData" :isBankStatement="currentDocument.isBankStatement"/>
             </div>
           </div>
@@ -145,6 +145,9 @@ export default {
     },
     currentIsReady: function() {
       return Object.values(this.currentDocument).length > 0
+    },
+    isBankViz: function() {
+      return get(this.currentDocument, 'isBankStatement')
     },
   },
   methods: {
