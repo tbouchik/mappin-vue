@@ -306,7 +306,10 @@
           zIndex: 1,
         }"
       >
-        <a-button type="primary" @click="onDrawerClose" ghost>
+        <a-button :style="{ marginRight: '8px' }" @click="onDrawerClose">
+          Fermer
+        </a-button>
+        <a-button type="primary" @click="onReset" ghost>
           Réinitialiser
         </a-button>
       </div>
@@ -477,9 +480,9 @@ export default {
     this.form.getFieldDecorator('searchedStatus', { initialValue: '', preserve: true })
     this.form.getFieldDecorator('searchedVat', { initialValue: '', preserve: true })
     this.form.getFieldDecorator('searchedTotalHt', { initialValue: null, preserve: true })
-    this.form.getFieldDecorator('totalHtOperator', { initialValue: null, preserve: true })
+    this.form.getFieldDecorator('totalHtOperator', { initialValue: 'eq', preserve: true })
     this.form.getFieldDecorator('searchedTotalTtc', { initialValue: null, preserve: true })
-    this.form.getFieldDecorator('totalTtcOperator', { initialValue: null, preserve: true })
+    this.form.getFieldDecorator('totalTtcOperator', { initialValue: 'eq', preserve: true })
     this.form.getFieldDecorator('searchedDates', { initialValue: null, preserve: true })
     this.form.getFieldDecorator('searchedWord', { initialValue: '', preserve: true })
   },
@@ -630,16 +633,15 @@ export default {
     showDrawer() {
       this.visible = true
     },
-    onDrawerClose() {
-      this.visible = false
+    onReset() {
       this.form.setFieldsValue({
         searchedName: '',
         searchedTemplate: '',
         searchedStatus: '',
         searchedTotalHt: null,
-        totalHtOperator: null,
+        totalHtOperator: 'eq',
         searchedTotalTtc: null,
-        totalTtcOperator: null,
+        totalTtcOperator: 'eq',
         searchedVat: '',
         searchedVendor: '',
         searchedBankEntity: '',
@@ -647,7 +649,21 @@ export default {
         searchedDates: [],
       })
       this.searchedDates = []
+      this.searchedWord = ''
+      this.searchedBankEntity = ''
+      this.searchedStatus = null
+      this.searchedTemplate = null
+      this.totalHtOperator = 'eq'
+      this.totalTtcOperator = 'eq'
+      this.searchedVat = ''
+      this.searchedVendor = ''
+      this.searchedName = ''
+      this.searchedTotalTtc = null
+      this.searchedTotalHt = null
       this.fetchDocuments()
+    },
+    onDrawerClose() {
+      this.visible = false
     },
     onDateChange(value, dateString) {
       this.searchedDates = value.map(x => x.toDate().setHours(0, 0, 0, 0))
