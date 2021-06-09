@@ -106,9 +106,10 @@ const messages = {
     searchClient: 'Entrez le nom du client',
   },
   template: {
-    addButton: 'Nouveau Template',
-    addTitle: 'Nouveau Template',
+    addButton: 'Nouveau template',
+    addTitle: 'Nouveau template',
     view: 'Consulter le template',
+    edit: 'Modifier le template',
     delete: 'Supprimer le template',
     constructCopy: 'Créer une copie',
     copy: 'Copie',
@@ -120,6 +121,19 @@ const messages = {
     insertBelow: 'Insérer une ligne en dessous',
     insertAbove: 'Insérer une ligne au dessus',
     deleteAction: 'Supprimer',
+    newTag: 'Nouvelle étiquette',
+    save: 'Enregistrer',
+    keys: 'Clés',
+    type: {
+      ref: 'Référence',
+      number: 'Nombre',
+      text: 'Texte',
+      date: 'Date',
+    },
+    placeholder: {
+      keyName: 'Nom de la clé',
+      keyType: 'Type de clé',
+    },
   },
   accounting: {
     expense: 'Achat',

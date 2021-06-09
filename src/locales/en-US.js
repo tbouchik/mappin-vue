@@ -108,6 +108,7 @@ const messages = {
     addButton: 'Add New Template',
     addTitle: 'Add New Template',
     view: 'View Template',
+    edit: 'Edit Template',
     delete: 'Delete Template',
     constructCopy: 'Create Copy',
     copy: 'Copy',
@@ -119,6 +120,19 @@ const messages = {
     insertBelow: 'Insert empty line below',
     insertAbove: 'Insert empty line above',
     deleteAction: 'Delete',
+    newTag: 'New Tag',
+    save: 'Save changes',
+    keys: 'Keys',
+    type: {
+      ref: 'Reference',
+      number: 'Number',
+      text: 'Text',
+      date: 'Date',
+    },
+    placeholder: {
+      keyName: 'key name',
+      keyType: 'Type',
+    },
   },
   accounting: {
     expense: 'Expense',

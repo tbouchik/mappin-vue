@@ -21,30 +21,16 @@
                   v-decorator="['description', { rules: [{ required: false, message: 'Input here your template description' }] }]"
               />
               </a-form-item>
-              <a-form-item label="Type">
-                <a-select
-                  v-decorator="[
-                    'type',
-                    { rules: [{ required: false, message: 'Please select your template type' }] },
-                  ]"
-                  :placeholder="$t('template.typeSelect')"
-                >
-                  <template>
-                    <a-select-option value="expense">{{ $t('accounting.expense') }}</a-select-option>
-                    <a-select-option value="sale"> {{ $t('accounting.sale') }}</a-select-option>
-                  </template>
-                </a-select>
-              </a-form-item>
               <a-form-item
                 v-for="(k, index) in names"
                 :key="index"
                 v-bind="index === 0 ? formItemLayout : formItemLayoutWithOutLabel"
-                :label="index === 0 ? 'Keys' : ''"
+                :label="index === 0 ? $t('template.keys') : ''"
                 :required="true"
                 >
                   <a-input
                       :value= k.value
-                      placeholder="key name"
+                      :placeholder="$t('template.placeholder.keyName')"
                       style="width: 40%; margin-right: 8px"
                       @change="e => handleChange(e, index)"
 
@@ -52,20 +38,20 @@
                   <a-select
                     :value=k.type
                     style="width: 10%; margin-right: 4px"
-                    placeholder="Type"
+                    :placeholder="$t('template.placeholder.keyType')"
                     @change="e => handleTypeChange(e, index)"
                   >
                     <a-select-option value="REF">
-                      REF
+                      {{ $t('accounting.type.ref') }}
                     </a-select-option>
                     <a-select-option value="TEXT">
-                      TEXT
+                      {{ $t('accounting.type.text') }}
                     </a-select-option>
                     <a-select-option value="NUMBER">
-                      NUMBER
+                      {{ $t('accounting.type.number') }}
                     </a-select-option>
                     <a-select-option value="DATE">
-                      DATE
+                      {{ $t('accounting.type.date') }}
                     </a-select-option>
                   </a-select>
                   <a-cascader
@@ -111,7 +97,7 @@
                     />
                     <a-tag v-else style="background: #fff; borderStyle: dashed;"
                       @click="() => showTagInput(index)">
-                      <a-icon type="plus" /> New Tag
+                      <a-icon type="plus" /> {{ $t('template.newTag') }}
                     </a-tag>
                   </div>
               </a-form-item>
@@ -122,7 +108,7 @@
         </a-form-item>
         <a-form-item v-bind="formItemLayoutWithOutLabel">
         <a-button type="primary" html-type="submit">
-            {{ $t('template.submit') }}
+            {{ $t('template.save') }}
         </a-button>
         </a-form-item>
           </a-form>
