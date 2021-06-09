@@ -38,7 +38,7 @@
               :label-col="{ span: 5 }"
               :wrapper-col="{ span: 12 }"
             >
-              <a-form-item label="Name">
+              <a-form-item :label="$t('client.name')">
                 <a-input
                   :placeholder="$t('client.searchClient')"
                   v-model="searchedName"

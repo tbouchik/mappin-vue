@@ -151,6 +151,7 @@ const messages = {
     company: 'Nom Entreprise',
     number: 'Numéro de Téléphone',
     profileTitle: 'Profile Client',
+    name: 'Nom client',
   },
   util: {
     submit: 'Envoyer',

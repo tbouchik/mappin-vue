@@ -150,6 +150,7 @@ const messages = {
     company: 'Company Name',
     number: 'Phone Number',
     profileTitle: 'Client Detail',
+    name: 'Client Name',
   },
   util: {
     submit: 'Submit',
