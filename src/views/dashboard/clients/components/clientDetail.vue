@@ -4,7 +4,7 @@
     <div class="air__utils__heading">
       <b-row>
         <b-col md="3" class="my-1">
-          <h5>Client Details</h5>
+          <h5>{{ $t('client.profileTitle') }}</h5>
         </b-col>
       </b-row>
     </div>
@@ -12,37 +12,37 @@
       <div class="card">
           <div class="card-body">
             <a-form :form="form" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }" @submit="handleSubmit">
-                <a-form-item label="Full Name">
+                <a-form-item :label="$t('client.fullName')">
                 <a-input
                     v-decorator="['name', { rules: [{ required: true, message: 'Please input your client full name' }] }]"
                 />
                 </a-form-item>
-                <a-form-item label="Client Reference">
+                <a-form-item :label="$t('client.clientref')">
                 <a-input
                     v-decorator="['reference', { rules: [{ required: true, message: 'Please input your client reference' }] }]"
                 />
                 </a-form-item>
-                <a-form-item label="Email Address">
+                <a-form-item :label="$t('client.email')">
                 <a-input
                     v-decorator="['email', { rules: [{ required: false, message: 'Please input your client email address' }] }]"
                 />
                 </a-form-item>
-                <a-form-item label="Company Name">
+                <a-form-item :label="$t('client.company')">
                 <a-input
                     v-decorator="['company', { rules: [{ required: false, message: 'Please input your client company name' }] }]"
                 />
                 </a-form-item>
-                <a-form-item label="Phone Number">
+                <a-form-item :label="$t('client.number')">
                 <a-input
                     v-decorator="['number', { rules: [{ required: false, message: 'Please input your client company name' }] }]"
                 />
                 </a-form-item>
                 <a-form-item :wrapper-col="{ span: 12, offset: 5 }">
                 <a-button type="primary" html-type="submit">
-                    Apply Changes
+                    {{ $t('util.apply') }}
                 </a-button>
                 <a-button type="warning" @click="cancelChanges">
-                    Cancel
+                    {{ $t('util.cancel') }}
                 </a-button>
                 </a-form-item>
             </a-form>

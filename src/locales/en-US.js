@@ -149,11 +149,16 @@ const messages = {
     email: 'Email Address',
     company: 'Company Name',
     number: 'Phone Number',
+    profileTitle: 'Client Detail',
   },
   util: {
     submit: 'Submit',
     view: 'View',
     remove: 'Remove',
+    cancel: 'Cancel',
+    create: 'Create',
+    save: 'Save',
+    apply: 'Appy',
   },
 }
 

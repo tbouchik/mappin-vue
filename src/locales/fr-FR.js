@@ -102,7 +102,7 @@ const messages = {
   },
   upload: {
     title: 'Uploader les documents',
-    credits: 'Statut du Crédit Mensuel',
+    credits: 'Statut du consommation',
     searchClient: 'Entrez le nom du client',
   },
   template: {
@@ -150,11 +150,16 @@ const messages = {
     email: 'Adresse Email',
     company: 'Nom Entreprise',
     number: 'Numéro de Téléphone',
+    profileTitle: 'Profile Client',
   },
   util: {
     submit: 'Envoyer',
     view: 'Consulter',
     remove: 'Supprimer',
+    cancel: 'Annuler',
+    create: 'Créer',
+    save: 'Enregistrer',
+    apply: 'Appliquer',
   },
 }
 
