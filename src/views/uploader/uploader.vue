@@ -13,9 +13,9 @@
     </a-steps>
     <br />
     <div>
-      <template v-if="steps[uploaderStep].title == 'UploadType'">
+      <template v-if="steps[uploaderStep].title == 'Type'">
         <div style="margin-bottom:1%">
-          Upload Type:
+          {{ $t('upload.credits')}}
           <a-progress
             :stroke-color="{
               '0%': '#108ee9',
@@ -76,7 +76,7 @@
 
       <template v-if="steps[uploaderStep].title == 'Client'">
         <div style="margin-bottom:1%">
-          Upload Type:
+          {{ $t('upload.credits')}}
           <a-progress
             :stroke-color="{
               '0%': '#108ee9',
@@ -117,7 +117,7 @@
       </template>
       <template v-if="steps[uploaderStep].title == 'Template'">
         <div style="margin-bottom:1%">
-          Upload Type:
+          {{ $t('upload.credits')}}
           <a-progress
             :stroke-color="{
               '0%': '#108ee9',
@@ -148,9 +148,9 @@
           </div>
         </div>
       </template>
-      <div v-if="steps[uploaderStep].title == 'Files'">
+      <div v-if="steps[uploaderStep].title == 'Fichiers'">
         <div style="margin-bottom:1%">
-          Upload Type:
+          {{ $t('upload.credits')}}
           <a-progress
             :stroke-color="{
               '0%': '#108ee9',
@@ -197,7 +197,7 @@ export default {
       isBankUpload: false,
       steps: [
         {
-          title: 'UploadType',
+          title: 'Type',
         },
         {
           title: 'Client',
@@ -206,7 +206,7 @@ export default {
           title: 'Template',
         },
         {
-          title: 'Files',
+          title: 'Fichiers',
         },
       ],
     }
