@@ -790,12 +790,13 @@ export default {
     },
     bulkExportInvoicesToCSV() {
       this.bulkCsvExportIsLoading = true
+      const bom = '\uFEFF' // Byte Order Mark
       let zip = JSZip()
       let downloadQueryParams = cloneDeep(this.queryParams)
       DocumentService.bulkExportCSV(downloadQueryParams)
         .then((templateAggregates) => {
           templateAggregates.map((templateAggregate) => {
-            let templateCsvContent = ''
+            let templateCsvContent = 'data:text/csv;charset=utf-8,'.concat(bom)
             let arrData = []
             arrData.push(templateAggregate.header.join(';'))
             templateAggregate.osmiums.map((osmiumEntries) => {

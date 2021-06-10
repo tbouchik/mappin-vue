@@ -91,7 +91,7 @@
           <button class="btn btn-outline-primary"
            @click="csvExport" >
             <span>
-              <i class=" fa fa-download" />
+              <i class=" fa fa-download"/>
             </span>
           </button>
         </a-tooltip>
@@ -185,7 +185,6 @@
 </template>
 <script>
 import { mapGetters, mapState } from 'vuex'
-import { pick } from 'lodash'
 import DocumentService from '../../../../services/documentService'
 
 export default {
@@ -321,20 +320,57 @@ export default {
       }
     },
     csvExport() {
-      let csvContent = 'data:text/csv;charset=utf-8,'
-      let lines = ['Key', 'Value']
+      const bom = '\uFEFF' // https://stackoverflow.com/questions/43463923/javascript-how-to-download-csv-file-containing-french-text-with-utf-8-encoding
+      let csvContent = 'data:text/csv;charset=utf-8,' + bom
       let arrData = []
-      lines.map(line => {
-        arrData.push(this.current.osmium.map(item => {
-          return Object.values(pick(item, [line]))
-        }).join(';'))
-      })
-      csvContent += arrData.join('\n').replace(/(^\[)|(\]$)/gm, '')
+      if (!this.current.isBankStatement) {
+        let nonImputableOsmiumKeysIndices = this.current.filter.keys.map((x, i) => { if (x.isImputable !== true) return i }).filter(x => x !== undefined)
+        let imputableOsmiumKeysIndices = this.current.filter.keys.map((x, i) => { if (x.isImputable === true) return i }).filter(x => x !== undefined)
+        let fixedKeys = ['N° Compte', 'Libellé', 'Valeur']
+        const osmiumKeys = nonImputableOsmiumKeysIndices.map((keyIdx) => this.current.filter.keys[keyIdx].value).concat(fixedKeys)
+        arrData.push(osmiumKeys.join(';'))
+        let nonImputableEntrySegment = nonImputableOsmiumKeysIndices.map(nonImputableIdx => this.current.osmium[nonImputableIdx].Value)
+        imputableOsmiumKeysIndices.forEach((imputableOsmiumKey) => {
+          let imputableEntrySegment = [ this.current.osmium[imputableOsmiumKey].Imputation,
+            this.current.osmium[imputableOsmiumKey].Libelle,
+            this.current.osmium[imputableOsmiumKey].Value]
+          let entrySegment = nonImputableEntrySegment.concat(imputableEntrySegment)
+          arrData.push(entrySegment.join(';'))
+        })
+      } else {
+        let fixedKeys = ['Date Opération', 'Désignation', 'Compte', 'Débit', 'Crédit']
+        arrData.push(fixedKeys.join(';'))
+        Object.keys(this.current.bankOsmium).forEach((docPage) => {
+          const pageStatements = this.current.bankOsmium[docPage]
+          pageStatements.forEach((statement) => {
+            let entrySegment = [statement.Date, statement.Designation, statement.Compte, statement.Debit, statement.Credit]
+            arrData.push(entrySegment.join(';'))
+          })
+        })
+      }
+      csvContent += arrData.join('\n')
       const data = encodeURI(csvContent)
       const link = document.createElement('a')
+      const fileName = this.current.isBankStatement ? this.getTitleForBankStatementDocument(this.current) : this.getTitleForInvoiceDocument(this.current)
       link.setAttribute('href', data)
-      link.setAttribute('download', `${this.current.name.split('.')[0]}.csv`)
+      link.setAttribute('download', `${fileName('.')[0]}.csv`)
       link.click()
+    },
+    getTitleForBankStatementDocument(document) {
+      const bankNameObj = document.osmium.find((x) => x.Role && x.Role.length && x.Role[x.Role.length - 1] === 'BANK_NAME')
+      const bankName = bankNameObj ? '_'.concat(bankNameObj.Value) : undefined
+      const dateFromObj = document.osmium.find((x) => x.Role && x.Role.length && x.Role[x.Role.length - 1] === 'DATE_FROM')
+      const dateFrom = dateFromObj ? '_'.concat(dateFromObj.Value).replace(/\//g, '_') : undefined
+      const clientName = document.client.name.replace(/\s/g, '_').toUpperCase()
+      return clientName.concat(bankName || '').concat(dateFrom || '')
+    },
+    getTitleForInvoiceDocument(document) {
+      const vendorObj = document.osmium.find((x) => x.Role && x.Role.length && x.Role[x.Role.length - 1] === 'VENDOR')
+      const vendorName = vendorObj ? '_'.concat(vendorObj.Value) : undefined
+      const invoiceDateIdx = document.filter.keys.findIndex((x) => x.type === 'DATE')
+      const invoiceDate = invoiceDateIdx ? '_'.concat(document.osmium[invoiceDateIdx].Value).replace(/\//g, '_') : undefined
+      const clientName = document.client.name.replace(/\s/g, '_').toUpperCase()
+      return clientName.concat(vendorName || '').concat(invoiceDate || '')
     },
     goToClient() {
       this.$router.push({ name: 'client', params: { clientId: this.current.client._id } })

@@ -5,7 +5,7 @@
         <a-alert  :message="currentImputationAlert" type="info" close-text="Fermer" />
     </div>
   <br>
-      <a-table  :columns="columns"
+      <a-table  :columns="adjustedColumns"
                 :data-source="pageData"
                 :pagination=false
                 bordered>
@@ -148,9 +148,16 @@ export default {
       required: false,
       default: false,
     },
+    isBankStatement: {
+      type: Boolean,
+      required: true,
+    },
   },
   computed: {
     ...mapGetters(['currentPage', 'currentActiveIndex', 'currentActivePane', 'currentActiveColumn', 'catMode', 'showImputationAlert', 'currentImputationAlert']),
+    adjustedColumns: function() {
+      return this.isBankStatement ? columns.slice(0, 2) : columns
+    },
   },
   watch: {
     osmium: function () {
