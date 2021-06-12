@@ -42,16 +42,16 @@
                     @change="e => handleTypeChange(e, index)"
                   >
                     <a-select-option value="REF">
-                      {{ $t('accounting.type.ref') }}
+                      {{ $t('template.type.ref') }}
                     </a-select-option>
                     <a-select-option value="TEXT">
-                      {{ $t('accounting.type.text') }}
+                      {{ $t('template.type.text') }}
                     </a-select-option>
                     <a-select-option value="NUMBER">
-                      {{ $t('accounting.type.number') }}
+                      {{ $t('template.type.number') }}
                     </a-select-option>
                     <a-select-option value="DATE">
-                      {{ $t('accounting.type.date') }}
+                      {{ $t('template.type.date') }}
                     </a-select-option>
                   </a-select>
                   <a-cascader
@@ -140,7 +140,7 @@ export default {
     keys: {
       type: Array,
       default: function () {
-        return []
+        return [{ type: undefined, value: null, isImputable: false, tags: [] }]
       },
     },
   },
