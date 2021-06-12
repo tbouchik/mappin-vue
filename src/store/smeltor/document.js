@@ -115,7 +115,7 @@ function getTableAdjacentColumn(currentCol, move) {
 
 function filterAlpha (str) {
   if (typeof str === 'string') {
-    return str.replace(',', '.').replace(/[^\d.-]/g, '')
+    return str.replace(',', '.').replace(/[^\d.]/g, '')
   }
   return str
 }
