@@ -353,7 +353,7 @@ export default {
       const link = document.createElement('a')
       const fileName = this.current.isBankStatement ? this.getTitleForBankStatementDocument(this.current) : this.getTitleForInvoiceDocument(this.current)
       link.setAttribute('href', data)
-      link.setAttribute('download', `${fileName('.')[0]}.csv`)
+      link.setAttribute('download', `${fileName}.csv`)
       link.click()
     },
     getTitleForBankStatementDocument(document) {

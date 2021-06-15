@@ -790,13 +790,12 @@ export default {
     },
     bulkExportInvoicesToCSV() {
       this.bulkCsvExportIsLoading = true
-      const bom = '\uFEFF' // Byte Order Mark
       let zip = JSZip()
       let downloadQueryParams = cloneDeep(this.queryParams)
       DocumentService.bulkExportCSV(downloadQueryParams)
         .then((templateAggregates) => {
           templateAggregates.map((templateAggregate) => {
-            let templateCsvContent = 'data:text/csv;charset=utf-8,'.concat(bom)
+            let templateCsvContent = '\uFEFF'
             let arrData = []
             arrData.push(templateAggregate.header.join(';'))
             templateAggregate.osmiums.map((osmiumEntries) => {
@@ -804,7 +803,7 @@ export default {
                 arrData.push(osmiumEntry.join(';'))
               })
             })
-            templateCsvContent += arrData.join('\n').replace(/(^\[)|(\]$)/gm, '')
+            templateCsvContent += arrData.join('\n')
             zip.file(`${templateAggregate.template}.csv`, templateCsvContent)
             this.bulkCsvExportIsLoading = false
           })
@@ -824,13 +823,13 @@ export default {
       DocumentService.bulkBankExportCSV(downloadQueryParams)
         .then((docsData) => {
           docsData.map((docData) => {
-            let templateCsvContent = ''
+            let templateCsvContent = '\uFEFF'
             let arrData = []
             arrData.push(docData.header.join(';'))
             docData.content.map((entrySegments) => {
               arrData.push(entrySegments.join(';'))
             })
-            templateCsvContent += arrData.join('\n').replace(/(^\[)|(\]$)/gm, '')
+            templateCsvContent += arrData.join('\n')
             zip.file(`${docData.title}.csv`, templateCsvContent)
             this.bulkCsvExportIsLoading = false
           })
