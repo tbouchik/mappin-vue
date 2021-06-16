@@ -35,7 +35,7 @@
     <div class="row">
       <div class="col-12">
         <div class="card">
-          <div class="card-body">
+          <div class="card-body" id="pdf-card">
             <canvas id="pdf-render" @click="updateOsmium"></canvas>
           </div>
         </div>
@@ -102,16 +102,27 @@ export default {
       let pageNumIsPending = null
       this.$store.dispatch('ACTION_RESET_PAGE')
 
-      const canvas = document.querySelector('#pdf-render')
-      const ctx = canvas.getContext('2d')
-
       // Render the page
       const renderPage = num => {
         pageIsRendering = true
 
+        var canvParent = document.querySelector('#pdf-card')
+        var oldcanv = document.querySelector('#pdf-render')
+        canvParent.removeChild(oldcanv)
+
+        var canv = document.createElement('canvas')
+        canv.id = 'pdf-render'
+        canvParent.appendChild(canv)
+
+        const canvas = document.querySelector('#pdf-render')
+        const ctx = canvas.getContext('2d')
         // Get page
         pdfDoc.getPage(num).then(page => {
           // Set scale
+          if (ctx) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            ctx.beginPath()
+          }
           const viewport = page.getViewport(
             document.querySelector('.card-body').offsetWidth /
               page.getViewport(1.0).width
@@ -191,13 +202,7 @@ export default {
           renderPage(pageNum)
         })
         .catch(err => {
-          // Display error
-          const div = document.createElement('div')
-          div.className = 'error'
-          div.appendChild(document.createTextNode(err.message))
-          document.querySelector('body').insertBefore(div, canvas)
-          // Remove top bar
-          document.querySelector('.top-bar').style.display = 'none'
+          console.log(err)
         })
 
       // Button Events
