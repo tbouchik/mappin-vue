@@ -5,7 +5,7 @@
       <div class="col-md-4"></div>
       <div class="col-md-5">
         <a-button-group>
-          <a-button type="primary" id="prev-page">
+          <a-button type="primary" id="prev-page" @click="showPrevPage">
             <a-icon type="left" />
           </a-button>
           <a-button type="primary">
@@ -15,7 +15,7 @@
               <span id="page-count"></span>
             </span>
           </a-button>
-          <a-button type="primary" id="next-page">
+          <a-button type="primary" id="next-page" @click="showNextPage">
             <a-icon type="right" />
           </a-button>
           <br />
@@ -48,7 +48,7 @@
 import DocumentService from '../../../../services/documentService.js'
 import { mapGetters } from 'vuex'
 
-var pdfjsLib = require('pdfjs-dist')
+let pdfjsLib = require('pdfjs-dist')
 export default {
   name: 'SmelterPdfWindow',
   mounted: async function() {
@@ -77,6 +77,14 @@ export default {
     },
     ...mapGetters(['current']),
   },
+  data: function () {
+    return {
+      pageNumIsPending: null,
+      pageIsRendering: false,
+      pdfDoc: null,
+      pageNum: 1,
+    }
+  },
   methods: {
     updateOsmium(event) {
       let x = event.layerX
@@ -95,123 +103,107 @@ export default {
         this.$store.dispatch('ACTION_AUTO_CHANGES_TO_STATEMENT', selectedTextSection[0])
       }
     },
-    async renderPdf() {
-      let pdfDoc = null
-      let pageNum = 1
-      let pageIsRendering = false
-      let pageNumIsPending = null
-      this.$store.dispatch('ACTION_RESET_PAGE')
+    // Render the page
+    renderPage(num) {
+      this.pageIsRendering = true
+      let canvParent = document.querySelector('#pdf-card')
+      let oldcanv = document.querySelector('#pdf-render')
+      canvParent.removeChild(oldcanv)
 
-      // Render the page
-      const renderPage = num => {
-        pageIsRendering = true
+      let canv = document.createElement('canvas')
+      canv.id = 'pdf-render'
+      canvParent.appendChild(canv)
+      canv.addEventListener('click', this.updateOsmium)
 
-        var canvParent = document.querySelector('#pdf-card')
-        var oldcanv = document.querySelector('#pdf-render')
-        canvParent.removeChild(oldcanv)
+      const canvas = document.querySelector('#pdf-render')
+      const ctx = canvas.getContext('2d')
+      // Get page
+      this.pdfDoc.getPage(num).then(page => {
+        // Set scale
+        if (ctx) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height)
+          ctx.beginPath()
+        }
+        const viewport = page.getViewport(
+          document.querySelector('.card-body').offsetWidth /
+            page.getViewport(1.0).width
+        )
+        canvas.height = viewport.height
+        canvas.width = viewport.width
+        const renderCtx = {
+          canvasContext: ctx,
+          viewport,
+        }
+        page.render(renderCtx).promise.then(() => {
+          this.pageIsRendering = false
 
-        var canv = document.createElement('canvas')
-        canv.id = 'pdf-render'
-        canvParent.appendChild(canv)
-
-        const canvas = document.querySelector('#pdf-render')
-        const ctx = canvas.getContext('2d')
-        // Get page
-        pdfDoc.getPage(num).then(page => {
-          // Set scale
-          if (ctx) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height)
-            ctx.beginPath()
+          if (this.pageNumIsPending !== null) {
+            this.renderPage(this.pageNumIsPending)
+            this.pageNumIsPending = null
           }
-          const viewport = page.getViewport(
-            document.querySelector('.card-body').offsetWidth /
-              page.getViewport(1.0).width
-          )
-          canvas.height = viewport.height
-          canvas.width = viewport.width
-
-          const renderCtx = {
-            canvasContext: ctx,
-            viewport,
+          if (this.currentPageData) {
+            for (let i = 0; i < this.currentPageData.length; i++) {
+              ctx.beginPath()
+              ctx.rect(
+                canvas.width * this.currentPageData[i].Left,
+                canvas.height * this.currentPageData[i].Top,
+                canvas.width * this.currentPageData[i].Width,
+                canvas.height * this.currentPageData[i].Height
+              )
+              ctx.strokeStyle = 'purple'
+              ctx.stroke()
+            }
           }
-
-          page.render(renderCtx).promise.then(() => {
-            pageIsRendering = false
-
-            if (pageNumIsPending !== null) {
-              renderPage(pageNumIsPending)
-              pageNumIsPending = null
-            }
-            if (this.currentPageData) {
-              for (var i = 0; i < this.currentPageData.length; i++) {
-                ctx.beginPath()
-                ctx.rect(
-                  canvas.width * this.currentPageData[i].Left,
-                  canvas.height * this.currentPageData[i].Top,
-                  canvas.width * this.currentPageData[i].Width,
-                  canvas.height * this.currentPageData[i].Height
-                )
-                ctx.strokeStyle = 'purple'
-                ctx.stroke()
-              }
-            }
-          })
-          // Output current page
-          document.querySelector('#page-num').textContent = num
         })
+        // Output current page
+        document.querySelector('#page-num').textContent = num
+      })
+    },
+    // Check for pages rendering
+    queueRenderPage(num) {
+      if (this.pageIsRendering) {
+        this.pageNumIsPending = num
+      } else {
+        this.renderPage(num)
       }
-
-      // Check for pages rendering
-      const queueRenderPage = num => {
-        if (pageIsRendering) {
-          pageNumIsPending = num
-        } else {
-          renderPage(num)
-        }
+    },
+    // Show Prev Page
+    showPrevPage() {
+      if (this.pageNum <= 1) {
+        return
       }
-
-      // Show Prev Page
-      const showPrevPage = () => {
-        if (pageNum <= 1) {
-          return
-        }
-        pageNum--
-        this.$store.dispatch('ACTION_DERCREMENT_PAGE')
-        queueRenderPage(pageNum)
+      this.pageNum--
+      this.$store.dispatch('ACTION_DERCREMENT_PAGE')
+      this.queueRenderPage(this.pageNum)
+    },
+    // Show Next Page
+    showNextPage() {
+      if (this.pageNum >= this.pdfDoc.numPages) {
+        return
       }
-
-      // Show Next Page
-      const showNextPage = () => {
-        if (pageNum >= pdfDoc.numPages) {
-          return
-        }
-        pageNum++
-        this.$store.dispatch('ACTION_INCREMENT_PAGE')
-        queueRenderPage(pageNum)
-      }
-
+      this.pageNum++
+      this.$store.dispatch('ACTION_INCREMENT_PAGE')
+      this.queueRenderPage(this.pageNum)
+    },
+    async renderPdf() {
+      this.pdfDoc = null
+      this.pageNum = 1
+      this.pageIsRendering = false
+      this.$store.dispatch('ACTION_RESET_PAGE')
       // Get Document
       pdfjsLib
         .getDocument(`/media/${this.name}`)
         .promise.then(pdfDoc_ => {
-          if (pdfDoc) {
-            pdfDoc.destroy()
+          if (this.pdfDoc) {
+            this.pdfDoc.destroy()
           }
-          pdfDoc = pdfDoc_
-          document.querySelector('#page-count').textContent = pdfDoc.numPages
-          renderPage(pageNum)
+          this.pdfDoc = pdfDoc_
+          document.querySelector('#page-count').textContent = this.pdfDoc.numPages
+          this.renderPage(this.pageNum)
         })
         .catch(err => {
           console.log(err)
         })
-
-      // Button Events
-      document
-        .querySelector('#prev-page')
-        .addEventListener('click', showPrevPage)
-      document
-        .querySelector('#next-page')
-        .addEventListener('click', showNextPage)
     },
     downloadItem() {
       DocumentService.downloadPDF(this.src).then(response => {

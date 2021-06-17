@@ -282,6 +282,7 @@ export default {
   },
   methods: {
     goNext() {
+      this.$store.dispatch('ACTION_RESET_PAGE')
       if (this.smeltedValidation) {
         this.$router.push({
           name: 'viewer',
@@ -301,6 +302,7 @@ export default {
       }
     },
     goPrevious() {
+      this.$store.dispatch('ACTION_RESET_PAGE')
       if (this.smeltedValidation) {
         this.$router.push({
           name: 'viewer',
