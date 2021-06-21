@@ -42,7 +42,6 @@
                 :value="text"
                 :max-suggestions="10"
                 :min-length="1"
-                :styles="autoCompleteStyle"
                 :list="simpleSuggestionList"
                 :filter-by-query="true"
                 :filter="suggestFilter"
@@ -130,9 +129,6 @@ export default {
       columns,
       pageData: [],
       chosen: '',
-      autoCompleteStyle: {
-        focus: 'c1',
-      },
     }
   },
   created() {

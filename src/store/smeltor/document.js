@@ -9,6 +9,7 @@ import moment from 'moment'
 Vue.use(Vuex)
 
 let cancelToken
+let debounce = null
 
 function saveDocToAPI(mbc, document, { imput, bankOsmiumChanged, keyAttributes }) {
   let updatedDocument = {
@@ -314,8 +315,11 @@ export default {
         })
       }
       state.formattedDocument = tempDoc
-      let options = { imput: false, bankOsmiumChanged: false, keyAttributes: updatedDocumentRoleAttributes }
-      saveDocToAPI(Object.fromEntries(mbcData), state.formattedDocument, options)
+      clearTimeout(debounce)
+      debounce = setTimeout(() => {
+        let options = { imput: false, bankOsmiumChanged: false, keyAttributes: updatedDocumentRoleAttributes }
+        saveDocToAPI(Object.fromEntries(mbcData), state.formattedDocument, options)
+      }, 600)
     },
     MUTATION_DO_IMPUTATION_CHANGES_TO_INVOICE(state, changeData) {
       let { imputation, itemIdx } = changeData
@@ -344,9 +348,11 @@ export default {
       let tempDoc = cloneDeep(state.formattedDocument)
       tempDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol] = value
       state.formattedDocument = tempDoc
-      console.log(state.formattedDocument.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol])
-      let options = { imput: false, bankOsmiumChanged: true, keyAttributes: null }
-      saveDocToAPI(null, state.formattedDocument, options)
+      clearTimeout(debounce)
+      debounce = setTimeout(() => {
+        let options = { imput: false, bankOsmiumChanged: true, keyAttributes: null }
+        saveDocToAPI(null, state.formattedDocument, options)
+      }, 600)
     },
     MUTATION_DO_IMPUTATION_CHANGES_TO_STATEMENT(state, changeData) {
       let { imputation, itemIdx } = changeData
