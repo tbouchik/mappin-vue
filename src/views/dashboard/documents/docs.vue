@@ -59,10 +59,10 @@ export default {
           this.$store.dispatch('ACTION_CACHE_SMELTED_IDS', { idsArray,
             concat: false })
           this.validatorIsLoading = false
+          const setting = 'currentActivePane'
+          const value = activeTab
+          this.$store.commit('CHANGE_SETTING', { setting, value })
         })
-      const setting = 'currentActivePane'
-      const value = activeTab
-      this.$store.commit('CHANGE_SETTING', { setting, value })
     },
   },
 }
