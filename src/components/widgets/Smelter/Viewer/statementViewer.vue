@@ -236,13 +236,14 @@ export default {
       let totalCredit = '0.00'
       let balanced = true
       const maxJumps = 2
+      let counter = 1
       let indicesToJump = new Set()
       allStatements.forEach((st, i, arr) => {
         if (!indicesToJump.has(i)) {
           let debitData = this.getStatementPrice(st.Debit)
           let creditData = this.getStatementPrice(st.Credit)
           if (debitData.isNull && !creditData.isNull) {
-            let counter = 1
+            counter = 1
             let debitCounterparty = '0.00'
             while (counter <= maxJumps && debitCounterparty < creditData.value) {
               let nextDebit = this.getStatementPrice(arr[i + counter].Debit).value
@@ -261,7 +262,7 @@ export default {
               this.assessment.error = st
             }
           } else if (creditData.isNull && !debitData.isNull) {
-            let counter = 1
+            counter = 1
             let creditCounterparty = '0.00'
             while (counter <= maxJumps && creditCounterparty < debitData.value) {
               creditCounterparty = (parseFloat(creditCounterparty) + parseFloat(this.getStatementPrice(arr[i + counter].Credit).value)).toFixed(2)
@@ -285,12 +286,12 @@ export default {
       this.assessment.debit = totalDebit
     },
     getStatementPrice(value) {
-      const pattern = /^\d+([.,]\d{1,2})*/gi
+      const pattern = /^([\d ]+)([.,]\d{1,2})*/gi
       let currentDebitDigits = '0.00'
       try {
         let valueIsNull = value === null || value === undefined || value === ''
         currentDebitDigits = !valueIsNull ? value.match(pattern) ? value.match(pattern)[0] : '0.00' : '0.00'
-        currentDebitDigits = parseFloat(currentDebitDigits.replace(',', '.')).toFixed(2)
+        currentDebitDigits = parseFloat(currentDebitDigits.replace(' ', '').replace(',', '.')).toFixed(2)
       } catch (error) {
         console.log(error)
       }

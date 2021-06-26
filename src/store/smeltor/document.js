@@ -203,7 +203,7 @@ function formatValue (value, keyType, keyRole, entryType) {
     case 'DATE':
       if (keyRole && keyRole.length && (keyRole[keyRole.length - 1] === 'DATE_FROM' || keyRole[keyRole.length - 1] === 'DATE_TO')) {
         let parseResult = parseDateRange(value, keyRole[keyRole.length - 1])
-        parsedValue = entryType === 'auto' ? (parseResult.hasRange ? parseResult.value : value) : value
+        parsedValue = entryType === 'auto' ? (parseResult.hasRange ? parseDate(parseResult.value) : parseDate(value)) : value
       } else {
         parsedValue = entryType === 'auto' ? parseDate(value) : value
       }
