@@ -291,11 +291,25 @@ export default {
       try {
         let valueIsNull = value === null || value === undefined || value === ''
         currentDebitDigits = !valueIsNull ? value.match(pattern) ? value.match(pattern)[0] : '0.00' : '0.00'
-        currentDebitDigits = parseFloat(currentDebitDigits.replace(' ', '').replace(',', '.')).toFixed(2)
+        currentDebitDigits = this.parsePrice(currentDebitDigits)
       } catch (error) {
         console.log(error)
       }
       return { isNull: currentDebitDigits === '0.00', value: currentDebitDigits }
+    },
+    parsePrice(value) {
+      if (!value) return value
+      let result = value
+      let commaIdx = value.indexOf(',')
+      let pointIdx = value.indexOf('.')
+      if (commaIdx !== -1 && pointIdx !== -1) {
+        if (commaIdx < pointIdx) {
+          result.replace(',', '')
+        } else {
+          result.replace('.', '')
+        }
+      }
+      return parseFloat(result.replace(' ', '').replace(',', '.')).toFixed(2)
     },
     switchEditMode() {
       this.editMode = !this.editMode
