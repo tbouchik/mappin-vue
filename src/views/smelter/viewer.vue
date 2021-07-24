@@ -18,7 +18,7 @@
                     <template-viewer  :isBankStatement="currentDocument.isBankStatement"  :osmium="currenOsmium" :isArchived="current.isArchived"/>
                   </a-collapse-panel>
                   <a-collapse-panel key="2" header="Détails du relevé" :disabled="false">
-                    <statement-viewer :bankOsmium="currentBankOsmium" :isArchived="current.isArchived"/>
+                    <statement-viewer :bankOsmium="currentBankOsmium" :isArchived="current.isArchived" :dateBeg="current.dateBeg" :dateEnd="current.dateEnd"/>
                   </a-collapse-panel>
                 </a-collapse>
               </div>
@@ -43,7 +43,7 @@
                     <template-viewer :osmium="currenOsmium"  :isBankStatement="currentDocument.isBankStatement"  :isArchived="current.isArchived"/>
                   </a-collapse-panel>
                   <a-collapse-panel key="2" header="Détails du relevé" :disabled="false">
-                    <statement-viewer :bankOsmium="currentBankOsmium" :isArchived="current.isArchived"/>
+                    <statement-viewer :bankOsmium="currentBankOsmium" :isArchived="current.isArchived" :dateBeg="current.dateBeg" :dateEnd="current.dateEnd"/>
                   </a-collapse-panel>
                 </a-collapse>
             </div>

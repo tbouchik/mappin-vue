@@ -22,6 +22,9 @@
         <a-button type="primary" style="margin-left:1%" @click="setBalanceModalVisible" ghost>
           Bilan
         </a-button>
+        <a-button type="primary" style="margin-left:1%" @click="setDateModalVisible" ghost>
+          Formater Date
+        </a-button>
         <a-modal
           v-model="balanceModalVisible"
           title="Totaux des mouvements"
@@ -106,6 +109,16 @@
       </a-table>
       <br>
     <br>
+    <a-modal v-model="dateModalVisible" title="Confirmation de Date" @ok="confirmDate">
+      <a-range-picker
+        :placeholder="['Mois début', 'Mois fin']"
+        format="MM/YYYY"
+        :value="dates"
+        :mode="datePickerMode"
+        @panelChange="handleDatePickerPanelChange"
+        @change="handleDateChange"
+      />
+    </a-modal>
   </div>
 </template>
 <script>
@@ -123,6 +136,7 @@ import { accountNumbers1,
 import labels from '../../../../assets/accounting/labels'
 import VueSimpleSuggest from 'vue-simple-suggest'
 import 'vue-simple-suggest/dist/styles.css' // Optional CSS
+import moment from 'moment'
 const columns = [
   {
     title: 'Date',
@@ -167,6 +181,9 @@ export default {
       columns,
       selectedStatements: [],
       balanceModalVisible: false,
+      dateModalVisible: false,
+      datePickerMode: ['month', 'month'],
+      dates: [],
       assessment: {
         balanced: true,
         credit: 0.00,
@@ -181,6 +198,12 @@ export default {
   props: {
     bankOsmium: {
       required: true,
+    },
+    dateEnd: {
+      required: false,
+    },
+    dateBeg: {
+      required: false,
     },
     isArchived: {
       type: Boolean,
@@ -374,6 +397,29 @@ export default {
     deleteStatements() {
       this.$store.dispatch('ACTION_DELETE_STATEMENTS', { selectedStatements: this.selectedStatements })
       this.selectedStatements = []
+    },
+    setDateModalVisible () {
+      this.setMonths()
+      this.dateModalVisible = true
+    },
+    confirmDate(e) {
+      this.dateModalVisible = false
+      this.$store.dispatch('ACTION_FORMAT_STATEMENT_DATES', this.dates)
+    },
+    handleDateChange(dates) {
+      this.dates = dates
+    },
+    handleDatePickerPanelChange(dates, mode) {
+      this.dates = dates
+      this.datePickerMode = [mode[0] === 'date' ? 'month' : mode[0], mode[1] === 'date' ? 'month' : mode[1]]
+    },
+    setMonths() {
+      if (this.dateBeg) {
+        this.dates[0] = moment(this.dateBeg)
+      }
+      if (this.dateEnd) {
+        this.dates[1] = moment(this.dateEnd)
+      }
     },
   },
   destroyed() {

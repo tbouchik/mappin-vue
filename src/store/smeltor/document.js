@@ -122,7 +122,7 @@ function filterAlpha (str) {
 }
 
 function getUpdatedDocumentRoles (props) {
-  let { keyRole, keyType, newVal } = props
+  let { keyRole, keyType, newVal, isBank } = props
   let result = {}
   let momentInstanceDate = moment()
   if (keyRole && keyRole.constructor === Array && keyRole.length > 0) {
@@ -155,7 +155,7 @@ function getUpdatedDocumentRoles (props) {
         break
     }
   }
-  if (keyType === 'DATE') {
+  if (keyType === 'DATE' && !isBank) {
     momentInstanceDate = moment(newVal, 'DD/MM/YYYY')
     result.invoiceDate = momentInstanceDate._isValid ? momentInstanceDate.toDate().setHours(0, 0, 0, 0) : null
   }
@@ -286,7 +286,8 @@ export default {
       } else {
         updateFormattedDoc.osmium[state.currentIdx].Value = newVal
       }
-      const updatedDocumentRoleAttributes = getUpdatedDocumentRoles({ keyRole, keyType, newVal })
+      const updatedDocumentRoleAttributes = getUpdatedDocumentRoles({ keyRole, keyType, newVal, isBank: state.formattedDocument.isBankStatement })
+      Object.assign(updateFormattedDoc, updatedDocumentRoleAttributes)
       if (keyRole && keyRole.length && keyRole[keyRole.length - 1] === 'VENDOR') {
         updateFormattedDoc.osmium.forEach((x) => {
           if (x.Imputation !== null) {
@@ -306,7 +307,8 @@ export default {
       let tempDoc = cloneDeep(state.formattedDocument)
       const newVal = formatValue(value, keyType, keyRole, 'manual')
       tempDoc.osmium[state.currentIdx][state.currentCol] = newVal
-      const updatedDocumentRoleAttributes = getUpdatedDocumentRoles({ keyRole, keyType, newVal })
+      const updatedDocumentRoleAttributes = getUpdatedDocumentRoles({ keyRole, keyType, newVal, isBank: state.formattedDocument.isBankStatement })
+      Object.assign(tempDoc, updatedDocumentRoleAttributes)
       if (keyRole && keyRole.length && keyRole[keyRole.length - 1] === 'VENDOR') {
         tempDoc.osmium.forEach((x) => {
           if (x.Imputation !== null) {
@@ -445,6 +447,38 @@ export default {
       const trimedImputation = trimImputationQuery(imputation)
       state.currentLibelle = labels[parseInt(trimedImputation)]
     },
+    MUTATION_FORMAT_STATEMENT_DATES(state, dates) {
+      let updateFormattedDoc = cloneDeep(state.formattedDocument)
+      Object.values(updateFormattedDoc.bankOsmium).forEach((statementPage) => {
+        let usedMonth = 0
+        let lastUsedDate = 0
+        statementPage.forEach((statementItem) => {
+          try {
+            let fullDate = statementItem.Date.replace(/\D+/g, '')
+            if (fullDate.length && fullDate.length >= 2) {
+              let date = parseInt(fullDate.substring(0, 2))
+              if (!isNaN(date)) {
+                if (date < lastUsedDate) {
+                  usedMonth = 1
+                }
+                date = `${date}`.length === 1 ? '0' + `${date}` : `${date}`
+                let month = dates[usedMonth].month() + 1
+                month = month.length === 1 ? '0' + month : month
+                let year = dates[usedMonth].year()
+                let newDate = date + '/' + month + '/' + year
+                statementItem.Date = newDate
+              }
+            }
+          } catch (err) {
+            console.log('Error parsing date', err)
+          }
+        })
+      })
+      state.formattedDocument = updateFormattedDoc
+      console.log(updateFormattedDoc)
+      let options = { imput: false, bankOsmiumChanged: true, keyAttributes: null }
+      saveDocToAPI(null, updateFormattedDoc, options)
+    },
   },
   actions: {
     UPDATE_DOCUMENT({ commit }, document) {
@@ -527,6 +561,9 @@ export default {
     },
     ACTION_CHANGE_LIBELLE({ commit }, libelle) {
       commit('MUTATION_CHANGE_LIBELLE', libelle)
+    },
+    ACTION_FORMAT_STATEMENT_DATES({ commit }, dates) {
+      commit('MUTATION_FORMAT_STATEMENT_DATES', dates)
     },
   },
   getters: {
