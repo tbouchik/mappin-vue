@@ -75,7 +75,7 @@ export default {
     src: function() {
       return `/media/${this.name}`
     },
-    ...mapGetters(['current']),
+    ...mapGetters(['current', 'pdfcontext']),
   },
   data: function () {
     return {
@@ -97,13 +97,15 @@ export default {
         let bottomBoundary = canvas.height * (parseFloat(textInfo.Top) + parseFloat(textInfo.Height))
         return (x > leftBoundary && x < rightBoundary) && (y > topBoundary && y < bottomBoundary)
       })
-      if (selectedTextSection[0] && selectedTextSection[0].Text && !this.isBankStatement) {
-        this.$store.dispatch('ACTION_UPDATE_ACTIVE_VALUE', selectedTextSection[0])
-      } else if (selectedTextSection[0] && selectedTextSection[0].Text && this.isBankStatement) {
-        this.$store.dispatch('ACTION_AUTO_CHANGES_TO_STATEMENT', selectedTextSection[0])
+      if (selectedTextSection[0] && selectedTextSection[0].Text) {
+        this.$store.dispatch('ACTION_SET_PDF_ACTIVE_BBOX', { canvas, bbox: selectedTextSection[0] })
+        if (!this.isBankStatement) {
+          this.$store.dispatch('ACTION_DO_AUTO_CHANGES_TO_INVOICE', selectedTextSection[0])
+        } else {
+          this.$store.dispatch('ACTION_AUTO_CHANGES_TO_STATEMENT', selectedTextSection[0])
+        }
       }
     },
-    // Render the page
     renderPage(num) {
       this.pageIsRendering = true
       let canvParent = document.querySelector('#pdf-card')
@@ -116,13 +118,12 @@ export default {
       canv.addEventListener('click', this.updateOsmium)
 
       const canvas = document.querySelector('#pdf-render')
-      const ctx = canvas.getContext('2d')
+      this.$store.dispatch('ACTION_SET_PDF_CONTEXT', canvas)
       // Get page
       this.pdfDoc.getPage(num).then(page => {
         // Set scale
-        if (ctx) {
-          ctx.clearRect(0, 0, canvas.width, canvas.height)
-          ctx.beginPath()
+        if (this.pdfcontext) {
+          this.$store.dispatch('ACTION_SET_PDF_CONTEXT_SCALE', canvas)
         }
         const viewport = page.getViewport(
           document.querySelector('.card-body').offsetWidth /
@@ -131,7 +132,7 @@ export default {
         canvas.height = viewport.height
         canvas.width = viewport.width
         const renderCtx = {
-          canvasContext: ctx,
+          canvasContext: this.pdfcontext,
           viewport,
         }
         page.render(renderCtx).promise.then(() => {
@@ -142,17 +143,7 @@ export default {
             this.pageNumIsPending = null
           }
           if (this.currentPageData) {
-            for (let i = 0; i < this.currentPageData.length; i++) {
-              ctx.beginPath()
-              ctx.rect(
-                canvas.width * this.currentPageData[i].Left,
-                canvas.height * this.currentPageData[i].Top,
-                canvas.width * this.currentPageData[i].Width,
-                canvas.height * this.currentPageData[i].Height
-              )
-              ctx.strokeStyle = 'purple'
-              ctx.stroke()
-            }
+            this.$store.dispatch('ACTION_DRAW_PDF_BBOXES', { canvas, bboxes: this.currentPageData })
           }
         })
         // Output current page

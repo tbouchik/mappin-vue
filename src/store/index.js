@@ -6,6 +6,7 @@ import document from './smeltor/document.js'
 import client from './clients/clients.js'
 import filter from './filters/filters.js'
 import uploader from './uploader/uploader.js'
+import viewer from './viewer/viewer.js'
 
 Vue.use(Vuex)
 
@@ -17,6 +18,7 @@ export default new Vuex.Store({
     client,
     filter,
     uploader,
+    viewer,
   },
   state: {},
   mutations: {},

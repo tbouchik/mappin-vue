@@ -78,8 +78,8 @@ export default {
         return (x > leftBoundary && x < rightBoundary) && (y > topBoundary && y < bottomBoundary)
       })
       if (selectedTextSection[0] && selectedTextSection[0].Text && !this.isBankStatement) {
-        this.$store.dispatch('ACTION_UPDATE_ACTIVE_VALUE', selectedTextSection[0])
-      } else if (selectedTextSection[0] && selectedTextSection[0].Text && !this.isBankStatement) {
+        this.$store.dispatch('ACTION_DO_AUTO_CHANGES_TO_INVOICE', selectedTextSection[0])
+      } else if (selectedTextSection[0] && selectedTextSection[0].Text && this.isBankStatement) {
         this.$store.dispatch('ACTION_AUTO_CHANGES_TO_STATEMENT', selectedTextSection[0])
       }
     },
@@ -125,7 +125,7 @@ export default {
           imgWidth = imgWidth * scale
         }
       }
-      canvas.width = document.querySelector('.ant-layout-content').scrollWidth * 0.60
+      canvas.width = document.querySelector('.ant-layout-content').scrollWidth * 0.50
       canvas.height = document.querySelector('.ant-layout-content').scrollHeight
       this.drawbackground(canvas, ctx, this.drawKvpRect)
     },

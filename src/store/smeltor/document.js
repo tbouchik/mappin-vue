@@ -214,6 +214,15 @@ function formatValue (value, keyType, keyRole, entryType) {
   return parsedValue
 }
 
+function extractTransactionDate (fullDate) {
+  const len = fullDate.length
+  if (len <= 2) {
+    return parseInt(fullDate)
+  } else {
+    return parseInt(fullDate.substring(0, 2 - len % 2))
+  }
+}
+
 export default {
   state: {
     formattedDocument: {},
@@ -456,14 +465,14 @@ export default {
           try {
             let fullDate = statementItem.Date.replace(/\D+/g, '')
             if (fullDate.length && fullDate.length >= 2) {
-              let date = parseInt(fullDate.substring(0, 2))
+              let date = extractTransactionDate(fullDate)
               if (!isNaN(date)) {
                 if (date < lastUsedDate) {
                   usedMonth = 1
                 }
                 date = `${date}`.length === 1 ? '0' + `${date}` : `${date}`
                 let month = dates[usedMonth].month() + 1
-                month = month.length === 1 ? '0' + month : month
+                month = `${month}`.length === 1 ? '0' + `${month}` : `${month}`
                 let year = dates[usedMonth].year()
                 let newDate = date + '/' + month + '/' + year
                 statementItem.Date = newDate
@@ -505,7 +514,7 @@ export default {
     ACTION_UPDATE_ACTIVE_INDEX({ commit }, payload) {
       commit('MUTATION_UPDATE_INDEX', payload)
     },
-    ACTION_UPDATE_ACTIVE_VALUE({ commit }, idx) {
+    ACTION_DO_AUTO_CHANGES_TO_INVOICE({ commit }, idx) {
       commit('MUTATION_DO_AUTO_CHANGES_TO_INVOICE', idx)
     },
     ACTION_DO_CHANGES_TO_DOCUMENT({ commit }, changeData) {
