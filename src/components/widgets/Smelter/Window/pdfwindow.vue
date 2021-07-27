@@ -90,6 +90,7 @@ export default {
       let x = event.layerX
       let y = event.layerY
       const canvas = document.querySelector('#pdf-render')
+      this.$store.dispatch('ACTION_SET_PDF_CONTEXT_CANVAS', canvas)
       let selectedTextSection = this.currentPageData.filter((textInfo) => {
         let leftBoundary = canvas.width * textInfo.Left
         let topBoundary = canvas.height * textInfo.Top
@@ -117,6 +118,7 @@ export default {
       canv.addEventListener('click', this.updateOsmium)
 
       const canvas = document.querySelector('#pdf-render')
+      this.$store.dispatch('ACTION_SET_PDF_CONTEXT_CANVAS', canvas)
       this.$store.dispatch('ACTION_SET_PDF_CONTEXT', canvas)
       // Get page
       this.pdfDoc.getPage(num).then(page => {
@@ -130,6 +132,7 @@ export default {
         )
         canvas.height = viewport.height
         canvas.width = viewport.width
+        this.$store.dispatch('ACTION_SET_PDF_CONTEXT_CANVAS', canvas)
         const renderCtx = {
           canvasContext: this.pdfcontext,
           viewport,

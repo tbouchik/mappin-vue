@@ -228,9 +228,13 @@ export default {
     currentPage: function() {
       this.selectedStatements = []
       this.pageData = this.bankOsmium[`page_${this.currentPage}`].map(x => { return { Date: x.Date.Text, Designation: x.Designation.Text, Compte: x.Compte.Text, Debit: x.Debit.Text, Credit: x.Credit.Text } })
+      let bboxes = Object.values(this.bankOsmium[`page_${this.currentPage}`][this.currentActiveIndex]).map(x => x.Bbox)
+      this.$store.dispatch('ACTION_SET_PDF_ACTIVE_BBOXES', bboxes)
     },
     currentActiveIndex: function() {
       if (this.currentActivePane === 'statementPane') {
+        let bboxes = Object.values(this.bankOsmium[`page_${this.currentPage}`][this.currentActiveIndex]).map(x => x.Bbox)
+        this.$store.dispatch('ACTION_SET_PDF_ACTIVE_BBOXES', bboxes)
         if (this.currentActiveColumn !== 'Compte') {
           this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
         } else {
