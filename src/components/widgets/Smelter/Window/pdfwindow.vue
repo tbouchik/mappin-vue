@@ -98,7 +98,6 @@ export default {
         return (x > leftBoundary && x < rightBoundary) && (y > topBoundary && y < bottomBoundary)
       })
       if (selectedTextSection[0] && selectedTextSection[0].Text) {
-        this.$store.dispatch('ACTION_SET_PDF_ACTIVE_BBOX', { canvas, bbox: selectedTextSection[0] })
         if (!this.isBankStatement) {
           this.$store.dispatch('ACTION_DO_AUTO_CHANGES_TO_INVOICE', selectedTextSection[0])
         } else {

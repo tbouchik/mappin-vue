@@ -69,7 +69,7 @@ function getInvoiceGraphNextMove(osmium, currentIdx, currentCol, move) {
 }
 
 function getTableGraphNextMove(osmium, currentIdx, currentCol, move) {
-  const graphDepth = osmium.length
+  const graphDepth = osmium.length // TODO CHECK IF IS POSSIBLE TO CARRY ONLY OSMIUM.LENGTH AS ARGUMENT INSTEAD OF OSMIUM
   if (move === 'inc') {
     const nextIndex = currentIdx < graphDepth - 1 ? currentIdx + 1 : 0
     const adjacentColumn = getTableAdjacentColumn(currentCol, 1)
@@ -96,7 +96,8 @@ function trimImputationQuery(query) {
 function changeDisplayedLibelle(col, osmiumItem) {
   let result = 'Libellé d\'Imputation'
   if (col === 'Imputation' || col === 'Compte') {
-    const trimedImputation = trimImputationQuery(osmiumItem[col])
+    const imputation = typeof osmiumItem[col] === 'object' ? osmiumItem[col].Text : osmiumItem[col]
+    const trimedImputation = trimImputationQuery(imputation)
     result = labels[parseInt(trimedImputation)]
   }
   return result
@@ -345,10 +346,10 @@ export default {
       const newVal = bbox.Text
       if (state.catMode) {
         let appendix = ' '.concat(newVal)
-        let currentValue = updateFormattedDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol]
-        updateFormattedDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol] = currentValue ? currentValue.concat(appendix) : appendix.trim()
+        let currentValue = updateFormattedDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol].Text
+        updateFormattedDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol].Text = currentValue ? currentValue.concat(appendix) : appendix.trim()
       } else {
-        updateFormattedDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol] = newVal
+        updateFormattedDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol].Text = newVal
       }
       state.formattedDocument = updateFormattedDoc
       let options = { imput: false, bankOsmiumChanged: true, keyAttributes: null }
@@ -357,7 +358,7 @@ export default {
     MUTATION_MANUAL_CHANGES_TO_STATEMENT(state, changeData) {
       let { value } = changeData
       let tempDoc = cloneDeep(state.formattedDocument)
-      tempDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol] = value
+      tempDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol].Text = value
       state.formattedDocument = tempDoc
       clearTimeout(debounce)
       debounce = setTimeout(() => {
@@ -368,7 +369,7 @@ export default {
     MUTATION_DO_IMPUTATION_CHANGES_TO_STATEMENT(state, changeData) {
       let { imputation, itemIdx } = changeData
       let tempDoc = cloneDeep(state.formattedDocument)
-      tempDoc.bankOsmium[`page_${state.page}`][itemIdx]['Compte'] = imputation
+      tempDoc.bankOsmium[`page_${state.page}`][itemIdx]['Compte'].Text = imputation
       state.formattedDocument = tempDoc
       let options = { imput: false, bankOsmiumChanged: true, keyAttributes: null }
       saveDocToAPI({}, state.formattedDocument, options)
@@ -377,11 +378,11 @@ export default {
       let { offset, selectedStatements } = changeData
       let tempDoc = cloneDeep(state.formattedDocument)
       const emptyStatement = {
-        'Date': '',
-        'Designation': '',
-        'Debit': '',
-        'Credit': '',
-        'Compte': '',
+        'Date': { Text: '', Bbox: null },
+        'Designation': { Text: '', Bbox: null },
+        'Debit': { Text: '', Bbox: null },
+        'Credit': { Text: '', Bbox: null },
+        'Compte': { Text: '', Bbox: null },
       }
       let counter = 0
       if (offset === -1) {
@@ -463,7 +464,7 @@ export default {
         let lastUsedDate = 0
         statementPage.forEach((statementItem) => {
           try {
-            let fullDate = statementItem.Date.replace(/\D+/g, '')
+            let fullDate = statementItem.Date.Text.replace(/\D+/g, '')
             if (fullDate.length && fullDate.length >= 2) {
               let date = extractTransactionDate(fullDate)
               if (!isNaN(date)) {
@@ -475,7 +476,7 @@ export default {
                 month = `${month}`.length === 1 ? '0' + `${month}` : `${month}`
                 let year = dates[usedMonth].year()
                 let newDate = date + '/' + month + '/' + year
-                statementItem.Date = newDate
+                statementItem.Date.Text = newDate
               }
             }
           } catch (err) {

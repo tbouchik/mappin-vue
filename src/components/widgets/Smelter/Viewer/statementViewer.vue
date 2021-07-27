@@ -192,7 +192,7 @@ export default {
     }
   },
   created() {
-    this.pageData = this.bankOsmium[`page_${this.currentPage}`].map(x => { return { Date: x.Date, Designation: x.Designation, Compte: x.Compte, Debit: x.Debit, Credit: x.Credit } })
+    this.pageData = this.bankOsmium[`page_${this.currentPage}`].map(x => { return { Date: x.Date.Text, Designation: x.Designation.Text, Compte: x.Compte.Text, Debit: x.Debit.Text, Credit: x.Credit.Text } })
     this.getTotalStreams()
   },
   props: {
@@ -222,12 +222,12 @@ export default {
   },
   watch: {
     bankOsmium: function() {
-      this.pageData = this.bankOsmium[`page_${this.currentPage}`].map(x => { return { Date: x.Date, Designation: x.Designation, Compte: x.Compte, Debit: x.Debit, Credit: x.Credit } })
+      this.pageData = this.bankOsmium[`page_${this.currentPage}`].map(x => { return { Date: x.Date.Text, Designation: x.Designation.Text, Compte: x.Compte.Text, Debit: x.Debit.Text, Credit: x.Credit.Text } })
       this.getTotalStreams()
     },
     currentPage: function() {
       this.selectedStatements = []
-      this.pageData = this.bankOsmium[`page_${this.currentPage}`].map(x => { return { Date: x.Date, Designation: x.Designation, Compte: x.Compte, Debit: x.Debit, Credit: x.Credit } })
+      this.pageData = this.bankOsmium[`page_${this.currentPage}`].map(x => { return { Date: x.Date.Text, Designation: x.Designation.Text, Compte: x.Compte.Text, Debit: x.Debit.Text, Credit: x.Credit.Text } })
     },
     currentActiveIndex: function() {
       if (this.currentActivePane === 'statementPane') {
@@ -263,13 +263,13 @@ export default {
       let indicesToJump = new Set()
       allStatements.forEach((st, i, arr) => {
         if (!indicesToJump.has(i)) {
-          let debitData = this.getStatementPrice(st.Debit)
-          let creditData = this.getStatementPrice(st.Credit)
+          let debitData = this.getStatementPrice(st.Debit.Text)
+          let creditData = this.getStatementPrice(st.Credit.Text)
           if (debitData.isNull && !creditData.isNull) {
             counter = 1
             let debitCounterparty = '0.00'
             while (counter <= maxJumps && debitCounterparty < creditData.value) {
-              let nextDebit = this.getStatementPrice(arr[i + counter].Debit).value
+              let nextDebit = this.getStatementPrice(arr[i + counter].Debit.Text).value
               debitCounterparty = (parseFloat(debitCounterparty) + parseFloat(nextDebit))
               debitCounterparty = debitCounterparty.toFixed(2)
               counter += 1
@@ -288,7 +288,7 @@ export default {
             counter = 1
             let creditCounterparty = '0.00'
             while (counter <= maxJumps && creditCounterparty < debitData.value) {
-              creditCounterparty = (parseFloat(creditCounterparty) + parseFloat(this.getStatementPrice(arr[i + counter].Credit).value)).toFixed(2)
+              creditCounterparty = (parseFloat(creditCounterparty) + parseFloat(this.getStatementPrice(arr[i + counter].Credit.Text).value)).toFixed(2)
               counter += 1
             }
             if (creditCounterparty === debitData.value) {

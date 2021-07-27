@@ -345,7 +345,7 @@ export default {
         Object.keys(this.current.bankOsmium).forEach((docPage) => {
           const pageStatements = this.current.bankOsmium[docPage]
           pageStatements.forEach((statement) => {
-            let entrySegment = [statement.Date, statement.Designation, statement.Compte, statement.Debit, statement.Credit]
+            let entrySegment = [statement.Date.Text, statement.Designation.Text, statement.Compte.Text, statement.Debit.Text, statement.Credit.Text]
             arrData.push(entrySegment.join(';'))
           })
         })
