@@ -375,7 +375,7 @@ export default {
       saveDocToAPI({}, state.formattedDocument, options)
     },
     MUTATION_INSERT_STATEMENTS(state, changeData) {
-      let { offset, selectedStatements } = changeData
+      let { offset, selectedStatements, lines } = changeData
       let tempDoc = cloneDeep(state.formattedDocument)
       const emptyStatement = {
         'Date': { Text: '', Bbox: null },
@@ -386,11 +386,13 @@ export default {
       }
       let counter = 0
       if (offset === -1) {
-        tempDoc.bankOsmium[`page_${state.page}`].push(emptyStatement)
+        Array.from({ length: lines }, (_) => { tempDoc.bankOsmium[`page_${state.page}`].push(emptyStatement) })
       } else {
         selectedStatements.forEach(idx => {
-          tempDoc.bankOsmium[`page_${state.page}`].splice([idx + offset + counter], 0, emptyStatement)
-          counter++
+          Array.from({ length: lines }, (_) => {
+            tempDoc.bankOsmium[`page_${state.page}`].splice([idx + offset + counter], 0, emptyStatement)
+            counter++
+          })
         })
       }
       state.formattedDocument = tempDoc

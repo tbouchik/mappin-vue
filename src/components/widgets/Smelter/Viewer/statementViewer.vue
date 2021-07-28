@@ -5,13 +5,13 @@
         <a-dropdown :disabled="!hasSelectedStatements" >
           <a-button>{{ $t('template.actions') }}</a-button>
           <a-menu slot="overlay">
-            <a-menu-item @click="insertStatements(-1)" v-if="hasNoStatements">
+            <a-menu-item @click="setInsertModalVisible(-1)" v-if="hasNoStatements">
               <div>{{ $t('template.insertLine') }}</div>
             </a-menu-item>
-            <a-menu-item @click="insertStatements(0)" v-if="!hasNoStatements">
+            <a-menu-item @click="setInsertModalVisible(0)" v-if="!hasNoStatements">
               <div>{{ $t('template.insertAbove') }}</div>
             </a-menu-item>
-            <a-menu-item @click="insertStatements(1)" v-if="!hasNoStatements">
+            <a-menu-item @click="setInsertModalVisible(1)" v-if="!hasNoStatements">
               <div>{{ $t('template.insertBelow') }}</div>
             </a-menu-item>
             <a-menu-item @click="deleteStatements" v-if="!hasNoStatements">
@@ -119,6 +119,19 @@
         @change="handleDateChange"
       />
     </a-modal>
+    <a-modal v-model="insertModalVisible" title="Confirmation de Date" @ok="confirmInsertStatements">
+      <div>
+        <p>Choisissez le nombre de lignes à insérer: </p>
+        <a-dropdown>
+          <a-menu slot="overlay" @click="handleNumberOfLinesChange">
+            <a-menu-item key="1"> 1 </a-menu-item>
+            <a-menu-item key="2"> 2 </a-menu-item>
+            <a-menu-item key="3"> 3 </a-menu-item>
+          </a-menu>
+          <a-button style="margin-left: 8px"> Button <a-icon type="down" /> </a-button>
+        </a-dropdown>
+      </div>
+    </a-modal>
   </div>
 </template>
 <script>
@@ -182,6 +195,9 @@ export default {
       selectedStatements: [],
       balanceModalVisible: false,
       dateModalVisible: false,
+      insertModalVisible: false,
+      offset: null,
+      numberOfLines: 0,
       datePickerMode: ['month', 'month'],
       dates: [],
       assessment: {
@@ -394,8 +410,16 @@ export default {
     onSelectChange(selectedStatements) {
       this.selectedStatements = selectedStatements.sort((a, b) => a - b)
     },
-    insertStatements(offset) {
-      this.$store.dispatch('ACTION_INSERT_STATEMENTS', { offset, selectedStatements: this.selectedStatements })
+    setInsertModalVisible (offset) {
+      this.insertModalVisible = true
+      this.offset = offset
+    },
+    handleNumberOfLinesChange(e) {
+      this.numberOfLines = parseInt(e.key)
+    },
+    confirmInsertStatements() {
+      this.insertModalVisible = false
+      this.$store.dispatch('ACTION_INSERT_STATEMENTS', { offset: this.offset, selectedStatements: this.selectedStatements, lines: this.numberOfLines })
       this.selectedStatements = []
     },
     deleteStatements() {
