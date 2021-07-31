@@ -247,7 +247,8 @@ export default {
       this.setActiveBboxes()
     },
     currentActiveIndex: function() {
-      if (this.currentActivePane === 'statementPane') {
+      const pageNotEmpty = this.bankOsmium[`page_${this.currentPage}`].length > 0
+      if (this.currentActivePane === 'statementPane' && pageNotEmpty) {
         this.setActiveBboxes()
         if (this.currentActiveColumn !== 'Compte') {
           this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
@@ -257,7 +258,8 @@ export default {
       }
     },
     currentActiveColumn: function() {
-      if (this.currentActivePane === 'statementPane') {
+      const pageNotEmpty = this.bankOsmium[`page_${this.currentPage}`].length > 0
+      if (this.currentActivePane === 'statementPane' && pageNotEmpty) {
         if (this.currentActiveColumn !== 'Compte') {
           this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
         } else {
