@@ -38,10 +38,10 @@
           </div>
           <div v-else>
             <p>La ligne suivante n'est pas équilibrée:</p>
-            <p>Date: {{ assessment.error.Date }} </p>
-            <p>Désignation: {{ assessment.error.Designation }} </p>
-            <p>Débit: {{ assessment.error.Debit }} </p>
-            <p>Crédit: {{ assessment.error.Credit }} </p>
+            <p>Date: {{ assessment.error.Date.Text }} </p>
+            <p>Désignation: {{ assessment.error.Designation.Text }} </p>
+            <p>Débit: {{ assessment.error.Debit.Text }} </p>
+            <p>Crédit: {{ assessment.error.Credit.Text }} </p>
           </div>
         </a-modal>
       </div>
@@ -209,7 +209,6 @@ export default {
   },
   created() {
     this.pageData = this.bankOsmium[`page_${this.currentPage}`].map(x => { return { Date: x.Date.Text, Designation: x.Designation.Text, Compte: x.Compte.Text, Debit: x.Debit.Text, Credit: x.Credit.Text } })
-    this.getTotalStreams()
   },
   props: {
     bankOsmium: {
@@ -239,7 +238,6 @@ export default {
   watch: {
     bankOsmium: function() {
       this.pageData = this.bankOsmium[`page_${this.currentPage}`].map(x => { return { Date: x.Date.Text, Designation: x.Designation.Text, Compte: x.Compte.Text, Debit: x.Debit.Text, Credit: x.Credit.Text } })
-      this.getTotalStreams()
     },
     currentPage: function() {
       this.selectedStatements = []
@@ -282,13 +280,14 @@ export default {
       let counter = 1
       let indicesToJump = new Set()
       allStatements.forEach((st, i, arr) => {
+        const nbrOfStatements = arr.length
         if (!indicesToJump.has(i)) {
           let debitData = this.getStatementPrice(st.Debit.Text)
           let creditData = this.getStatementPrice(st.Credit.Text)
           if (debitData.isNull && !creditData.isNull) {
             counter = 1
             let debitCounterparty = '0.00'
-            while (counter <= maxJumps && debitCounterparty < creditData.value) {
+            while (counter <= maxJumps && debitCounterparty < creditData.value && i + counter < nbrOfStatements) {
               let nextDebit = this.getStatementPrice(arr[i + counter].Debit.Text).value
               debitCounterparty = (parseFloat(debitCounterparty) + parseFloat(nextDebit))
               debitCounterparty = debitCounterparty.toFixed(2)
@@ -307,7 +306,7 @@ export default {
           } else if (creditData.isNull && !debitData.isNull) {
             counter = 1
             let creditCounterparty = '0.00'
-            while (counter <= maxJumps && creditCounterparty < debitData.value) {
+            while (counter <= maxJumps && creditCounterparty < debitData.value && i + counter < nbrOfStatements) {
               creditCounterparty = (parseFloat(creditCounterparty) + parseFloat(this.getStatementPrice(arr[i + counter].Credit.Text).value)).toFixed(2)
               counter += 1
             }

@@ -217,8 +217,8 @@ function formatValue (value, keyType, keyRole, entryType) {
 
 function extractTransactionDate (fullDate) {
   const len = fullDate.length
-  if (len <= 2) {
-    return parseInt(fullDate)
+  if (len <= 3) {
+    return parseInt(fullDate.substring(0, 2))
   } else {
     return parseInt(fullDate.substring(0, 2 - len % 2))
   }
@@ -387,7 +387,10 @@ export default {
       }
       let counter = 0
       if (offset === -1) {
-        Array.from({ length: lines }, (_) => { tempDoc.bankOsmium[`page_${state.page}`].push(emptyStatement) })
+        Array.from({ length: lines }, (_) => {
+          const newEmptyStatement = cloneDeep(emptyStatement)
+          tempDoc.bankOsmium[`page_${state.page}`].push(newEmptyStatement)
+        })
       } else {
         selectedStatements.forEach(idx => {
           Array.from({ length: lines }, (_) => {
