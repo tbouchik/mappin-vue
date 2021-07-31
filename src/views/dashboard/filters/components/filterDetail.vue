@@ -8,7 +8,6 @@
         </b-col>
         <b-col md="2" class="my-1">
           <button
-            v-if="!isSmartTemplate"
             @click="showDeleteConfirm"
             type="button"
             class="btn btn-danger btn-with-addon mr-auto text-nowrap d-none d-md-block"
@@ -27,15 +26,28 @@
             <a-form :form="form" :label-col="{ span: 4 }" :wrapper-col="{ span: 12 }" @submit.prevent="handleSubmit">
               <a-form-item label="Name">
               <a-input
-                :disabled="isSmartTemplate"
                 v-decorator="['name', { rules: [{ required: true, message: 'Please input your template name' }] }]"
               />
               </a-form-item>
               <a-form-item label="Description">
               <a-input
-                :disabled="isSmartTemplate"
                 v-decorator="['description', { rules: [{ required: false, message: 'Input here your template description' }] }]"
               />
+              </a-form-item>
+              <a-form-item label="Type">
+              <a-select
+                  @change="e => handleTypeChange(e)"
+                  v-decorator="[
+                    'type',
+                    { rules: [{ required: false, message: 'Please select your template type' }] },
+                  ]"
+                  :placeholder="$t('template.typeSelect')"
+                >
+                  <template>
+                    <a-select-option value="invoice">{{ $t('accounting.invoice') }} </a-select-option>
+                    <a-select-option value="bankStatement"> {{ $t('accounting.bankStatement') }} </a-select-option>
+                  </template>
+                </a-select>
               </a-form-item>
               <a-form-item
                 v-for="(k, index) in names"
@@ -56,8 +68,7 @@
                     :value=k.type
                     style="width: 15%; margin-right: 4px"
                     :placeholder="$t('template.placeholder.keyType')"
-                    :disabled="isSmartTemplate"
-                    @change="e => handleTypeChange(e, index)"
+                    @change="e => handleKeyTypeChange(e, index)"
                   >
                     <a-select-option value="REF">
                       {{ $t('template.type.ref') }}
@@ -73,7 +84,18 @@
                     </a-select-option>
                   </a-select>
                   <a-cascader
-                    :options="roleOptions"
+                    v-if="displayBankRoles"
+                    :options="bankOptions"
+                    :value=k.role
+                    :display-render="displayRender"
+                    expand-trigger="hover"
+                    placeholder="Role"
+                    style="width: 10%; margin-right: 4px"
+                    @change="e => handleRoleChange(e, index)"
+                  />
+                  <a-cascader
+                    v-else
+                    :options="invoiceOptions"
                     :value=k.role
                     :display-render="displayRender"
                     expand-trigger="hover"
@@ -85,7 +107,7 @@
                     IMPUTABLE
                   </a-checkbox>
                   <a-icon
-                      v-if="names.length > 1 && !isSmartTemplate"
+                      v-if="names.length > 1"
                       class="dynamic-delete-button"
                       type="minus-circle-o"
                       :disabled="form.getFieldValue('keys').length === 1"
@@ -120,12 +142,12 @@
                   </div>
               </a-form-item>
         <a-form-item v-bind="formItemLayoutWithOutLabel">
-        <a-button v-if="!isSmartTemplate" type="dashed" style="width: 60%" @click="add">
+        <a-button  type="dashed" style="width: 60%" @click="add">
             <a-icon type="plus" /> {{ $t('template.addField') }}
         </a-button>
         </a-form-item>
         <a-form-item v-bind="formItemLayoutWithOutLabel">
-        <a-button v-if="!isSmartTemplate" type="primary" html-type="submit">
+        <a-button type="primary" html-type="submit">
             {{ $t('template.save') }}
         </a-button>
         </a-form-item>
@@ -174,7 +196,7 @@ export default {
           sm: { span: 20 },
         },
       },
-      roleOptions: [
+      bankOptions: [
         {
           value: 'BANK',
           label: 'Relevé bancaires',
@@ -194,31 +216,35 @@ export default {
           ],
         },
         {
-          value: 'INVOICE',
-          label: 'Factures',
-          children: [
-            {
-              value: 'TOTAL_HT',
-              label: 'Total HT',
-            },
-            {
-              value: 'TOTAL_TTC',
-              label: 'Total TTC',
-            },
-            {
-              value: 'VENDOR',
-              label: 'Fournisseur',
-            },
-            {
-              value: 'VAT',
-              label: 'TVA',
-            },
-          ],
-        },
-        {
           value: 'N/A',
           label: 'Aucun',
-        },
+        }],
+      invoiceOptions: [{
+        value: 'INVOICE',
+        label: 'Factures',
+        children: [
+          {
+            value: 'TOTAL_HT',
+            label: 'Total HT',
+          },
+          {
+            value: 'TOTAL_TTC',
+            label: 'Total TTC',
+          },
+          {
+            value: 'VENDOR',
+            label: 'Fournisseur',
+          },
+          {
+            value: 'VAT',
+            label: 'TVA',
+          },
+        ],
+      },
+      {
+        value: 'N/A',
+        label: 'Aucun',
+      },
       ],
       formItemLayoutWithOutLabel: {
         wrapperCol: {
@@ -238,7 +264,6 @@ export default {
       type: {
         type: String,
       },
-      isSmartTemplate: true,
     }
   },
   beforeMount() {
@@ -246,7 +271,6 @@ export default {
       .then(defaultFilterIds => {
         FilterService.fetchFilter(this.filterId)
           .then((filter) => {
-            this.isSmartTemplate = defaultFilterIds ? defaultFilterIds.includes(filter.id) : false
             this.name = filter.name
             this.description = filter.description
             this.type = filter.type
@@ -263,15 +287,18 @@ export default {
   },
   created() {
   },
+  computed: {
+    displayBankRoles() {
+      return this.type === 'bankStatement'
+    },
+  },
   methods: {
     remove(index) {
       this.names.splice(index, 1)
     },
-
     add() {
       this.names.push({ type: undefined, value: null, isImputable: false, tags: [] })
     },
-
     handleSubmit(e) {
       e.preventDefault()
       this.form.validateFields((err, values) => {
@@ -299,8 +326,10 @@ export default {
       newNames[index].value = e.target.value
       this.names = newNames
     },
-
-    handleTypeChange(e, index) {
+    handleTypeChange(e) {
+      this.type = e
+    },
+    handleKeyTypeChange(e, index) {
       let newNames = cloneDeep(this.names)
       newNames[index].type = e
       this.names = newNames

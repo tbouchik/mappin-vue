@@ -113,7 +113,7 @@ const messages = {
     delete: 'Supprimer le template',
     constructCopy: 'Créer une copie',
     copy: 'Copie',
-    typeSelect: 'Sélectionner le type: Achat ou Vente',
+    typeSelect: 'Sélectionner le type: Facture ou Relevé Bancaire',
     addField: 'Nouvelle entrée',
     submit: 'Envoyer',
     actions: 'Actions',
@@ -138,6 +138,8 @@ const messages = {
   accounting: {
     expense: 'Achat',
     sale: 'Vente',
+    bankStatement: 'Relevé Bancaire',
+    invoice: 'Facture',
   },
   client: {
     dashboardTitle: 'Vos clients',

@@ -21,6 +21,21 @@
                   v-decorator="['description', { rules: [{ required: false, message: 'Input here your template description' }] }]"
               />
               </a-form-item>
+              <a-form-item label="Type">
+              <a-select
+                  @change="e => handleTypeChange(e)"
+                  v-decorator="[
+                    'type',
+                    { rules: [{ required: false, message: 'Please select your template type' }] },
+                  ]"
+                  :placeholder="$t('template.typeSelect')"
+                >
+                  <template>
+                    <a-select-option value="invoice">{{ $t('accounting.invoice') }} </a-select-option>
+                    <a-select-option value="bankStatement"> {{ $t('accounting.bankStatement') }} </a-select-option>
+                  </template>
+                </a-select>
+              </a-form-item>
               <a-form-item
                 v-for="(k, index) in names"
                 :key="index"
@@ -39,7 +54,7 @@
                     :value=k.type
                     style="width: 10%; margin-right: 4px"
                     :placeholder="$t('template.placeholder.keyType')"
-                    @change="e => handleTypeChange(e, index)"
+                    @change="e => handleKeyTypeChange(e, index)"
                   >
                     <a-select-option value="REF">
                       {{ $t('template.type.ref') }}
@@ -55,7 +70,18 @@
                     </a-select-option>
                   </a-select>
                   <a-cascader
-                    :options="roleOptions"
+                    v-if="displayBankRoles"
+                    :options="bankOptions"
+                    :value=k.role
+                    :display-render="displayRender"
+                    expand-trigger="hover"
+                    placeholder="Role"
+                    style="width: 10%; margin-right: 4px"
+                    @change="e => handleRoleChange(e, index)"
+                  />
+                  <a-cascader
+                    v-else
+                    :options="invoiceOptions"
                     :value=k.role
                     :display-render="displayRender"
                     expand-trigger="hover"
@@ -128,21 +154,7 @@ export default {
   },
   name: 'FiltersComponent',
   props: {
-    name: {
-      type: String,
-    },
-    description: {
-      type: String,
-    },
-    type: {
-      type: String,
-    },
-    keys: {
-      type: Array,
-      default: function () {
-        return [{ type: undefined, value: null, isImputable: false, tags: [] }]
-      },
-    },
+
   },
   beforeCreate() {
     this.form = this.$form.createForm(this, { name: 'dynamic_form_item' })
@@ -152,8 +164,17 @@ export default {
     this.form.getFieldDecorator('type', { initialValue: '', preserve: true })
     this.form.getFieldDecorator('name', { initialValue: '', preserve: true })
   },
+  computed: {
+    displayBankRoles() {
+      return this.type === 'bankStatement'
+    },
+  },
   data() {
     return {
+      name: '',
+      description: '',
+      type: 'invoice',
+      keys: [{ type: undefined, value: null, isImputable: false, tags: [] }],
       formItemLayout: {
         labelCol: {
           xs: { span: 24 },
@@ -164,7 +185,7 @@ export default {
           sm: { span: 20 },
         },
       },
-      roleOptions: [
+      bankOptions: [
         {
           value: 'BANK',
           label: 'Relevé bancaires',
@@ -184,31 +205,35 @@ export default {
           ],
         },
         {
-          value: 'INVOICE',
-          label: 'Factures',
-          children: [
-            {
-              value: 'TOTAL_HT',
-              label: 'Total HT',
-            },
-            {
-              value: 'TOTAL_TTC',
-              label: 'Total TTC',
-            },
-            {
-              value: 'VENDOR',
-              label: 'Fournisseur',
-            },
-            {
-              value: 'VAT',
-              label: 'TVA',
-            },
-          ],
-        },
-        {
           value: 'N/A',
           label: 'Aucun',
-        },
+        }],
+      invoiceOptions: [{
+        value: 'INVOICE',
+        label: 'Factures',
+        children: [
+          {
+            value: 'TOTAL_HT',
+            label: 'Total HT',
+          },
+          {
+            value: 'TOTAL_TTC',
+            label: 'Total TTC',
+          },
+          {
+            value: 'VENDOR',
+            label: 'Fournisseur',
+          },
+          {
+            value: 'VAT',
+            label: 'TVA',
+          },
+        ],
+      },
+      {
+        value: 'N/A',
+        label: 'Aucun',
+      },
       ],
       formItemLayoutWithOutLabel: {
         wrapperCol: {
@@ -264,10 +289,13 @@ export default {
       this.names = newNames
     },
 
-    handleTypeChange(e, index) {
+    handleKeyTypeChange(e, index) {
       let newNames = cloneDeep(this.names)
       newNames[index].type = e
       this.names = newNames
+    },
+    handleTypeChange(e) {
+      this.type = e
     },
     handleRoleChange(e, index) {
       let newNames = cloneDeep(this.names)

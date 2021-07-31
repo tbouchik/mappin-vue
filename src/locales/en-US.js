@@ -112,7 +112,7 @@ const messages = {
     delete: 'Delete Template',
     constructCopy: 'Create Copy',
     copy: 'Copy',
-    typeSelect: 'Select a type: Expense or Sale',
+    typeSelect: 'Select a type: Invoice or Bank Statement',
     addField: 'Add field',
     submit: 'Submit',
     actions: 'Actions',
@@ -137,6 +137,8 @@ const messages = {
   accounting: {
     expense: 'Expense',
     sale: 'Sale',
+    bankStatement: 'Bank Statement',
+    invoice: 'Invoice',
   },
   client: {
     dashboardTitle: 'Your clients',
