@@ -344,6 +344,7 @@ export default {
     MUTATION_AUTO_CHANGES_TO_STATEMENT(state, bbox) {
       let updateFormattedDoc = cloneDeep(state.formattedDocument)
       const newVal = bbox.Text
+      console.log(updateFormattedDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol])
       if (state.catMode) {
         let appendix = ' '.concat(newVal)
         let currentValue = updateFormattedDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol].Text
@@ -390,7 +391,8 @@ export default {
       } else {
         selectedStatements.forEach(idx => {
           Array.from({ length: lines }, (_) => {
-            tempDoc.bankOsmium[`page_${state.page}`].splice([idx + offset + counter], 0, emptyStatement)
+            const newEmptyStatement = cloneDeep(emptyStatement)
+            tempDoc.bankOsmium[`page_${state.page}`].splice([idx + offset + counter], 0, newEmptyStatement)
             counter++
           })
         })

@@ -244,13 +244,11 @@ export default {
     currentPage: function() {
       this.selectedStatements = []
       this.pageData = this.bankOsmium[`page_${this.currentPage}`].map(x => { return { Date: x.Date.Text, Designation: x.Designation.Text, Compte: x.Compte.Text, Debit: x.Debit.Text, Credit: x.Credit.Text } })
-      let bboxes = Object.values(this.bankOsmium[`page_${this.currentPage}`][this.currentActiveIndex]).map(x => x.Bbox)
-      this.$store.dispatch('ACTION_SET_PDF_ACTIVE_BBOXES', bboxes)
+      this.setActiveBboxes()
     },
     currentActiveIndex: function() {
       if (this.currentActivePane === 'statementPane') {
-        let bboxes = Object.values(this.bankOsmium[`page_${this.currentPage}`][this.currentActiveIndex]).map(x => x.Bbox)
-        this.$store.dispatch('ACTION_SET_PDF_ACTIVE_BBOXES', bboxes)
+        this.setActiveBboxes()
         if (this.currentActiveColumn !== 'Compte') {
           this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
         } else {
@@ -329,7 +327,7 @@ export default {
       this.assessment.debit = totalDebit
     },
     getStatementPrice(value) {
-      const pattern = /^([\d ]+)([.,]\d{1,2})*/gi
+      const pattern = /^([\d .]+)([.,]\d{1,2})*/gi
       let currentDebitDigits = '0.00'
       try {
         let valueIsNull = value === null || value === undefined || value === ''
@@ -347,12 +345,18 @@ export default {
       let pointIdx = value.indexOf('.')
       if (commaIdx !== -1 && pointIdx !== -1) {
         if (commaIdx < pointIdx) {
-          result.replace(',', '')
+          result = result.replace(',', '')
         } else {
-          result.replace('.', '')
+          result = result.replace('.', '')
         }
       }
       return parseFloat(result.replace(' ', '').replace(',', '.')).toFixed(2)
+    },
+    setActiveBboxes() {
+      if (this.bankOsmium[`page_${this.currentPage}`] && this.bankOsmium[`page_${this.currentPage}`].length) {
+        let bboxes = Object.values(this.bankOsmium[`page_${this.currentPage}`][this.currentActiveIndex]).map(x => x.Bbox)
+        this.$store.dispatch('ACTION_SET_PDF_ACTIVE_BBOXES', bboxes)
+      }
     },
     switchEditMode() {
       this.editMode = !this.editMode
