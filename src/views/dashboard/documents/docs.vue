@@ -38,8 +38,8 @@ export default {
   },
   data() {
     const panes = [
-      { title: this.$t('topBar.panesInvoice'), key: '0', ref: 'invoices', icon: 'apple', bankViz: false },
-      { title: this.$t('topBar.panesStatement'), key: '1', ref: 'statements', icon: 'android', bankViz: true },
+      { title: this.$t('topBar.panesInvoice'), key: '0', ref: 'invoices', icon: 'home', bankViz: false },
+      { title: this.$t('topBar.panesStatement'), key: '1', ref: 'statements', icon: 'home', bankViz: true },
     ]
     return {
       activeKey: panes[0].key,
@@ -49,6 +49,7 @@ export default {
   methods: {
     onChangeTab(activeTab) {
       const activeTabIdx = parseInt(activeTab)
+      this.$store.dispatch('ACTION_RESET_SMELTED_IDS')
       const params = {
         client: this.clientId,
         isArchived: this.isArchiveViz,
