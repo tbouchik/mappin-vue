@@ -9,7 +9,7 @@ Vue.use(Vuex)
 let cancelToken
 
 function fetchTemplates (queryParams) {
-  const { page, limit, name, current } = queryParams
+  const { page, limit, name, current, type } = queryParams
   if (typeof cancelToken !== typeof undefined) {
     cancelToken.cancel('Operation canceled due to new request.')
   }
@@ -24,6 +24,9 @@ function fetchTemplates (queryParams) {
   }
   if (name && name !== '') {
     params.name = name
+  }
+  if (type) {
+    params.type = type
   }
   try {
     return axios.get(`/v1/filters`, { params }, { cancelToken: cancelToken.token })

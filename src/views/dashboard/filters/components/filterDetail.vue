@@ -60,7 +60,6 @@
                       :value= k.value
                       :placeholder="$t('template.placeholder.keyName')"
                       style="width: 25%; margin-right: 8px"
-                      :disabled="isSmartTemplate"
                       @change="e => handleChange(e, index)"
 
                   />

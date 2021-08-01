@@ -11,8 +11,25 @@
     <a-steps :current="uploaderStep">
       <a-step v-for="item in steps" :key="item.title" :title="item.title" />
     </a-steps>
-    <br />
+    <br/>
     <div>
+      <template>
+        <a-breadcrumb v-if="selectedUploadType">
+          <a-breadcrumb-item>
+            <a-icon type="snippets" />
+            <span>{{selectedUploadType.name}}</span>
+          </a-breadcrumb-item>
+          <a-breadcrumb-item v-if="selectedClient">
+            <a-icon type="user" />
+            <span>{{selectedClient.name}}</span>
+          </a-breadcrumb-item>
+          <a-breadcrumb-item v-if="selectedTemplate">
+            <a-icon type="filter"/>
+            {{selectedTemplate.name}}
+          </a-breadcrumb-item>
+        </a-breadcrumb>
+      </template>
+      <br>
       <template v-if="steps[uploaderStep].title == 'Type'">
         <div style="margin-bottom:1%">
           {{ $t('upload.credits')}}
@@ -195,6 +212,9 @@ export default {
       searchedClient: null,
       searchedTemplate: null,
       isBankUpload: false,
+      selectedUploadType: null,
+      selectedClient: null,
+      selectedTemplate: null,
       steps: [
         {
           title: 'Type',
@@ -224,6 +244,7 @@ export default {
         limit: 100,
         page: 1,
         name: this.searchedTemplate,
+        type: this.selectedUploadType ? this.selectedUploadType.id : null,
       })
     },
   },
@@ -242,7 +263,6 @@ export default {
       'userId',
     ]),
     canUpload: function () {
-      console.log(this.userCount, this.userLimit)
       return this.userCount < this.userLimit
     },
     creditRatio: function () {
@@ -267,17 +287,33 @@ export default {
   },
   methods: {
     selectFilter(item) {
+      this.selectedTemplate = item
       this.$store.dispatch('ACTION_SELECT_UPLOADER_FILTER', item)
       this.$store.dispatch('ACTION_INCREMENT_UPLOADER_INDEX')
     },
     prev() {
       this.$store.dispatch('ACTION_DECREMENT_UPLOADER_INDEX')
+      if (this.selectedTemplate) {
+        this.selectedTemplate = null
+      } else if (this.selectedClient) {
+        this.selectedClient = null
+      } else {
+        this.selectedUploadType = null
+      }
     },
     selectClient(item) {
+      this.selectedClient = item
       this.$store.dispatch('ACTION_SELECT_UPLOADER_CLIENT', item)
       this.$store.dispatch('ACTION_INCREMENT_UPLOADER_INDEX')
     },
     selectBankUploadType(isBankUpload) {
+      this.selectedUploadType = isBankUpload ? { name: 'Relevé Bancaire', id: 'bankStatement' } : { name: 'Facture', id: 'invoice' }
+      this.$store.dispatch('ACTION_FETCH_FILTERS', {
+        limit: 100,
+        page: 1,
+        name: this.searchedTemplate,
+        type: this.selectedUploadType.id,
+      })
       this.isBankUpload = isBankUpload
       this.$store.dispatch('ACTION_INCREMENT_UPLOADER_INDEX')
     },
