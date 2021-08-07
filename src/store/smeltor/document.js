@@ -18,6 +18,7 @@ function saveDocToAPI(mbc, document, { imput, bankOsmiumChanged, keyAttributes }
     osmium: bankOsmiumChanged ? null : document.osmium,
     bankOsmium: bankOsmiumChanged ? document.bankOsmium : null,
     ggMetadata: bankOsmiumChanged ? null : document.ggMetadata,
+    status: 'validated',
   }
   if (keyAttributes) {
     Object.assign(updatedDocument, keyAttributes)
