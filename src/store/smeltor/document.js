@@ -218,7 +218,7 @@ function formatValue (value, keyType, keyRole, entryType) {
 
 export default {
   state: {
-    formattedDocument: {},
+    document: {},
     page: 1,
     documentsList: [],
     viewerIdList: [],
@@ -235,15 +235,15 @@ export default {
   },
   mutations: {
     UPDATE_DOCUMENT_DATA(state, document) {
-      state.formattedDocument = document
-      state.formattedDocument.osmium = state.formattedDocument.osmium.map((item, index) => {
+      state.document = document
+      state.document.osmium = state.document.osmium.map((item, index) => {
         item.key = index // This is to avoid ant design spitting on your face for
         return item // inserting items from osmium in ant table <a-table> without a unique key
       })
-      state.documentsList[state.documentsList.findIndex(x => x.id === state.formattedDocument.id)] = state.formattedDocument
+      state.documentsList[state.documentsList.findIndex(x => x.id === state.document.id)] = state.document
     },
     CLEAR_DOCUMENT_DATA(state) {
-      state.formattedDocument = null
+      state.document = null
     },
     REMOVE_DOC_FROM_LIST(state, id) {
       state.documentsList = state.documentsList.filter(item => item.id !== id)
@@ -265,51 +265,51 @@ export default {
         state.currentCol = payload.col
       } else {
         let nextCoords = state.currentPane === 'statementPane'
-          ? getTableGraphNextMove(state.formattedDocument.bankOsmium[`page_${state.page}`], state.currentIdx, state.currentCol, payload.move)
-          : getInvoiceGraphNextMove(state.formattedDocument.osmium, state.currentIdx, state.currentCol, payload.move)
+          ? getTableGraphNextMove(state.document.bankOsmium[`page_${state.page}`], state.currentIdx, state.currentCol, payload.move)
+          : getInvoiceGraphNextMove(state.document.osmium, state.currentIdx, state.currentCol, payload.move)
         state.currentIdx = nextCoords.idx
         state.currentCol = nextCoords.col
         state.currentLibelle = state.currentPane === 'statementPane'
-          ? changeDisplayedLibelle(state.currentCol, state.formattedDocument.bankOsmium[`page_${state.page}`][state.currentIdx])
-          : changeDisplayedLibelle(state.currentCol, state.formattedDocument.osmium[state.currentIdx])
+          ? changeDisplayedLibelle(state.currentCol, state.document.bankOsmium[`page_${state.page}`][state.currentIdx])
+          : changeDisplayedLibelle(state.currentCol, state.document.osmium[state.currentIdx])
       }
     },
     MUTATION_DO_AUTO_CHANGES_TO_INVOICE(state, bbox) {
-      let updateFormattedDoc = cloneDeep(state.formattedDocument)
-      const keyType = state.formattedDocument.filter.keys[state.currentIdx].type
-      const keyRole = state.formattedDocument.filter.keys[state.currentIdx].role
+      let newDoc = cloneDeep(state.document)
+      const keyType = state.document.filter.keys[state.currentIdx].type
+      const keyRole = state.document.filter.keys[state.currentIdx].role
       const newVal = formatValue(bbox.Text, keyType, keyRole, 'auto')
       let mbcData = new Map()
-      mbcData.set(updateFormattedDoc.osmium[state.currentIdx].Key, bbox)
+      mbcData.set(newDoc.osmium[state.currentIdx].Key, bbox)
       if (state.catMode) {
         let appendix = ' '.concat(newVal)
-        let currentValue = updateFormattedDoc.osmium[state.currentIdx].Value
-        updateFormattedDoc.osmium[state.currentIdx].Value = currentValue ? currentValue.concat(appendix) : appendix.trim()
+        let currentValue = newDoc.osmium[state.currentIdx].Value
+        newDoc.osmium[state.currentIdx].Value = currentValue ? currentValue.concat(appendix) : appendix.trim()
       } else {
-        updateFormattedDoc.osmium[state.currentIdx].Value = newVal
+        newDoc.osmium[state.currentIdx].Value = newVal
       }
-      const updatedDocumentRoleAttributes = getUpdatedDocumentRoles({ keyRole, keyType, newVal, isBank: state.formattedDocument.isBankStatement })
-      Object.assign(updateFormattedDoc, updatedDocumentRoleAttributes)
+      const updatedDocumentRoleAttributes = getUpdatedDocumentRoles({ keyRole, keyType, newVal, isBank: state.document.isBankStatement })
+      Object.assign(newDoc, updatedDocumentRoleAttributes)
       if (keyRole && keyRole.length && keyRole[keyRole.length - 1] === 'VENDOR') {
-        updateFormattedDoc.osmium.forEach((x) => {
+        newDoc.osmium.forEach((x) => {
           if (x.Imputation !== null) {
             x.Libelle = newVal
           }
         })
       }
-      state.formattedDocument = updateFormattedDoc
+      state.document = newDoc
       let options = { imput: false, bankOsmiumChanged: false, keyAttributes: updatedDocumentRoleAttributes }
-      saveDocToAPI(Object.fromEntries(mbcData), updateFormattedDoc, options)
+      saveDocToAPI(Object.fromEntries(mbcData), newDoc, options)
     },
     MUTATION_DO_MANUAL_CHANGES_TO_INVOICE(state, changeData) {
       let { value } = changeData
       let mbcData = new Map()
-      const keyType = state.formattedDocument.filter.keys[state.currentIdx].type
-      const keyRole = state.formattedDocument.filter.keys[state.currentIdx].role
-      let tempDoc = cloneDeep(state.formattedDocument)
+      const keyType = state.document.filter.keys[state.currentIdx].type
+      const keyRole = state.document.filter.keys[state.currentIdx].role
+      let tempDoc = cloneDeep(state.document)
       const newVal = formatValue(value, keyType, keyRole, 'manual')
       tempDoc.osmium[state.currentIdx][state.currentCol] = newVal
-      const updatedDocumentRoleAttributes = getUpdatedDocumentRoles({ keyRole, keyType, newVal, isBank: state.formattedDocument.isBankStatement })
+      const updatedDocumentRoleAttributes = getUpdatedDocumentRoles({ keyRole, keyType, newVal, isBank: state.document.isBankStatement })
       Object.assign(tempDoc, updatedDocumentRoleAttributes)
       if (keyRole && keyRole.length && keyRole[keyRole.length - 1] === 'VENDOR') {
         tempDoc.osmium.forEach((x) => {
@@ -318,58 +318,58 @@ export default {
           }
         })
       }
-      state.formattedDocument = tempDoc
+      state.document = tempDoc
       clearTimeout(debounce)
       debounce = setTimeout(() => {
         let options = { imput: false, bankOsmiumChanged: false, keyAttributes: updatedDocumentRoleAttributes }
-        saveDocToAPI(Object.fromEntries(mbcData), state.formattedDocument, options)
+        saveDocToAPI(Object.fromEntries(mbcData), state.document, options)
       }, 600)
     },
     MUTATION_DO_IMPUTATION_CHANGES_TO_INVOICE(state, changeData) {
       let { imputation, itemIdx } = changeData
-      let tempDoc = cloneDeep(state.formattedDocument)
+      let tempDoc = cloneDeep(state.document)
       tempDoc.osmium[itemIdx]['Imputation'] = imputation
-      state.formattedDocument = tempDoc
+      state.document = tempDoc
       let options = { imput: true, bankOsmiumChanged: false, keyAttributes: null }
-      saveDocToAPI({}, state.formattedDocument, options)
+      saveDocToAPI({}, state.document, options)
     },
     MUTATION_AUTO_CHANGES_TO_STATEMENT(state, bbox) {
-      let updateFormattedDoc = cloneDeep(state.formattedDocument)
+      let newDoc = cloneDeep(state.document)
       const newVal = bbox.Text
-      console.log(updateFormattedDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol])
+      console.log(newDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol])
       if (state.catMode) {
         let appendix = ' '.concat(newVal)
-        let currentValue = updateFormattedDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol].Text
-        updateFormattedDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol].Text = currentValue ? currentValue.concat(appendix) : appendix.trim()
+        let currentValue = newDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol].Text
+        newDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol].Text = currentValue ? currentValue.concat(appendix) : appendix.trim()
       } else {
-        updateFormattedDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol].Text = newVal
+        newDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol].Text = newVal
       }
-      state.formattedDocument = updateFormattedDoc
+      state.document = newDoc
       let options = { imput: false, bankOsmiumChanged: true, keyAttributes: null }
-      saveDocToAPI(null, updateFormattedDoc, options)
+      saveDocToAPI(null, newDoc, options)
     },
     MUTATION_MANUAL_CHANGES_TO_STATEMENT(state, changeData) {
       let { value } = changeData
-      let tempDoc = cloneDeep(state.formattedDocument)
+      let tempDoc = cloneDeep(state.document)
       tempDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol].Text = value
-      state.formattedDocument = tempDoc
+      state.document = tempDoc
       clearTimeout(debounce)
       debounce = setTimeout(() => {
         let options = { imput: false, bankOsmiumChanged: true, keyAttributes: null }
-        saveDocToAPI(null, state.formattedDocument, options)
+        saveDocToAPI(null, state.document, options)
       }, 600)
     },
     MUTATION_DO_IMPUTATION_CHANGES_TO_STATEMENT(state, changeData) {
       let { imputation, itemIdx } = changeData
-      let tempDoc = cloneDeep(state.formattedDocument)
+      let tempDoc = cloneDeep(state.document)
       tempDoc.bankOsmium[`page_${state.page}`][itemIdx]['Compte'].Text = imputation
-      state.formattedDocument = tempDoc
+      state.document = tempDoc
       let options = { imput: false, bankOsmiumChanged: true, keyAttributes: null }
-      saveDocToAPI({}, state.formattedDocument, options)
+      saveDocToAPI({}, state.document, options)
     },
     MUTATION_INSERT_STATEMENTS(state, changeData) {
       let { offset, selectedStatements, lines } = changeData
-      let tempDoc = cloneDeep(state.formattedDocument)
+      let tempDoc = cloneDeep(state.document)
       const emptyStatement = {
         'Date': { Text: '', Bbox: null },
         'Designation': { Text: '', Bbox: null },
@@ -392,21 +392,21 @@ export default {
           })
         })
       }
-      state.formattedDocument = tempDoc
+      state.document = tempDoc
       let options = { imput: false, bankOsmiumChanged: true, keyAttributes: null }
-      saveDocToAPI({}, state.formattedDocument, options)
+      saveDocToAPI({}, state.document, options)
     },
     MUTATION_DELETE_STATEMENTS(state, changeData) {
       let { selectedStatements } = changeData
-      let tempDoc = cloneDeep(state.formattedDocument)
+      let tempDoc = cloneDeep(state.document)
       let counter = 0
       selectedStatements.forEach(idx => {
         tempDoc.bankOsmium[`page_${state.page}`].splice([idx - counter], 1)
         counter++
       })
-      state.formattedDocument = tempDoc
+      state.document = tempDoc
       let options = { imput: false, bankOsmiumChanged: true, keyAttributes: null }
-      saveDocToAPI({}, state.formattedDocument, options)
+      saveDocToAPI({}, state.document, options)
     },
     MUTATION_ADD_RECORD_AFTER_INDEX(state) {
       const newElement = {
@@ -414,13 +414,13 @@ export default {
         'Value': '',
         'key': uuidv4(),
       }
-      let tempDoc = cloneDeep(state.formattedDocument)
+      let tempDoc = cloneDeep(state.document)
       if (state.currentIdx !== null) { // TODO Since currenIdx is no longer null as default, This condition is probably deprecated
         tempDoc.osmium.splice(state.currentIdx + 1, 0, newElement)
       } else {
         tempDoc.osmium.push(newElement)
       }
-      state.formattedDocument = cloneDeep(tempDoc)
+      state.document = cloneDeep(tempDoc)
     },
     MUTATION_TOGGLE_CATMODE(state) {
       state.catMode = !state.catMode
@@ -457,8 +457,8 @@ export default {
       state.currentLibelle = labels[parseInt(trimedImputation)]
     },
     MUTATION_FORMAT_STATEMENT_DATES(state, dates) {
-      let updateFormattedDoc = cloneDeep(state.formattedDocument)
-      Object.values(updateFormattedDoc.bankOsmium).forEach((statementPage) => {
+      let newDoc = cloneDeep(state.document)
+      Object.values(newDoc.bankOsmium).forEach((statementPage) => {
         statementPage.forEach((statementItem) => {
           try {
             let fullDate = statementItem.Date.Text.replace(/\D+/g, '')
@@ -486,10 +486,10 @@ export default {
           }
         })
       })
-      state.formattedDocument = updateFormattedDoc
-      console.log(updateFormattedDoc)
+      state.document = newDoc
+      console.log(newDoc)
       let options = { imput: false, bankOsmiumChanged: true, keyAttributes: null }
-      saveDocToAPI(null, updateFormattedDoc, options)
+      saveDocToAPI(null, newDoc, options)
     },
   },
   actions: {
@@ -579,8 +579,8 @@ export default {
     },
   },
   getters: {
-    current: state => state.formattedDocument,
-    currentPageData: state => get(state, 'formattedDocument.metadata', {})['page_' + state.page],
+    current: state => state.document,
+    currentPageData: state => get(state, 'document.metadata', {})['page_' + state.page],
     currentPage: state => get(state, 'page'),
     documentsList: state => state.documentsList,
     documentsIdList: state => state.documentsIdList, // todo remove
