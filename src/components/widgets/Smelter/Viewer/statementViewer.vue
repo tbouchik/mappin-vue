@@ -111,11 +111,10 @@
     <br>
     <a-modal v-model="dateModalVisible" title="Confirmation de Date" @ok="confirmDate">
       <a-range-picker
-        :placeholder="['Mois début', 'Mois fin']"
-        format="MM/YYYY"
+        :placeholder="['Date début', 'Date fin']"
+        format="DD/MM/YYYY"
         :value="dates"
-        :mode="datePickerMode"
-        @panelChange="handleDatePickerPanelChange"
+        @panelChange="handleDateChange"
         @change="handleDateChange"
       />
     </a-modal>
@@ -198,7 +197,6 @@ export default {
       insertModalVisible: false,
       offset: null,
       numberOfLines: 0,
-      datePickerMode: ['month', 'month'],
       dates: [],
       assessment: {
         balanced: true,
@@ -442,15 +440,11 @@ export default {
     handleDateChange(dates) {
       this.dates = dates
     },
-    handleDatePickerPanelChange(dates, mode) {
-      this.dates = dates
-      this.datePickerMode = [mode[0] === 'date' ? 'month' : mode[0], mode[1] === 'date' ? 'month' : mode[1]]
-    },
     setMonths() {
-      if (this.dateBeg) {
+      if (this.dateBeg && this.dates.length === 0) {
         this.dates[0] = moment(this.dateBeg)
       }
-      if (this.dateEnd) {
+      if (this.dateEnd && this.dates.length <= 1) {
         this.dates[1] = moment(this.dateEnd)
       }
     },

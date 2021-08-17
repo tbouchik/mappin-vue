@@ -216,15 +216,6 @@ function formatValue (value, keyType, keyRole, entryType) {
   return parsedValue
 }
 
-function extractTransactionDate (fullDate) {
-  const len = fullDate.length
-  if (len <= 3) {
-    return parseInt(fullDate.substring(0, 2))
-  } else {
-    return parseInt(fullDate.substring(0, 2 - len % 2))
-  }
-}
-
 export default {
   state: {
     formattedDocument: {},
@@ -468,23 +459,26 @@ export default {
     MUTATION_FORMAT_STATEMENT_DATES(state, dates) {
       let updateFormattedDoc = cloneDeep(state.formattedDocument)
       Object.values(updateFormattedDoc.bankOsmium).forEach((statementPage) => {
-        let usedMonth = 0
-        let lastUsedDate = 0
         statementPage.forEach((statementItem) => {
           try {
             let fullDate = statementItem.Date.Text.replace(/\D+/g, '')
             if (fullDate.length && fullDate.length >= 2) {
-              let date = extractTransactionDate(fullDate)
+              let date = parseInt(fullDate.substring(0, 2))
               if (!isNaN(date)) {
-                if (date < lastUsedDate) {
-                  usedMonth = 1
+                let guessedDate = moment()
+                guessedDate.set('date', date)
+                guessedDate.set('month', dates[0].month())
+                guessedDate.set('year', dates[0].year())
+                console.log(guessedDate.format('DD/MM/YYYY'))
+                if (dates[0].isBefore(guessedDate) && dates[1].isAfter(guessedDate)) {
+                  statementItem.Date.Text = guessedDate.format('DD/MM/YYYY')
+                } else {
+                  guessedDate.set('month', dates[1].month())
+                  guessedDate.set('year', dates[1].year())
+                  if (dates[0].isBefore(guessedDate) && dates[1].isAfter(guessedDate)) {
+                    statementItem.Date.Text = guessedDate.format('DD/MM/YYYY')
+                  }
                 }
-                date = `${date}`.length === 1 ? '0' + `${date}` : `${date}`
-                let month = dates[usedMonth].month() + 1
-                month = `${month}`.length === 1 ? '0' + `${month}` : `${month}`
-                let year = dates[usedMonth].year()
-                let newDate = date + '/' + month + '/' + year
-                statementItem.Date.Text = newDate
               }
             }
           } catch (err) {
