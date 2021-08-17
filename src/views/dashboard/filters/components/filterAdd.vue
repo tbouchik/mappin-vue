@@ -13,12 +13,12 @@
             <a-form :form="form" :label-col="{ span: 4 }" :wrapper-col="{ span: 12 }" @submit.prevent="handleSubmit">
               <a-form-item label="Name">
               <a-input
-                  v-decorator="['name', { rules: [{ required: true, message: 'Please input your template name' }] }]"
+                  v-decorator="['name', { rules: [{ required: true, message: 'Veuillez renseigner le nom du template' }] }]"
               />
               </a-form-item>
               <a-form-item label="Description">
               <a-input
-                  v-decorator="['description', { rules: [{ required: false, message: 'Input here your template description' }] }]"
+                  v-decorator="['description', { rules: [{ required: false, message: 'Veuillez renseigner la description' }] }]"
               />
               </a-form-item>
               <a-form-item label="Type">
@@ -26,7 +26,7 @@
                   @change="e => handleTypeChange(e)"
                   v-decorator="[
                     'type',
-                    { rules: [{ required: false, message: 'Please select your template type' }] },
+                    { rules: [{ required: true, message: 'Veuillez renseigner le type' }] },
                   ]"
                   :placeholder="$t('template.typeSelect')"
                 >
@@ -48,6 +48,10 @@
                       :placeholder="$t('template.placeholder.keyName')"
                       style="width: 40%; margin-right: 8px"
                       @change="e => handleChange(e, index)"
+                      v-decorator="[
+                        `keyname-${index}`,
+                        { rules: [{ required: true, message: 'Veuillez renseigner le nom et le type de la clé' }] },
+                      ]"
 
                   />
                   <a-select
@@ -55,6 +59,10 @@
                     style="width: 10%; margin-right: 4px"
                     :placeholder="$t('template.placeholder.keyType')"
                     @change="e => handleKeyTypeChange(e, index)"
+                    v-decorator="[
+                        `keytype-${index}`,
+                        { rules: [{ required: true, message: 'Veuillez renseigner le type de la clé' }] },
+                      ]"
                   >
                     <a-select-option value="REF">
                       {{ $t('template.type.ref') }}
@@ -277,9 +285,11 @@ export default {
             type,
             keys: this.names,
           })
+          this.$router.push({ name: 'filters' })
+        } else {
+          this.form.validateFields({ force: true })
         }
       })
-      this.$router.push({ name: 'filters' })
     },
 
     handleChange(e, index) {
