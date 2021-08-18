@@ -197,6 +197,7 @@ export default {
       insertModalVisible: false,
       offset: null,
       numberOfLines: 0,
+      debounce: null,
       dates: [],
       assessment: {
         balanced: true,
@@ -361,7 +362,11 @@ export default {
       this.editMode = !this.editMode
     },
     handleChange(value, itemIdx, column) {
-      this.$store.dispatch('ACTION_MANUAL_CHANGES_TO_STATEMENT', { value, itemIdx, column })
+      this.pageData[itemIdx][column] = value
+      clearTimeout(this.debounce)
+      this.debounce = setTimeout(() => {
+        this.$store.dispatch('ACTION_MANUAL_CHANGES_TO_STATEMENT', { value, itemIdx, column })
+      }, 600)
     },
     activateIndex(idx, col) {
       this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', { idx, col })

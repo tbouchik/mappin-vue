@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 import axios from 'axios'
 import dateFormats from '../helpers'
 import labels from '../../assets/accounting/labels'
-import { cloneDeep, get, pick, pickBy } from 'lodash'
+import { cloneDeep, get, pick, pickBy, isEqual } from 'lodash'
 import uuidv4 from 'uuid/v4'
 import moment from 'moment'
 Vue.use(Vuex)
@@ -219,9 +219,9 @@ function formatValue (value, keyType, keyRole, entryType) {
 export default {
   state: {
     document: {},
+    changeSnapshots: [],
     page: 1,
     documentsList: [],
-    viewerIdList: [],
     currentIdx: 0,
     catMode: false,
     loading: false,
@@ -230,8 +230,8 @@ export default {
     currentPane: 'templatePane',
     currentLibelle: 'Libellé d\'Imputation',
     smeltedCache: [],
-    totalDocumentsCount: 0,
     documentsIdList: [],
+    totalDocumentsCount: 0,
   },
   mutations: {
     UPDATE_DOCUMENT_DATA(state, document) {
@@ -276,6 +276,16 @@ export default {
     },
     MUTATION_DO_AUTO_CHANGES_TO_INVOICE(state, bbox) {
       let newDoc = cloneDeep(state.document)
+      const snapshot = {
+        type: 'osmium',
+        index: state.currentIdx,
+        column: state.currentCol,
+        value: state.document.osmium[state.currentIdx].Value,
+      }
+      if (!isEqual(snapshot, state.changeSnapshots[state.changeSnapshots.length - 1])) {
+        state.changeSnapshots.push(snapshot)
+        console.log(snapshot)
+      }
       const keyType = state.document.filter.keys[state.currentIdx].type
       const keyRole = state.document.filter.keys[state.currentIdx].role
       const newVal = formatValue(bbox.Text, keyType, keyRole, 'auto')
@@ -318,6 +328,16 @@ export default {
           }
         })
       }
+      const snapshot = {
+        type: 'osmium',
+        index: state.currentIdx,
+        column: state.currentCol,
+        value: state.document.osmium[state.currentIdx].Value,
+      }
+      if (!isEqual(snapshot, state.changeSnapshots[state.changeSnapshots.length - 1])) {
+        state.changeSnapshots.push(snapshot)
+        console.log(snapshot)
+      }
       state.document = tempDoc
       clearTimeout(debounce)
       debounce = setTimeout(() => {
@@ -328,6 +348,16 @@ export default {
     MUTATION_DO_IMPUTATION_CHANGES_TO_INVOICE(state, changeData) {
       let { imputation, itemIdx } = changeData
       let tempDoc = cloneDeep(state.document)
+      const snapshot = {
+        type: 'osmium',
+        index: state.currentIdx,
+        column: state.currentCol,
+        value: state.document.osmium[state.currentIdx].Value,
+      }
+      if (!isEqual(snapshot, state.changeSnapshots[state.changeSnapshots.length - 1])) {
+        state.changeSnapshots.push(snapshot)
+        console.log(snapshot)
+      }
       tempDoc.osmium[itemIdx]['Imputation'] = imputation
       state.document = tempDoc
       let options = { imput: true, bankOsmiumChanged: false, keyAttributes: null }
@@ -337,6 +367,16 @@ export default {
       let newDoc = cloneDeep(state.document)
       const newVal = bbox.Text
       console.log(newDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol])
+      const snapshot = {
+        type: 'bankOsmium',
+        index: state.currentIdx,
+        column: state.currentCol,
+        value: state.document.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol].Text,
+      }
+      if (!isEqual(snapshot, state.changeSnapshots[state.changeSnapshots.length - 1])) {
+        state.changeSnapshots.push(snapshot)
+        console.log(snapshot)
+      }
       if (state.catMode) {
         let appendix = ' '.concat(newVal)
         let currentValue = newDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol].Text
@@ -351,6 +391,16 @@ export default {
     MUTATION_MANUAL_CHANGES_TO_STATEMENT(state, changeData) {
       let { value } = changeData
       let tempDoc = cloneDeep(state.document)
+      const snapshot = {
+        type: 'bankOsmium',
+        index: state.currentIdx,
+        column: state.currentCol,
+        value: state.document.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol].Text,
+      }
+      if (!isEqual(snapshot, state.changeSnapshots[state.changeSnapshots.length - 1])) {
+        state.changeSnapshots.push(snapshot)
+        console.log(snapshot)
+      }
       tempDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol].Text = value
       state.document = tempDoc
       clearTimeout(debounce)
@@ -362,6 +412,16 @@ export default {
     MUTATION_DO_IMPUTATION_CHANGES_TO_STATEMENT(state, changeData) {
       let { imputation, itemIdx } = changeData
       let tempDoc = cloneDeep(state.document)
+      const snapshot = {
+        type: 'bankOsmium',
+        index: state.currentIdx,
+        column: state.currentCol,
+        value: state.document.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol].Text,
+      }
+      if (!isEqual(snapshot, state.changeSnapshots[state.changeSnapshots.length - 1])) {
+        state.changeSnapshots.push(snapshot)
+        console.log(snapshot)
+      }
       tempDoc.bankOsmium[`page_${state.page}`][itemIdx]['Compte'].Text = imputation
       state.document = tempDoc
       let options = { imput: false, bankOsmiumChanged: true, keyAttributes: null }
@@ -370,6 +430,14 @@ export default {
     MUTATION_INSERT_STATEMENTS(state, changeData) {
       let { offset, selectedStatements, lines } = changeData
       let tempDoc = cloneDeep(state.document)
+      const snapshot = {
+        type: 'add',
+        bankOsmium: cloneDeep(state.document.bankOsmium),
+      }
+      if (!isEqual(snapshot, state.changeSnapshots[state.changeSnapshots.length - 1])) {
+        state.changeSnapshots.push(snapshot)
+        console.log(snapshot)
+      }
       const emptyStatement = {
         'Date': { Text: '', Bbox: null },
         'Designation': { Text: '', Bbox: null },
@@ -397,6 +465,14 @@ export default {
       saveDocToAPI({}, state.document, options)
     },
     MUTATION_DELETE_STATEMENTS(state, changeData) {
+      const snapshot = {
+        type: 'add',
+        bankOsmium: cloneDeep(state.document.bankOsmium),
+      }
+      if (!isEqual(snapshot, state.changeSnapshots[state.changeSnapshots.length - 1])) {
+        state.changeSnapshots.push(snapshot)
+        console.log(snapshot)
+      }
       let { selectedStatements } = changeData
       let tempDoc = cloneDeep(state.document)
       let counter = 0

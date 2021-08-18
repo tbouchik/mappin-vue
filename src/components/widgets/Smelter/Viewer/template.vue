@@ -129,6 +129,7 @@ export default {
       columns,
       pageData: [],
       chosen: '',
+      debounce: null,
     }
   },
   created() {
@@ -183,7 +184,11 @@ export default {
       this.editMode = !this.editMode
     },
     handleChange(value, itemIdx, column) {
-      this.$store.dispatch('ACTION_DO_CHANGES_TO_DOCUMENT', { value, itemIdx, column })
+      this.pageData[itemIdx][column] = value
+      clearTimeout(this.debounce)
+      this.debounce = setTimeout(() => {
+        this.$store.dispatch('ACTION_DO_CHANGES_TO_DOCUMENT', { value, itemIdx, column })
+      }, 600)
     },
     activateIndex(idx, col) {
       this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', { idx, col })
