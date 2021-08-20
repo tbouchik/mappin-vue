@@ -4,7 +4,6 @@ import axios from 'axios'
 import dateFormats from '../helpers'
 import labels from '../../assets/accounting/labels'
 import { cloneDeep, get, pick, pickBy, isEqual } from 'lodash'
-import uuidv4 from 'uuid/v4'
 import moment from 'moment'
 Vue.use(Vuex)
 
@@ -219,7 +218,8 @@ function formatValue (value, keyType, keyRole, entryType) {
 export default {
   state: {
     document: {},
-    changeSnapshots: [],
+    osmiumChangeSnapshots: [],
+    bankOsmiumChangeSnapshots: [],
     page: 1,
     documentsList: [],
     currentIdx: 0,
@@ -276,16 +276,6 @@ export default {
     },
     MUTATION_DO_AUTO_CHANGES_TO_INVOICE(state, bbox) {
       let newDoc = cloneDeep(state.document)
-      const snapshot = {
-        type: 'osmium',
-        index: state.currentIdx,
-        column: state.currentCol,
-        value: state.document.osmium[state.currentIdx].Value,
-      }
-      if (!isEqual(snapshot, state.changeSnapshots[state.changeSnapshots.length - 1])) {
-        state.changeSnapshots.push(snapshot)
-        console.log(snapshot)
-      }
       const keyType = state.document.filter.keys[state.currentIdx].type
       const keyRole = state.document.filter.keys[state.currentIdx].role
       const newVal = formatValue(bbox.Text, keyType, keyRole, 'auto')
@@ -307,13 +297,23 @@ export default {
           }
         })
       }
+      const snapshot = {
+        index: state.currentIdx,
+        column: state.currentCol,
+        value: state.document.osmium[state.currentIdx].Value,
+        keyAttributes: updatedDocumentRoleAttributes,
+        imput: false,
+        mbc: Object.fromEntries(mbcData),
+      }
+      if (!isEqual(snapshot, state.osmiumChangeSnapshots[state.osmiumChangeSnapshots.length - 1])) {
+        state.osmiumChangeSnapshots.push(snapshot)
+      }
       state.document = newDoc
       let options = { imput: false, bankOsmiumChanged: false, keyAttributes: updatedDocumentRoleAttributes }
       saveDocToAPI(Object.fromEntries(mbcData), newDoc, options)
     },
     MUTATION_DO_MANUAL_CHANGES_TO_INVOICE(state, changeData) {
       let { value } = changeData
-      let mbcData = new Map()
       const keyType = state.document.filter.keys[state.currentIdx].type
       const keyRole = state.document.filter.keys[state.currentIdx].role
       let tempDoc = cloneDeep(state.document)
@@ -329,34 +329,36 @@ export default {
         })
       }
       const snapshot = {
-        type: 'osmium',
         index: state.currentIdx,
         column: state.currentCol,
         value: state.document.osmium[state.currentIdx].Value,
+        keyAttributes: updatedDocumentRoleAttributes,
+        imput: false,
+        mbc: {},
       }
-      if (!isEqual(snapshot, state.changeSnapshots[state.changeSnapshots.length - 1])) {
-        state.changeSnapshots.push(snapshot)
-        console.log(snapshot)
+      if (!isEqual(snapshot, state.osmiumChangeSnapshots[state.osmiumChangeSnapshots.length - 1])) {
+        state.osmiumChangeSnapshots.push(snapshot)
       }
       state.document = tempDoc
       clearTimeout(debounce)
       debounce = setTimeout(() => {
         let options = { imput: false, bankOsmiumChanged: false, keyAttributes: updatedDocumentRoleAttributes }
-        saveDocToAPI(Object.fromEntries(mbcData), state.document, options)
+        saveDocToAPI({}, state.document, options)
       }, 600)
     },
     MUTATION_DO_IMPUTATION_CHANGES_TO_INVOICE(state, changeData) {
       let { imputation, itemIdx } = changeData
       let tempDoc = cloneDeep(state.document)
       const snapshot = {
-        type: 'osmium',
         index: state.currentIdx,
         column: state.currentCol,
         value: state.document.osmium[state.currentIdx].Value,
+        keyAttributes: null,
+        imput: true,
+        mbc: {},
       }
-      if (!isEqual(snapshot, state.changeSnapshots[state.changeSnapshots.length - 1])) {
-        state.changeSnapshots.push(snapshot)
-        console.log(snapshot)
+      if (!isEqual(snapshot, state.osmiumChangeSnapshots[state.osmiumChangeSnapshots.length - 1])) {
+        state.osmiumChangeSnapshots.push(snapshot)
       }
       tempDoc.osmium[itemIdx]['Imputation'] = imputation
       state.document = tempDoc
@@ -368,14 +370,14 @@ export default {
       const newVal = bbox.Text
       console.log(newDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol])
       const snapshot = {
-        type: 'bankOsmium',
+        type: 'modify',
         index: state.currentIdx,
         column: state.currentCol,
+        page: `page_${state.page}`,
         value: state.document.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol].Text,
       }
-      if (!isEqual(snapshot, state.changeSnapshots[state.changeSnapshots.length - 1])) {
-        state.changeSnapshots.push(snapshot)
-        console.log(snapshot)
+      if (!isEqual(snapshot, state.bankOsmiumChangeSnapshots[state.bankOsmiumChangeSnapshots.length - 1])) {
+        state.bankOsmiumChangeSnapshots.push(snapshot)
       }
       if (state.catMode) {
         let appendix = ' '.concat(newVal)
@@ -392,14 +394,14 @@ export default {
       let { value } = changeData
       let tempDoc = cloneDeep(state.document)
       const snapshot = {
-        type: 'bankOsmium',
+        type: 'modify',
         index: state.currentIdx,
         column: state.currentCol,
+        page: `page_${state.page}`,
         value: state.document.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol].Text,
       }
-      if (!isEqual(snapshot, state.changeSnapshots[state.changeSnapshots.length - 1])) {
-        state.changeSnapshots.push(snapshot)
-        console.log(snapshot)
+      if (!isEqual(snapshot, state.bankOsmiumChangeSnapshots[state.bankOsmiumChangeSnapshots.length - 1])) {
+        state.bankOsmiumChangeSnapshots.push(snapshot)
       }
       tempDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol].Text = value
       state.document = tempDoc
@@ -413,14 +415,14 @@ export default {
       let { imputation, itemIdx } = changeData
       let tempDoc = cloneDeep(state.document)
       const snapshot = {
-        type: 'bankOsmium',
+        type: 'modify',
         index: state.currentIdx,
         column: state.currentCol,
+        page: `page_${state.page}`,
         value: state.document.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol].Text,
       }
-      if (!isEqual(snapshot, state.changeSnapshots[state.changeSnapshots.length - 1])) {
-        state.changeSnapshots.push(snapshot)
-        console.log(snapshot)
+      if (!isEqual(snapshot, state.bankOsmiumChangeSnapshots[state.bankOsmiumChangeSnapshots.length - 1])) {
+        state.bankOsmiumChangeSnapshots.push(snapshot)
       }
       tempDoc.bankOsmium[`page_${state.page}`][itemIdx]['Compte'].Text = imputation
       state.document = tempDoc
@@ -434,9 +436,8 @@ export default {
         type: 'add',
         bankOsmium: cloneDeep(state.document.bankOsmium),
       }
-      if (!isEqual(snapshot, state.changeSnapshots[state.changeSnapshots.length - 1])) {
-        state.changeSnapshots.push(snapshot)
-        console.log(snapshot)
+      if (!isEqual(snapshot, state.bankOsmiumChangeSnapshots[state.bankOsmiumChangeSnapshots.length - 1])) {
+        state.bankOsmiumChangeSnapshots.push(snapshot)
       }
       const emptyStatement = {
         'Date': { Text: '', Bbox: null },
@@ -466,12 +467,11 @@ export default {
     },
     MUTATION_DELETE_STATEMENTS(state, changeData) {
       const snapshot = {
-        type: 'add',
+        type: 'remove',
         bankOsmium: cloneDeep(state.document.bankOsmium),
       }
-      if (!isEqual(snapshot, state.changeSnapshots[state.changeSnapshots.length - 1])) {
-        state.changeSnapshots.push(snapshot)
-        console.log(snapshot)
+      if (!isEqual(snapshot, state.bankOsmiumChangeSnapshots[state.bankOsmiumChangeSnapshots.length - 1])) {
+        state.bankOsmiumChangeSnapshots.push(snapshot)
       }
       let { selectedStatements } = changeData
       let tempDoc = cloneDeep(state.document)
@@ -483,20 +483,6 @@ export default {
       state.document = tempDoc
       let options = { imput: false, bankOsmiumChanged: true, keyAttributes: null }
       saveDocToAPI({}, state.document, options)
-    },
-    MUTATION_ADD_RECORD_AFTER_INDEX(state) {
-      const newElement = {
-        'Key': '',
-        'Value': '',
-        'key': uuidv4(),
-      }
-      let tempDoc = cloneDeep(state.document)
-      if (state.currentIdx !== null) { // TODO Since currenIdx is no longer null as default, This condition is probably deprecated
-        tempDoc.osmium.splice(state.currentIdx + 1, 0, newElement)
-      } else {
-        tempDoc.osmium.push(newElement)
-      }
-      state.document = cloneDeep(tempDoc)
     },
     MUTATION_TOGGLE_CATMODE(state) {
       state.catMode = !state.catMode
@@ -534,6 +520,13 @@ export default {
     },
     MUTATION_FORMAT_STATEMENT_DATES(state, dates) {
       let newDoc = cloneDeep(state.document)
+      const snapshot = {
+        type: 'remove',
+        bankOsmium: cloneDeep(state.document.bankOsmium),
+      }
+      if (!isEqual(snapshot, state.bankOsmiumChangeSnapshots[state.bankOsmiumChangeSnapshots.length - 1])) {
+        state.bankOsmiumChangeSnapshots.push(snapshot)
+      }
       Object.values(newDoc.bankOsmium).forEach((statementPage) => {
         statementPage.forEach((statementItem) => {
           try {
@@ -567,6 +560,39 @@ export default {
       let options = { imput: false, bankOsmiumChanged: true, keyAttributes: null }
       saveDocToAPI(null, newDoc, options)
     },
+    MUTATION_ROLLBACK_CHANGE(state, payload) {
+      let lastState
+      let newDoc = cloneDeep(state.document)
+      let options = {}
+      if (payload.target === 'invoice') {
+        lastState = state.osmiumChangeSnapshots.pop()
+        if (lastState) {
+          newDoc = cloneDeep(state.document)
+          newDoc.osmium[lastState.index][lastState.column] = lastState.value
+          state.document = newDoc
+          let options = { imput: lastState.imput, bankOsmiumChanged: false, keyAttributes: lastState.keyAttributes }
+          saveDocToAPI(lastState.mbc, newDoc, options)
+        }
+      } else {
+        lastState = state.bankOsmiumChangeSnapshots.pop()
+        if (lastState) {
+          if (lastState.type === 'modify') {
+            newDoc.bankOsmium[lastState.page][lastState.index][lastState.column].Text = lastState.value
+            state.document = newDoc
+            options = { imput: false, bankOsmiumChanged: true, keyAttributes: null }
+          } else {
+            newDoc.bankOsmium = lastState.bankOsmium
+            state.document = newDoc
+            options = { imput: false, bankOsmiumChanged: true, keyAttributes: null }
+          }
+          saveDocToAPI({}, newDoc, options)
+        }
+      }
+    },
+    MUTATION_RESET_CHANGE_SNAPSHOTS(state) {
+      state.bankOsmiumChangeSnapshots = []
+      state.osmiumChangeSnapshots = []
+    },
   },
   actions: {
     UPDATE_DOCUMENT({ commit }, document) {
@@ -598,9 +624,6 @@ export default {
     },
     ACTION_DO_CHANGES_TO_DOCUMENT({ commit }, changeData) {
       commit('MUTATION_DO_MANUAL_CHANGES_TO_INVOICE', changeData)
-    },
-    ACTION_ADD_RECORD_AFTER_INDEX({ commit }) {
-      commit('MUTATION_ADD_RECORD_AFTER_INDEX')
     },
     ACTION_TOGGLE_CATMODE({ commit }) {
       commit('MUTATION_TOGGLE_CATMODE')
@@ -653,6 +676,12 @@ export default {
     ACTION_FORMAT_STATEMENT_DATES({ commit }, dates) {
       commit('MUTATION_FORMAT_STATEMENT_DATES', dates)
     },
+    ACTION_ROLLBACK_CHANGE({ commit }, payload) {
+      commit('MUTATION_ROLLBACK_CHANGE', payload)
+    },
+    ACTION_RESET_CHANGE_SNAPSHOTS({ commit }) {
+      commit('MUTATION_RESET_CHANGE_SNAPSHOTS')
+    },
   },
   getters: {
     current: state => state.document,
@@ -674,5 +703,7 @@ export default {
     totalDocumentsCount: state => state.totalDocumentsCount, // TODO REMOVE IF NOT USABLE IN SUBBAR
     showImputationAlert: state => (state.currentCol === 'Imputation' || state.currentCol === 'Compte') && state.currentLibelle,
     currentImputationAlert: state => state.currentLibelle,
+    osmiumSnapshotsEmpty: state => state.osmiumChangeSnapshots.length === 0,
+    bankOsmiumSnapshotsEmpty: state => state.bankOsmiumChangeSnapshots.length === 0,
   },
 }

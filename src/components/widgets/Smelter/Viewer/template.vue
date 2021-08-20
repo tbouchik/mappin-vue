@@ -5,6 +5,14 @@
         <a-alert  :message="currentImputationAlert" type="info" close-text="Fermer" />
     </div>
   <br>
+      <a-tooltip>
+          <template slot="title">
+            Défaire
+          </template>
+          <a-button type="primary" style="margin-bottom:1%" icon="rollback"
+                    @click="rollbackChange"
+                    :disabled="osmiumSnapshotsEmpty" ghost></a-button>
+        </a-tooltip>
       <a-table  :columns="adjustedColumns"
                 :data-source="pageData"
                 :pagination=false
@@ -151,7 +159,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['currentPage', 'currentActiveIndex', 'currentActivePane', 'currentActiveColumn', 'catMode', 'showImputationAlert', 'currentImputationAlert']),
+    ...mapGetters(['osmiumSnapshotsEmpty', 'currentPage', 'currentActiveIndex', 'currentActivePane', 'currentActiveColumn', 'catMode', 'showImputationAlert', 'currentImputationAlert']),
     adjustedColumns: function() {
       return this.isBankStatement ? columns.slice(0, 2) : columns
     },
@@ -235,6 +243,9 @@ export default {
         imputation: e.target.value,
       }
       this.$store.dispatch('ACTION_DO_IMPUTATION_CHANGES_TO_INVOICE', payload)
+    },
+    rollbackChange() {
+      this.$store.dispatch('ACTION_ROLLBACK_CHANGE', { target: 'invoice' })
     },
   },
   destroyed() {

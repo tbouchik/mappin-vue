@@ -25,6 +25,14 @@
         <a-button type="primary" style="margin-left:1%" @click="setDateModalVisible" ghost>
           Formater Date
         </a-button>
+        <a-tooltip>
+          <template slot="title">
+            Défaire
+          </template>
+          <a-button type="primary" style="margin-left:2%" icon="rollback"
+                    @click="rollbackChange"
+                    :disabled="bankOsmiumSnapshotsEmpty" ghost></a-button>
+        </a-tooltip>
         <a-modal
           v-model="balanceModalVisible"
           title="Totaux des mouvements"
@@ -226,7 +234,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['currentPage', 'currentActiveIndex', 'currentActivePane', 'currentActiveColumn', 'catMode', 'showImputationAlert', 'currentImputationAlert']),
+    ...mapGetters(['currentPage', 'currentActiveIndex', 'currentActivePane', 'currentActiveColumn', 'catMode', 'showImputationAlert', 'currentImputationAlert', 'bankOsmiumSnapshotsEmpty']),
     hasSelectedStatements() {
       return this.selectedStatements.length > 0 || this.bankOsmium[`page_${this.currentPage}`].length === 0
     },
@@ -360,6 +368,9 @@ export default {
     },
     switchEditMode() {
       this.editMode = !this.editMode
+    },
+    rollbackChange() {
+      this.$store.dispatch('ACTION_ROLLBACK_CHANGE', { target: 'statement' })
     },
     handleChange(value, itemIdx, column) {
       this.pageData[itemIdx][column] = value

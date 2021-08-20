@@ -113,6 +113,7 @@ export default {
       this.currentDocument = doc
       this.currenOsmium = this.currentDocument.osmium
       this.currentBankOsmium = this.currentDocument.bankOsmium
+      this.$store.dispatch('ACTION_RESET_CHANGE_SNAPSHOTS')
     })
   },
   watch: {
@@ -122,6 +123,7 @@ export default {
         this.currentDocument = doc
         const firstActiveCell = this.currentDocument.isBankStatement ? { idx: 0, col: 'Date' } : { idx: 0, col: 'Value' }
         this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', firstActiveCell)
+        this.$store.dispatch('ACTION_RESET_CHANGE_SNAPSHOTS')
       })
     },
     currentDocument: function() {
