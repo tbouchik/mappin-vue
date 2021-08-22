@@ -2,22 +2,32 @@
   <div>
     <br />
     <div class="row">
-      <div class="col-md-4"></div>
+      <div class="col-md-4">
+        <a-button-group>
+          <a-button type="primary" @click="zoomIn" ghost>
+            <a-icon type="plus" />
+          </a-button>
+          <a-button type="primary" @click="zoomOut" ghost>
+            <a-icon type="minus" />
+          </a-button>
+        </a-button-group>
+      </div>
       <div class="col-md-5">
         <a-button-group>
-          <a-button type="primary" id="prev-page" @click="showPrevPage">
+          <a-button type="primary" id="prev-page" @click="showPrevPage" ghost>
             <a-icon type="left" />
           </a-button>
-          <a-button type="primary">
+          <a-button type="primary" ghost>
             <span class="page-info">
               Page
               <span id="page-num"></span> {{ $t('windows.of') }}
               <span id="page-count"></span>
             </span>
           </a-button>
-          <a-button type="primary" id="next-page" @click="showNextPage">
+          <a-button type="primary" id="next-page" @click="showNextPage" ghost>
             <a-icon type="right" />
           </a-button>
+
           <br />
         </a-button-group>
       </div>
@@ -31,11 +41,18 @@
         </a-button-group>
       </div>
     </div>
+    <div class="row">
+      <div class="col-md-2 col-md-offset-9" style="margin: 0 auto;">
+
+    </div>
+      <div class="col-md-2">
+      </div>
+    </div>
     <br />
     <div class="row">
       <div class="col-12">
         <div class="card">
-          <div class="card-body" id="pdf-card">
+          <div class="card-body" id="pdf-card" style="overflow-y:scroll;overflow-x:scroll;">
             <canvas id="pdf-render" @click="updateOsmium"></canvas>
           </div>
         </div>
@@ -83,6 +100,7 @@ export default {
       pageIsRendering: false,
       pdfDoc: null,
       pageNum: 1,
+      scale: 1.0,
     }
   },
   methods: {
@@ -126,10 +144,10 @@ export default {
         if (this.pdfcontext) {
           this.$store.dispatch('ACTION_SET_PDF_CONTEXT_SCALE', canvas)
         }
-        const viewport = page.getViewport(
+        const viewport = page.getViewport({ scale:
           document.querySelector('.card-body').offsetWidth /
-            page.getViewport(1.0).width
-        )
+            page.getViewport({ scale: this.scale }).width,
+        })
         canvas.height = viewport.height
         canvas.width = viewport.width
         this.$store.dispatch('ACTION_SET_PDF_CONTEXT_CANVAS', canvas)
@@ -177,6 +195,22 @@ export default {
       this.pageNum++
       this.$store.dispatch('ACTION_INCREMENT_PAGE')
       this.queueRenderPage(this.pageNum)
+    },
+    zoomOut() {
+      if (this.scale >= 1.75) {
+
+      } else {
+        this.scale += 0.25
+        this.renderPage(this.pageNum)
+      }
+    },
+    zoomIn() {
+      if (this.scale <= 0.25) {
+
+      } else {
+        this.scale -= 0.25
+        this.renderPage(this.pageNum)
+      }
     },
     async renderPdf() {
       this.pdfDoc = null

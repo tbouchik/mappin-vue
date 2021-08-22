@@ -276,22 +276,6 @@
             />
           </a-form-item>
         </a-row>
-        <!-- <a-row :gutter="16">
-          <a-col :span="24">
-            <a-form-item label="Contient">
-              <a-textarea
-                v-decorator="[
-                  'searchedWord',
-                  {
-                    rules: [{ required: false, message: 'Entrez un mot contenu dans la facture' }],
-                  },
-                ]"
-                :rows="1"
-                placeholder="Entrez un mot contenu dans la facture"
-              />
-            </a-form-item>
-          </a-col>
-        </a-row> -->
       </a-form>
       <div
         :style="{
