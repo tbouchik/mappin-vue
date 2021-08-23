@@ -5,14 +5,15 @@
         <a-alert  :message="currentImputationAlert" type="info" close-text="Fermer" />
     </div>
   <br>
-      <a-tooltip>
-          <template slot="title">
-            Défaire
-          </template>
-          <a-button type="primary" style="margin-bottom:1%" icon="rollback"
-                    @click="rollbackChange"
-                    :disabled="osmiumSnapshotsEmpty" ghost></a-button>
-        </a-tooltip>
+          <a-button type="primary" icon="rollback"
+            style="margin-bottom:1%"
+            :disabled="osmiumSnapshotsEmpty" ghost>
+            <a
+            @click.prevent="rollbackChange"
+            >&nbsp; Annuler
+            </a>
+        </a-button>
+
       <a-table  :columns="adjustedColumns"
                 :data-source="pageData"
                 :pagination=false

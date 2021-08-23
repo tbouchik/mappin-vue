@@ -25,14 +25,22 @@
         <a-button type="primary" style="margin-left:1%" @click="setDateModalVisible" ghost>
           Formater Date
         </a-button>
-        <a-tooltip>
+        <!-- <a-tooltip>
           <template slot="title">
             Défaire
           </template>
           <a-button type="primary" style="margin-left:2%" icon="rollback"
                     @click="rollbackChange"
                     :disabled="bankOsmiumSnapshotsEmpty" ghost></a-button>
-        </a-tooltip>
+        </a-tooltip> -->
+        <a-button type="primary" icon="rollback"
+            style="margin-left:1%"
+            :disabled="bankOsmiumSnapshotsEmpty" ghost>
+            <a
+            @click.prevent="rollbackChange"
+            >&nbsp; Annuler
+            </a>
+        </a-button>
         <a-modal
           v-model="balanceModalVisible"
           title="Totaux des mouvements"
