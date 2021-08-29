@@ -164,8 +164,8 @@
               </a-form-item>
           </a-col>
         </a-row>
-        <a-row v-if="!isBankViz">
-          <a-col :span="8">
+        <a-row :gutter="16" v-if="!isBankViz">
+          <a-col :span="12">
             <a-form-item label="TVA">
               <a-input
                 v-decorator="[
@@ -177,6 +177,30 @@
                 placeholder="Entrez le montant de TVA"
                 @input="e => debounceFilterSearchedItem(e, 'vat')"
               />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="Operation">
+              <a-select
+                v-decorator="[
+                  'vatOperator',
+                  {
+                    rules: [{ required: false, message: 'Choisissez la relation d\'ordre' }],
+                  },
+                ]"
+                placeholder="Choisissez la relation d'ordre"
+                @change="e => handleFilterDropdownChange(e, 'vat')"
+              >
+                <a-select-option value="gt">
+                  Supérieur à
+                </a-select-option>
+                <a-select-option value="lt">
+                  Inférieur à
+                </a-select-option>
+                <a-select-option value="eq">
+                  Égale à
+                </a-select-option>
+              </a-select>
             </a-form-item>
           </a-col>
         </a-row>
@@ -431,6 +455,7 @@ export default {
       searchedTotalTtc: null,
       totalTtcOperator: null,
       searchedVat: null,
+      vatOperator: null,
       searchedVendor: null,
       searchedBankEntity: null,
       searchedWord: null,
@@ -467,6 +492,7 @@ export default {
     this.form.getFieldDecorator('totalHtOperator', { initialValue: 'eq', preserve: true })
     this.form.getFieldDecorator('searchedTotalTtc', { initialValue: null, preserve: true })
     this.form.getFieldDecorator('totalTtcOperator', { initialValue: 'eq', preserve: true })
+    this.form.getFieldDecorator('vatOperator', { initialValue: 'eq', preserve: true })
     this.form.getFieldDecorator('searchedDates', { initialValue: null, preserve: true })
     this.form.getFieldDecorator('searchedWord', { initialValue: '', preserve: true })
   },
@@ -488,6 +514,9 @@ export default {
   },
   watch: {
     totalTtcOperator: function() {
+      this.fetchDocuments()
+    },
+    vatOperator: function() {
       this.fetchDocuments()
     },
     totalHtOperator: function() {
@@ -532,6 +561,7 @@ export default {
         totalHtOperator: this.totalHtOperator,
         totalTtc: this.searchedTotalTtc,
         totalTtcOperator: this.totalTtcOperator,
+        vatOperator: this.vatOperator,
         vat: this.searchedVat,
         bankEntity: this.searchedBankEntity,
         vendor: this.searchedVendor,
@@ -576,6 +606,9 @@ export default {
           break
         case 'template':
           this.searchedTemplate = e
+          break
+        case 'vat':
+          this.vatOperator = e
           break
         case 'ttco':
           this.totalTtcOperator = e
@@ -626,6 +659,7 @@ export default {
         totalHtOperator: 'eq',
         searchedTotalTtc: null,
         totalTtcOperator: 'eq',
+        vatOperator: 'eq',
         searchedVat: '',
         searchedVendor: '',
         searchedBankEntity: '',
@@ -639,6 +673,7 @@ export default {
       this.searchedTemplate = null
       this.totalHtOperator = 'eq'
       this.totalTtcOperator = 'eq'
+      this.vatOperator = 'eq'
       this.searchedVat = ''
       this.searchedVendor = ''
       this.searchedName = ''
