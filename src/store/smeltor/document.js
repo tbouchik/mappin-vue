@@ -72,18 +72,10 @@ function getTableGraphNextMove(osmium, currentIdx, currentCol, move) {
   const graphDepth = osmium.length // TODO CHECK IF IS POSSIBLE TO CARRY ONLY OSMIUM.LENGTH AS ARGUMENT INSTEAD OF OSMIUM
   if (move === 'inc') {
     const nextIndex = currentIdx < graphDepth - 1 ? currentIdx + 1 : 0
-    const adjacentColumn = getTableAdjacentColumn(currentCol, 1)
-    if (adjacentColumn === 'Date') {
-      return { idx: nextIndex, col: 'Date' }
-    }
-    return { idx: currentIdx, col: adjacentColumn }
+    return { idx: nextIndex, col: 'Compte' }
   } else {
     const previousIndex = currentIdx > 0 ? currentIdx - 1 : graphDepth - 1
-    const adjacentColumn = getTableAdjacentColumn(currentCol, -1)
-    if (adjacentColumn === 'Credit') {
-      return { idx: previousIndex, col: 'Credit' }
-    }
-    return { idx: currentIdx, col: adjacentColumn }
+    return { idx: previousIndex, col: 'Compte' }
   }
 }
 
@@ -101,18 +93,6 @@ function changeDisplayedLibelle(col, osmiumItem) {
     result = labels[parseInt(trimedImputation)]
   }
   return result
-}
-
-function getTableAdjacentColumn(currentCol, move) {
-  const cols = ['Date', 'Designation', 'Compte', 'Debit', 'Credit']
-  const currentIdx = cols.findIndex(x => x === currentCol)
-  if (currentIdx + move > 4) {
-    return cols[0]
-  } else if (currentIdx + move < 0) {
-    return cols[4]
-  } else {
-    return cols[currentIdx + move]
-  }
 }
 
 function filterAlpha (str) {
