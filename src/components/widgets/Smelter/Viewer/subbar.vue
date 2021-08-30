@@ -334,7 +334,6 @@ export default {
         let nonImputableEntrySegment = nonImputableOsmiumKeysIndices.map(nonImputableIdx => this.current.osmium[nonImputableIdx].Value)
         imputableOsmiumKeysIndices.forEach((imputableOsmiumKey) => {
           let imputableEntrySegment = [ this.current.osmium[imputableOsmiumKey].Imputation,
-            this.current.osmium[imputableOsmiumKey].Libelle,
             this.current.osmium[imputableOsmiumKey].Value]
           let entrySegment = nonImputableEntrySegment.concat(imputableEntrySegment)
           arrData.push(entrySegment.join(';'))

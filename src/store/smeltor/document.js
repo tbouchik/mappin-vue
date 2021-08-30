@@ -37,7 +37,7 @@ function saveDocToAPI(mbc, document, { imput, bankOsmiumChanged, keyAttributes }
 }
 
 function getActivePane(columnName) {
-  const templateColumns = ['Key', 'Value', 'Imputation', 'Libelle']
+  const templateColumns = ['Key', 'Value', 'Imputation']
   return templateColumns.includes(columnName) ? 'templatePane' : 'statementPane'
 }
 
@@ -290,13 +290,6 @@ export default {
       }
       const updatedDocumentRoleAttributes = getUpdatedDocumentRoles({ keyRole, keyType, newVal, isBank: state.document.isBankStatement })
       Object.assign(newDoc, updatedDocumentRoleAttributes)
-      if (keyRole && keyRole.length && keyRole[keyRole.length - 1] === 'VENDOR') {
-        newDoc.osmium.forEach((x) => {
-          if (x.Imputation !== null) {
-            x.Libelle = newVal
-          }
-        })
-      }
       const snapshot = {
         index: state.currentIdx,
         column: state.currentCol,
@@ -321,13 +314,6 @@ export default {
       tempDoc.osmium[state.currentIdx][state.currentCol] = newVal
       const updatedDocumentRoleAttributes = getUpdatedDocumentRoles({ keyRole, keyType, newVal, isBank: state.document.isBankStatement })
       Object.assign(tempDoc, updatedDocumentRoleAttributes)
-      if (keyRole && keyRole.length && keyRole[keyRole.length - 1] === 'VENDOR') {
-        tempDoc.osmium.forEach((x) => {
-          if (x.Imputation !== null) {
-            x.Libelle = newVal
-          }
-        })
-      }
       const snapshot = {
         index: state.currentIdx,
         column: state.currentCol,

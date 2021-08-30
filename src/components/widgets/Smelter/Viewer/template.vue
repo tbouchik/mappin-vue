@@ -18,7 +18,7 @@
                 :data-source="pageData"
                 :pagination=false
                 bordered>
-        <template v-for="col in ['Key', 'Value', 'Imputation', 'Libelle']" :slot="col"   slot-scope="text, record, dataIndex" style="background:blue">
+        <template v-for="col in ['Key', 'Value', 'Imputation']" :slot="col"   slot-scope="text, record, dataIndex" style="background:blue">
           <div :key="col"  v-if="col==='Key'" @click="activateIndex(dataIndex, col)" >
             {{text}}
           </div>
@@ -77,9 +77,6 @@
               />
             </template>
           </div>
-          <div :key="col"  v-if="col==='Libelle'" @click="activateIndex(dataIndex, col)">
-            {{text}}
-          </div>
         </template>
       </a-table>
       <br>
@@ -120,12 +117,6 @@ const columns = [
     width: '15%',
     scopedSlots: { customRender: 'Imputation' },
   },
-  {
-    title: 'Libelle',
-    dataIndex: 'Libelle',
-    width: '20%',
-    scopedSlots: { customRender: 'Libelle' },
-  },
 ]
 export default {
   components: {
@@ -142,7 +133,7 @@ export default {
     }
   },
   created() {
-    this.pageData = this.osmium.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation, Libelle: x.Libelle } })
+    this.pageData = this.osmium.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation } })
     this.activateIndex(0, 'Value')
   },
   props: {
@@ -167,7 +158,7 @@ export default {
   },
   watch: {
     osmium: function () {
-      this.pageData = this.osmium.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation, Libelle: x.Libelle } })
+      this.pageData = this.osmium.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation } })
     },
     currentActiveIndex: function() {
       if (this.currentActivePane === 'templatePane') {
