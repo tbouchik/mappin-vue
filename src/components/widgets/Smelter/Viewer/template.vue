@@ -43,11 +43,8 @@
           <div :key="col"  v-if="col==='Imputation' && isActive(dataIndex, col) && !isArchived" @click="activateIndex(dataIndex, col)">
             <template v-if="record.Imputation !== undefined && record.Imputation !== null">
               <vue-simple-suggest
-                @input="e => changeLibelle(e)"
-                @hover="e => changeLibelle(e)"
+                @input="e => changeLibelle(e, dataIndex)"
                 @select="e => updateImputation(e, dataIndex)"
-                @blur="e => updateImputationFromBlur(e, dataIndex)"
-                @request-start="e => changeLibelle(e)"
                 :value="text"
                 :max-suggestions="10"
                 :min-length="1"
@@ -205,8 +202,16 @@ export default {
     hash(idx, col) {
       return `${idx}_${col}`
     },
-    changeLibelle(input) {
+    changeLibelle(input, idx) {
       this.$store.dispatch('ACTION_CHANGE_LIBELLE', input)
+      clearTimeout(this.debounce)
+      this.debounce = setTimeout(() => {
+        const payload = {
+          itemIdx: idx,
+          imputation: input,
+        }
+        this.$store.dispatch('ACTION_DO_IMPUTATION_CHANGES_TO_INVOICE', payload)
+      }, 600)
     },
     updateImputation(input, idx) {
       this.$store.dispatch('ACTION_CHANGE_LIBELLE', input)
@@ -228,13 +233,6 @@ export default {
       const trimedQuery = pattern.exec(query) ? pattern.exec(query)[0] : query
       const trimedItem = this.removeEndingZeros(singleItem)
       return trimedQuery.length && trimedItem.indexOf(trimedQuery) === 0 && trimedItem.length - trimedQuery.length <= 2
-    },
-    updateImputationFromBlur(e, idx) {
-      const payload = {
-        itemIdx: idx,
-        imputation: e.target.value,
-      }
-      this.$store.dispatch('ACTION_DO_IMPUTATION_CHANGES_TO_INVOICE', payload)
     },
     rollbackChange() {
       this.$store.dispatch('ACTION_ROLLBACK_CHANGE', { target: 'invoice' })

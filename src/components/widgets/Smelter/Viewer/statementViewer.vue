@@ -97,10 +97,7 @@
           <div :key="col"  v-if="col==='Compte' && isActive(dataIndex, col)" @click="activateIndex(dataIndex, col)">
             <template v-if="record.Compte !== undefined && record.Compte !== null">
               <vue-simple-suggest
-                @input="e => changeLibelle(e)"
-                @hover="e => changeLibelle(e)"
-                @blur="e => updateImputationFromBlur(e, dataIndex)"
-                @request-start="e => changeLibelle(e)"
+                @input="e => changeLibelle(e, dataIndex)"
                 @select="e => updateImputation(e, dataIndex)"
                 :value="text"
                 :max-suggestions="10"
@@ -161,7 +158,6 @@ import { accountNumbers1,
   accountNumbers8,
   accountNumbers9,
   accountNumbers0 } from '../../../../assets/accounting/imputations'
-import labels from '../../../../assets/accounting/labels'
 import VueSimpleSuggest from 'vue-simple-suggest'
 import 'vue-simple-suggest/dist/styles.css' // Optional CSS
 import moment from 'moment'
@@ -402,15 +398,22 @@ export default {
     hash(idx, col) {
       return `${idx}_${col}`
     },
-    changeLibelle(input) {
+    changeLibelle(input, idx) {
       this.$store.dispatch('ACTION_CHANGE_LIBELLE', input)
+      clearTimeout(this.debounce)
+      this.debounce = setTimeout(() => {
+        const payload = {
+          itemIdx: idx,
+          imputation: input,
+        }
+        this.$store.dispatch('ACTION_DO_IMPUTATION_CHANGES_TO_STATEMENT', payload)
+      }, 600)
     },
     updateImputation(input, idx) {
       this.$store.dispatch('ACTION_CHANGE_LIBELLE', input)
       const payload = {
         imputation: input,
         itemIdx: idx,
-        libelle: labels[parseInt(input)],
       }
       this.$store.dispatch('ACTION_DO_IMPUTATION_CHANGES_TO_STATEMENT', payload)
     },
@@ -426,13 +429,6 @@ export default {
       const trimedQuery = pattern.exec(query) ? pattern.exec(query)[0] : query
       const trimedItem = this.removeEndingZeros(singleItem)
       return trimedQuery.length && trimedItem.indexOf(trimedQuery) === 0 && trimedItem.length - trimedQuery.length <= 2
-    },
-    updateImputationFromBlur(e, idx) {
-      const payload = {
-        itemIdx: idx,
-        imputation: e.target.value,
-      }
-      this.$store.dispatch('ACTION_DO_IMPUTATION_CHANGES_TO_STATEMENT', payload)
     },
     onSelectChange(selectedStatements) {
       this.selectedStatements = selectedStatements.sort((a, b) => a - b)

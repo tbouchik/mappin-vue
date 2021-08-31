@@ -318,7 +318,7 @@ export default {
       const snapshot = {
         index: state.currentIdx,
         column: state.currentCol,
-        value: state.document.osmium[state.currentIdx].Value,
+        value: state.document.osmium[state.currentIdx].Imputation,
         keyAttributes: null,
         imput: true,
         mbc: {},
