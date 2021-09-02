@@ -19,20 +19,9 @@
             </a-menu-item>
           </a-menu>
         </a-dropdown>
-        <a-button type="primary" style="margin-left:1%" @click="setBalanceModalVisible" ghost>
-          Bilan
-        </a-button>
         <a-button type="primary" style="margin-left:1%" @click="setDateModalVisible" ghost>
           Formater Date
         </a-button>
-        <!-- <a-tooltip>
-          <template slot="title">
-            Défaire
-          </template>
-          <a-button type="primary" style="margin-left:2%" icon="rollback"
-                    @click="rollbackChange"
-                    :disabled="bankOsmiumSnapshotsEmpty" ghost></a-button>
-        </a-tooltip> -->
         <a-button type="primary" icon="rollback"
             style="margin-left:1%"
             :disabled="bankOsmiumSnapshotsEmpty" ghost>
@@ -122,6 +111,16 @@
       </a-table>
       <br>
     <br>
+    <a-affix :offset-bottom="10" v-if="assessment.balanced">
+      <a-button type="primary" shape="round" style="margin-left:1%" @click="setBalanceModalVisible">
+          Total mouvements
+        </a-button>
+    </a-affix>
+    <a-affix :offset-bottom="10" v-else>
+      <a-button type="danger" icon="exclamation-circle" shape="round" style="margin-left:1%" @click="setBalanceModalVisible">
+          Bilan non équilibré
+        </a-button>
+    </a-affix>
     <a-modal v-model="dateModalVisible" title="Confirmation de Date" @ok="confirmDate">
       <a-range-picker
         :placeholder="['Date début', 'Date fin']"
@@ -220,6 +219,7 @@ export default {
   },
   created() {
     this.pageData = this.bankOsmium[`page_${this.currentPage}`].map(x => { return { Date: x.Date.Text, Designation: x.Designation.Text, Compte: x.Compte.Text, Debit: x.Debit.Text, Credit: x.Credit.Text } })
+    this.getTotalStreams()
   },
   props: {
     bankOsmium: {
@@ -249,6 +249,7 @@ export default {
   watch: {
     bankOsmium: function() {
       this.pageData = this.bankOsmium[`page_${this.currentPage}`].map(x => { return { Date: x.Date.Text, Designation: x.Designation.Text, Compte: x.Compte.Text, Debit: x.Debit.Text, Credit: x.Credit.Text } })
+      this.getTotalStreams()
     },
     currentPage: function() {
       this.selectedStatements = []
@@ -334,9 +335,7 @@ export default {
           }
         }
       })
-      this.assessment.balanced = balanced
-      this.assessment.credit = totalCredit
-      this.assessment.debit = totalDebit
+      Object.assign(this.assessment, { balanced, credit: totalCredit, debit: totalDebit })
     },
     getStatementPrice(value) {
       const pattern = /^([\d .]+)([.,]\d{1,2})*/gi
