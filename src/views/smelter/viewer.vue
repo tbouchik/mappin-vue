@@ -12,10 +12,10 @@
           <div class="row">
             <div class="col-md-6">
               <div :class="{ sticky: !isBankViz }">
-                <template-viewer ref="statement" :osmium="currenOsmium" :isArchived="current.isArchived" :isBankStatement="currentDocument.isBankStatement" v-if="!currentDocument.isBankStatement"/>
+                <template-viewer ref="statement" :document="currentDocument" v-if="!currentDocument.isBankStatement"/>
                 <a-collapse ref="statement"  class="top-5" :activeKey="[1, 2]" :bordered="true" v-else>
                   <a-collapse-panel key="1" header="En-tête">
-                    <template-viewer  :isBankStatement="currentDocument.isBankStatement"  :osmium="currenOsmium" :isArchived="current.isArchived"/>
+                    <template-viewer  :document="currentDocument" />
                   </a-collapse-panel>
                   <a-collapse-panel key="2" header="Détails du relevé" :disabled="false">
                     <statement-viewer :bankOsmium="currentBankOsmium" :isArchived="current.isArchived" :dateBeg="current.dateBeg" :dateEnd="current.dateEnd"/>
@@ -37,10 +37,10 @@
          <div class="row">
           <div class="col-md-12">
             <div class="sticky">
-              <template-viewer :osmium="currenOsmium"  :isBankStatement="currentDocument.isBankStatement"  :isArchived="current.isArchived" v-if="!currentDocument.isBankStatement"/>
+              <template-viewer :document="currentDocument" v-if="!currentDocument.isBankStatement"/>
               <a-collapse class="top-5" :activeKey="[1, 2]" :bordered="true" v-else>
                   <a-collapse-panel key="1" header="En-tête">
-                    <template-viewer :osmium="currenOsmium"  :isBankStatement="currentDocument.isBankStatement"  :isArchived="current.isArchived"/>
+                    <template-viewer :document="currentDocument"/>
                   </a-collapse-panel>
                   <a-collapse-panel key="2" header="Détails du relevé" :disabled="false">
                     <statement-viewer :bankOsmium="currentBankOsmium" :isArchived="current.isArchived" :dateBeg="current.dateBeg" :dateEnd="current.dateEnd"/>

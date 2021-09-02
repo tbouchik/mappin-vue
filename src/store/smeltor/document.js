@@ -123,16 +123,16 @@ function getUpdatedDocumentRoles (props) {
         result.dateEnd = momentInstanceDate._isValid ? momentInstanceDate.toDate().setHours(0, 0, 0, 0) : null
         break
       case 'TOTAL_HT':
-        result.totalHt = newVal
+        result.totalHt = parseFloat(newVal)
         break
       case 'TOTAL_TTC':
-        result.totalTtc = newVal
+        result.totalTtc = parseFloat(newVal)
         break
       case 'VENDOR':
         result.vendor = newVal
         break
       case 'VAT':
-        result.vat = newVal
+        result.vat = parseFloat(newVal)
         break
     }
   }
@@ -274,7 +274,7 @@ export default {
         index: state.currentIdx,
         column: state.currentCol,
         value: state.document.osmium[state.currentIdx].Value,
-        keyAttributes: updatedDocumentRoleAttributes,
+        keyAttributes: getUpdatedDocumentRoles({ keyRole, keyType, newVal: state.document.osmium[state.currentIdx].Value, isBank: state.document.isBankStatement }),
         imput: false,
         mbc: Object.fromEntries(mbcData),
       }
@@ -298,7 +298,7 @@ export default {
         index: state.currentIdx,
         column: state.currentCol,
         value: state.document.osmium[state.currentIdx].Value,
-        keyAttributes: updatedDocumentRoleAttributes,
+        keyAttributes: getUpdatedDocumentRoles({ keyRole, keyType, newVal: state.document.osmium[state.currentIdx].Value, isBank: state.document.isBankStatement }),
         imput: false,
         mbc: {},
       }
@@ -535,6 +535,10 @@ export default {
         if (lastState) {
           newDoc = cloneDeep(state.document)
           newDoc.osmium[lastState.index][lastState.column] = lastState.value
+          if (lastState.keyAttributes) {
+            let keyAttribute = Object.keys(lastState.keyAttributes)[0]
+            newDoc[keyAttribute] = Object.values(lastState.keyAttributes)[0]
+          }
           state.document = newDoc
           let options = { imput: lastState.imput, bankOsmiumChanged: false, keyAttributes: lastState.keyAttributes }
           saveDocToAPI(lastState.mbc, newDoc, options)

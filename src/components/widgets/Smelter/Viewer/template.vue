@@ -12,8 +12,8 @@
             @click.prevent="rollbackChange"
             >&nbsp; Annuler
             </a>
-        </a-button>
-
+        </a-button>&nbsp;
+        <span>Taux T.V.A: {{vatRate}} %</span>
       <a-table  :columns="adjustedColumns"
                 :data-source="pageData"
                 :pagination=false
@@ -28,7 +28,7 @@
               :value="text"
               @change="e => handleChange(e.target.value, dataIndex, col)"
               :ref="hash(dataIndex,col)"
-              :disabled="isArchived"
+              :disabled="document.isArchived"
             />
           </div>
           <div :key="col"  v-if="col==='Value' && !isActive(dataIndex, col)" @click="activateIndex(dataIndex, col)">
@@ -37,10 +37,10 @@
               :value="text"
               @change="e => handleChange(e.target.value, dataIndex, col)"
               :ref="hash(dataIndex,col)"
-              :disabled="isArchived"
+              :disabled="document.isArchived"
             />
           </div>
-          <div :key="col"  v-if="col==='Imputation' && isActive(dataIndex, col) && !isArchived" @click="activateIndex(dataIndex, col)">
+          <div :key="col"  v-if="col==='Imputation' && isActive(dataIndex, col) && !document.isArchived" @click="activateIndex(dataIndex, col)">
             <template v-if="record.Imputation !== undefined && record.Imputation !== null">
               <vue-simple-suggest
                 @input="e => changeLibelle(e, dataIndex)"
@@ -55,7 +55,7 @@
               </vue-simple-suggest>
             </template>
           </div>
-          <div :key="col"  v-if="col==='Imputation' && !isActive(dataIndex, col) && !isArchived" @click="activateIndex(dataIndex, col)">
+          <div :key="col"  v-if="col==='Imputation' && !isActive(dataIndex, col) && !document.isArchived" @click="activateIndex(dataIndex, col)">
             <template v-if="record.Imputation !== undefined && record.Imputation !== null">
               <vue-simple-suggest
               :value="text"
@@ -65,12 +65,12 @@
           </vue-simple-suggest>
             </template>
           </div>
-          <div :key="col"  v-if="col==='Imputation' && isArchived" @click="activateIndex(dataIndex, col)">
+          <div :key="col"  v-if="col==='Imputation' && document.isArchived" @click="activateIndex(dataIndex, col)">
             <template v-if="record.Imputation !== undefined && record.Imputation !== null">
               <a-input
                 style="margin: -5px 0"
                 :value="text"
-                :disabled="isArchived"
+                :disabled="document.isArchived"
               />
             </template>
           </div>
@@ -127,35 +127,29 @@ export default {
       pageData: [],
       chosen: '',
       debounce: null,
+      vatRate: null,
     }
   },
   created() {
-    this.pageData = this.osmium.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation } })
+    this.pageData = this.document.osmium.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation } })
     this.activateIndex(0, 'Value')
+    this.computeVatRate()
   },
   props: {
-    osmium: {
-      required: true,
-    },
-    isArchived: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    isBankStatement: {
-      type: Boolean,
+    document: {
       required: true,
     },
   },
   computed: {
     ...mapGetters(['osmiumSnapshotsEmpty', 'currentPage', 'currentActiveIndex', 'currentActivePane', 'currentActiveColumn', 'catMode', 'showImputationAlert', 'currentImputationAlert']),
     adjustedColumns: function() {
-      return this.isBankStatement ? columns.slice(0, 2) : columns
+      return this.document.isBankStatement ? columns.slice(0, 2) : columns
     },
   },
   watch: {
-    osmium: function () {
-      this.pageData = this.osmium.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation } })
+    document: function () {
+      this.pageData = this.document.osmium.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation } })
+      this.computeVatRate()
     },
     currentActiveIndex: function() {
       if (this.currentActivePane === 'templatePane') {
@@ -236,6 +230,11 @@ export default {
     },
     rollbackChange() {
       this.$store.dispatch('ACTION_ROLLBACK_CHANGE', { target: 'invoice' })
+    },
+    computeVatRate() {
+      if (!isNaN(this.document.vat) && !isNaN(this.document.totalTtc) && this.document.totalTtc > 0) {
+        this.vatRate = parseFloat((this.document.vat / this.document.totalTtc) * 100).toFixed(1)
+      }
     },
   },
   destroyed() {
