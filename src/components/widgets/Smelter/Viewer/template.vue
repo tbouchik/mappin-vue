@@ -13,7 +13,7 @@
             >&nbsp; Annuler
             </a>
         </a-button>&nbsp;
-        <span>Taux T.V.A: {{vatRate}} %</span>
+        <span v-if="!isBankStatement">Taux T.V.A: {{vatRate}} %</span>
       <a-table  :columns="adjustedColumns"
                 :data-source="pageData"
                 :pagination=false
@@ -138,6 +138,9 @@ export default {
   props: {
     document: {
       required: true,
+    },
+    isBankStatement: {
+      type: Boolean,
     },
   },
   computed: {
