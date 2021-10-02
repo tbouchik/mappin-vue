@@ -250,6 +250,7 @@ export default {
     bankOsmium: function() {
       this.pageData = this.bankOsmium[`page_${this.currentPage}`].map(x => { return { Date: x.Date.Text, Designation: x.Designation.Text, Compte: x.Compte.Text, Debit: x.Debit.Text, Credit: x.Credit.Text } })
       this.getTotalStreams()
+      this.dates = []
     },
     currentPage: function() {
       this.selectedStatements = []

@@ -156,6 +156,7 @@ function parseDate (value) {
 }
 
 function parseDateRange (value, side) {
+  if (!value) return null
   let result = { value: '', hasRange: false }
   const pattern = /(du)(.*)(au)(.*)/gi
   const matches = [...value.matchAll(pattern)]
@@ -334,7 +335,6 @@ export default {
     MUTATION_AUTO_CHANGES_TO_STATEMENT(state, bbox) {
       let newDoc = cloneDeep(state.document)
       const newVal = bbox.Text
-      console.log(newDoc.bankOsmium[`page_${state.page}`][state.currentIdx][state.currentCol])
       const snapshot = {
         type: 'modify',
         index: state.currentIdx,
@@ -504,7 +504,6 @@ export default {
                 guessedDate.set('date', date)
                 guessedDate.set('month', dates[0].month())
                 guessedDate.set('year', dates[0].year())
-                console.log(guessedDate.format('DD/MM/YYYY'))
                 if (dates[0].isBefore(guessedDate) && dates[1].isAfter(guessedDate)) {
                   statementItem.Date.Text = guessedDate.format('DD/MM/YYYY')
                 } else {
@@ -522,7 +521,6 @@ export default {
         })
       })
       state.document = newDoc
-      console.log(newDoc)
       let options = { imput: false, bankOsmiumChanged: true, keyAttributes: null }
       saveDocToAPI(null, newDoc, options)
     },
