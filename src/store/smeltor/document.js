@@ -504,12 +504,12 @@ export default {
                 guessedDate.set('date', date)
                 guessedDate.set('month', dates[0].month())
                 guessedDate.set('year', dates[0].year())
-                if (dates[0].isBefore(guessedDate) && dates[1].isAfter(guessedDate)) {
+                if ((dates[0].isBefore(guessedDate) || dates[0].isSame(guessedDate, 'day')) && dates[1].isAfter(guessedDate)) {
                   statementItem.Date.Text = guessedDate.format('DD/MM/YYYY')
                 } else {
                   guessedDate.set('month', dates[1].month())
                   guessedDate.set('year', dates[1].year())
-                  if (dates[0].isBefore(guessedDate) && dates[1].isAfter(guessedDate)) {
+                  if (dates[0].isBefore(guessedDate) && (dates[1].isSame(guessedDate, 'day') || dates[1].isAfter(guessedDate))) {
                     statementItem.Date.Text = guessedDate.format('DD/MM/YYYY')
                   }
                 }
