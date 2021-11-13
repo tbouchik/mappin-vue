@@ -313,6 +313,32 @@ export default {
         saveDocToAPI({}, state.document, options)
       }, 600)
     },
+    MUTATION_DO_ADJUSTMENT_TO_INVOICE(state, changeData) {
+      let { value, role } = changeData
+      const keyType = 'NUMBER'
+      const keyRole = role
+      const keyIndex = state.document.osmium.findIndex(x => x.Role && x.Role[1] && x.Role[1] === role[1])
+      let tempDoc = cloneDeep(state.document)
+      const newVal = formatValue(value, keyType, keyRole, 'manual')
+      tempDoc.osmium[keyIndex]['Value'] = newVal
+      const updatedDocumentRoleAttributes = getUpdatedDocumentRoles({ keyRole, keyType, newVal, isBank: false })
+      Object.assign(tempDoc, updatedDocumentRoleAttributes)
+      const snapshot = {
+        index: keyIndex,
+        column: 'Value',
+        value: state.document.osmium[keyIndex].Value,
+        keyAttributes: getUpdatedDocumentRoles({ keyRole, keyType, newVal: state.document.osmium[keyIndex].Value, isBank: false }),
+        imput: false,
+        mbc: {},
+      }
+      state.osmiumChangeSnapshots.push(snapshot)
+      state.document = tempDoc
+      clearTimeout(debounce)
+      debounce = setTimeout(() => {
+        let options = { imput: false, bankOsmiumChanged: false, keyAttributes: updatedDocumentRoleAttributes }
+        saveDocToAPI({}, state.document, options)
+      }, 600)
+    },
     MUTATION_DO_IMPUTATION_CHANGES_TO_INVOICE(state, changeData) {
       let { imputation, itemIdx } = changeData
       let tempDoc = cloneDeep(state.document)
@@ -649,6 +675,9 @@ export default {
     },
     ACTION_RESET_CHANGE_SNAPSHOTS({ commit }) {
       commit('MUTATION_RESET_CHANGE_SNAPSHOTS')
+    },
+    ACTION_DO_ADJUSTMENT_TO_INVOICE({ commit }, payload) {
+      commit('MUTATION_DO_ADJUSTMENT_TO_INVOICE', payload)
     },
   },
   getters: {
