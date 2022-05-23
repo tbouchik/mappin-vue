@@ -55,10 +55,10 @@ export default {
     },
     MUTATION_SET_PDF_ACTIVE_BBOXES(state, bboxes) {
       if (state.pdfActiveBboxes.length === 0) {
-        strokeBboxes(state.pdfcontext, state.pdfcanvas, bboxes, 'green')
+        strokeBboxes(state.pdfcontext, state.pdfcanvas, bboxes, 'blue')
       } else {
         strokeBboxes(state.pdfcontext, state.pdfcanvas, state.pdfActiveBboxes, 'white')
-        strokeBboxes(state.pdfcontext, state.pdfcanvas, bboxes, 'green')
+        strokeBboxes(state.pdfcontext, state.pdfcanvas, bboxes, 'blue')
       }
       state.pdfActiveBboxes = bboxes
     },

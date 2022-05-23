@@ -105,8 +105,8 @@ export default {
   },
   methods: {
     updateOsmium(event) {
-      let x = event.layerX
-      let y = event.layerY
+      let x = event.offsetX
+      let y = event.offsetY
       const canvas = document.querySelector('#pdf-render')
       this.$store.dispatch('ACTION_SET_PDF_CONTEXT_CANVAS', canvas)
       let selectedTextSection = this.currentPageData.filter((textInfo) => {

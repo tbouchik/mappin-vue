@@ -2,7 +2,7 @@ import axios from 'axios'
 
 class FilterService {
   static updateFilter(body, filterId) {
-    return axios.patch(`/v1/filters/${filterId}`, {
+    return axios.put(`/v1/filters/${filterId}`, {
       ...body,
     })
   }

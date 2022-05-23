@@ -67,8 +67,8 @@ export default {
   },
   methods: {
     updateOsmium(event) {
-      let x = event.layerX
-      let y = event.layerY
+      let x = event.offsetX
+      let y = event.offsetY
       const canvas = document.getElementById('can')
       let selectedTextSection = this.currentPageData.filter((textInfo) => {
         let leftBoundary = canvas.width * textInfo.Left

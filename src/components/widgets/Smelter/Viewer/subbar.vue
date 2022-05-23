@@ -328,7 +328,7 @@ export default {
       if (!this.current.isBankStatement) {
         let nonImputableOsmiumKeysIndices = this.current.filter.keys.map((x, i) => { if (x.isImputable !== true) return i }).filter(x => x !== undefined)
         let imputableOsmiumKeysIndices = this.current.filter.keys.map((x, i) => { if (x.isImputable === true) return i }).filter(x => x !== undefined)
-        let fixedKeys = ['N° Compte', 'Libellé', 'Valeur']
+        let fixedKeys = ['N° Compte', 'Valeur']
         const osmiumKeys = nonImputableOsmiumKeysIndices.map((keyIdx) => this.current.filter.keys[keyIdx].value).concat(fixedKeys)
         arrData.push(osmiumKeys.join(';'))
         let nonImputableEntrySegment = nonImputableOsmiumKeysIndices.map(nonImputableIdx => this.current.osmium[nonImputableIdx].Value)
