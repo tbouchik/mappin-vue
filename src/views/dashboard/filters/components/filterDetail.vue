@@ -49,6 +49,16 @@
                   </template>
                 </a-select>
               </a-form-item>
+              <a-form-item label="Sens">
+                <a-switch v-model="isActiveDC"/>
+                <br />
+              </a-form-item>
+              <a-form-item label="Journal">
+                <a-switch v-model="isActiveJournal" />
+                <br />
+                <a-select v-if="isActiveJournal" mode="tags" style="width: 100%" placeholder="Achat; Banque; Caisse; Immobilisation..." v-model="journalTags">
+                </a-select>
+              </a-form-item>
               <a-form-item
                 v-for="(k, index) in names"
                 :key="index"
@@ -264,6 +274,9 @@ export default {
       type: {
         type: String,
       },
+      isActiveDC: false,
+      isActiveJournal: false,
+      journalTags: [],
     }
   },
   beforeMount() {
@@ -275,6 +288,9 @@ export default {
             this.description = filter.description
             this.type = filter.type
             this.names = filter.keys
+            this.isActiveDC = filter.isActiveDC
+            this.isActiveJournal = filter.isActiveJournal
+            this.journalTags = filter.journalTags
             this.form.setFieldsValue({
               name: this.name,
               description: this.description,
@@ -309,8 +325,10 @@ export default {
             description,
             type,
             keys: this.names,
+            isActiveDC: this.isActiveDC,
+            isActiveJournal: this.isActiveJournal,
+            journalTags: this.journalTags,
           }
-
           this.$store.dispatch('ACTION_UPDATE_FILTER', {
             id: this.filterId,
             body: payloadBody,
