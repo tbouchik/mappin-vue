@@ -13,6 +13,8 @@
             <div class="col-md-6">
               <div :class="{ sticky: !isBankViz }">
                 <template-viewer ref="statement" :document="currentDocument" :isBankStatement="currentDocument.isBankStatement" v-if="!currentDocument.isBankStatement"/>
+                <br>
+                <reference-viewer ref="reference" :references="references" :isBankStatement="currentDocument.isBankStatement" v-if="!currentDocument.isBankStatement"/>
                 <a-collapse ref="statement"  class="top-5" :activeKey="[1, 2]" :bordered="true" v-else>
                   <a-collapse-panel key="1" header="En-tête">
                     <template-viewer  :document="currentDocument" :isBankStatement="currentDocument.isBankStatement"/>
@@ -75,6 +77,7 @@
 <script>
 import TemplateViewer from '@/components/widgets/Smelter/Viewer/template.vue'
 import StatementViewer from '@/components/widgets/Smelter/Viewer/statementViewer.vue'
+import ReferenceViewer from '@/components/widgets/Smelter/Viewer/referenceViewer.vue'
 import SmelterPdfWindow from '@/components/widgets/Smelter/Window/pdfwindow.vue'
 import SmelterImageWindow from '@/components/widgets/Smelter/Window/imgwindow.vue'
 import SmelterSubbar from '@/components/widgets/Smelter/Viewer/subbar.vue'
@@ -89,6 +92,7 @@ export default {
     SmelterImageWindow,
     TemplateViewer,
     StatementViewer,
+    ReferenceViewer,
   },
   data() {
     return {
@@ -113,6 +117,7 @@ export default {
       this.currentDocument = doc
       this.currenOsmium = this.currentDocument.osmium
       this.currentBankOsmium = this.currentDocument.bankOsmium
+      this.references = this.currentDocument.references
       this.$store.dispatch('ACTION_RESET_CHANGE_SNAPSHOTS')
     })
   },

@@ -10,13 +10,15 @@ Vue.use(Vuex)
 let cancelToken
 let debounce = null
 
-function saveDocToAPI(mbc, document, { imput, bankOsmiumChanged, keyAttributes }) {
+function saveDocToAPI(mbc, document, { imput, bankOsmiumChanged, keyAttributes, refChange, refMapping }) {
   let updatedDocument = {
     mbc: mbc || null,
     imput: imput || null,
-    osmium: bankOsmiumChanged ? null : document.osmium,
-    bankOsmium: bankOsmiumChanged ? document.bankOsmium : null,
-    ggMetadata: bankOsmiumChanged ? null : document.ggMetadata,
+    osmium: bankOsmiumChanged && !refMapping ? null : document.osmium,
+    bankOsmium: bankOsmiumChanged && !refMapping ? document.bankOsmium : null,
+    ggMetadata: bankOsmiumChanged && !refMapping ? null : document.ggMetadata,
+    refMapping: refMapping,
+    references: refChange ? document.references : null,
     status: 'validated',
   }
   if (keyAttributes) {
@@ -38,7 +40,14 @@ function saveDocToAPI(mbc, document, { imput, bankOsmiumChanged, keyAttributes }
 
 function getActivePane(columnName) {
   const templateColumns = ['Key', 'Value', 'Imputation']
-  return templateColumns.includes(columnName) ? 'templatePane' : 'statementPane'
+  const expenseColumns = ['Libelle Référence', 'Prix', 'Compte Référence']
+  if (templateColumns.includes(columnName)) {
+    return 'templatePane'
+  } else if (expenseColumns.includes(columnName)) {
+    return 'expensePane'
+  } else {
+    return 'statementPane'
+  }
 }
 
 function getInvoiceGraphNextMove(osmium, currentIdx, currentCol, move) {
@@ -79,6 +88,29 @@ function getTableGraphNextMove(osmium, currentIdx, currentCol, move) {
   }
 }
 
+function getExpenseGraphNextMove(references, currentIdx, currentCol, move) {
+  const graphDepth = references.length // TODO CHECK IF IS POSSIBLE TO CARRY ONLY OSMIUM.LENGTH AS ARGUMENT INSTEAD OF OSMIUM
+  if (move === 'inc') {
+    const nextIndex = currentIdx < graphDepth - 1 ? currentIdx + 1 : 0
+    if (currentCol === 'Compte Référence') {
+      return { idx: nextIndex, col: 'Libelle Référence' }
+    } else if (currentCol === 'Libelle Référence') { // Prix
+      return { idx: currentIdx, col: 'Prix' }
+    } else if (currentCol === 'Prix') {
+      return { idx: currentIdx, col: 'Compte Référence' }
+    }
+  } else {
+    const previousIndex = currentIdx > 0 ? currentIdx - 1 : graphDepth - 1
+    if (currentCol === 'Compte Référence') {
+      return { idx: currentIdx, col: 'Prix' }
+    } else if (currentCol === 'Libelle Référence') { // Prix
+      return { idx: previousIndex, col: 'Compte Référence' }
+    } else if (currentCol === 'Prix') {
+      return { idx: currentIdx, col: 'Libelle Référence' }
+    }
+  }
+}
+
 function trimImputationQuery(query) {
   const pattern = /([^0]+[0][^0]+|^.[^0]+)/ // 19109002 matches with => 19109 | 12189001 matches with => 12189 |
   const trimedQuery = pattern.exec(query) ? pattern.exec(query)[0] : query
@@ -90,6 +122,9 @@ function changeDisplayedLibelle(col, osmiumItem) {
   if (col === 'Imputation' || col === 'Compte') {
     const imputation = typeof osmiumItem[col] === 'object' ? osmiumItem[col].Text : osmiumItem[col]
     const trimedImputation = trimImputationQuery(imputation)
+    result = labels[parseInt(trimedImputation)]
+  } else {
+    const trimedImputation = trimImputationQuery(osmiumItem['Imputation'])
     result = labels[parseInt(trimedImputation)]
   }
   return result
@@ -240,19 +275,28 @@ export default {
       state.page = 1
     },
     MUTATION_UPDATE_INDEX(state, payload) {
+      let nextCoords = null
       if (payload.idx !== undefined && payload.col !== undefined) {
         state.currentPane = getActivePane(payload.col)
         state.currentIdx = payload.idx
         state.currentCol = payload.col
       } else {
-        let nextCoords = state.currentPane === 'statementPane'
-          ? getTableGraphNextMove(state.document.bankOsmium[`page_${state.page}`], state.currentIdx, state.currentCol, payload.move)
-          : getInvoiceGraphNextMove(state.document.osmium, state.currentIdx, state.currentCol, payload.move)
+        if (state.currentPane === 'statementPane') {
+          nextCoords = getTableGraphNextMove(state.document.bankOsmium[`page_${state.page}`], state.currentIdx, state.currentCol, payload.move)
+        } else if (state.currentPane === 'templatePane') {
+          nextCoords = getInvoiceGraphNextMove(state.document.osmium, state.currentIdx, state.currentCol, payload.move)
+        } else {
+          nextCoords = getExpenseGraphNextMove(state.document.bankOsmium[`page_${state.page}`], state.currentIdx, state.currentCol, payload.move)
+        }
         state.currentIdx = nextCoords.idx
         state.currentCol = nextCoords.col
-        state.currentLibelle = state.currentPane === 'statementPane'
-          ? changeDisplayedLibelle(state.currentCol, state.document.bankOsmium[`page_${state.page}`][state.currentIdx])
-          : changeDisplayedLibelle(state.currentCol, state.document.osmium[state.currentIdx])
+        if (state.currentPane === 'statementPane') {
+          state.currentLibelle = changeDisplayedLibelle(state.currentCol, state.document.bankOsmium[`page_${state.page}`][state.currentIdx])
+        } else if (state.currentPane === 'templatePane') {
+          state.currentLibelle = changeDisplayedLibelle(state.currentCol, state.document.osmium[state.currentIdx])
+        } else {
+          state.currentLibelle = changeDisplayedLibelle(state.currentCol, state.document.references[state.currentIdx])
+        }
       }
     },
     MUTATION_DO_AUTO_CHANGES_TO_INVOICE(state, bbox) {
@@ -587,6 +631,59 @@ export default {
       state.bankOsmiumChangeSnapshots = []
       state.osmiumChangeSnapshots = []
     },
+    MUTATION_DO_IMPUTATION_CHANGES_TO_REFERENCE(state, payload) {
+      let { imputation, itemIdx } = payload
+      let tempDoc = cloneDeep(state.document)
+      tempDoc.references[itemIdx]['Imputation'] = imputation
+      let refMapping = null
+      if (tempDoc.references[itemIdx]['Libelle']) {
+        refMapping = new Map()
+        refMapping.set(tempDoc.references[itemIdx]['Libelle'], imputation)
+      }
+      state.document = tempDoc
+      let options = { imput: false, bankOsmiumChanged: false, keyAttributes: null, refMapping: Object.fromEntries(refMapping), refChange: true }
+      saveDocToAPI({}, state.document, options)
+    },
+    MUTATION_INSERT_REFERENCES(state, payload) {
+      let { offset, selectedStatements, lines } = payload
+      let tempDoc = cloneDeep(state.document)
+      const emptyReference = { // {'Libelle': libelle, 'DisplayedLibelle': libelle, 'Price': price, 'Imputation': None}
+        'Libelle': null,
+        'DisplayedLibelle': null,
+        'Price': null,
+        'Imputation': null,
+      }
+      let counter = 0
+      if (offset === -1) {
+        Array.from({ length: lines }, (_) => {
+          const newEmptyStatement = cloneDeep(emptyReference)
+          tempDoc.references.push(newEmptyStatement)
+        })
+      } else {
+        selectedStatements.forEach(idx => {
+          Array.from({ length: lines }, (_) => {
+            const newEmptyStatement = cloneDeep(emptyReference)
+            tempDoc.references.splice([idx + offset + counter], 0, newEmptyStatement)
+            counter++
+          })
+        })
+      }
+      state.document = tempDoc
+      let options = { imput: false, bankOsmiumChanged: false, keyAttributes: null, refChange: true }
+      saveDocToAPI({}, state.document, options)
+    },
+    MUTATION_DELETE_REFERENCES(state, payload) {
+      let { selectedStatements } = payload
+      let tempDoc = cloneDeep(state.document)
+      let counter = 0
+      selectedStatements.forEach(idx => {
+        tempDoc.references.splice([idx - counter], 1)
+        counter++
+      })
+      state.document = tempDoc
+      let options = { imput: false, bankOsmiumChanged: false, keyAttributes: null, refChange: true }
+      saveDocToAPI({}, state.document, options)
+    },
   },
   actions: {
     UPDATE_DOCUMENT({ commit }, document) {
@@ -678,6 +775,15 @@ export default {
     },
     ACTION_DO_ADJUSTMENT_TO_INVOICE({ commit }, payload) {
       commit('MUTATION_DO_ADJUSTMENT_TO_INVOICE', payload)
+    },
+    ACTION_DO_IMPUTATION_CHANGES_TO_REFERENCE({ commit }, payload) {
+      commit('MUTATION_DO_IMPUTATION_CHANGES_TO_REFERENCE', payload)
+    },
+    ACTION_INSERT_REFERENCES({ commit }, payload) {
+      commit('MUTATION_INSERT_REFERENCES', payload)
+    },
+    ACTION_DELETE_REFERENCES({ commit }, payload) {
+      commit('MUTATION_DELETE_REFERENCES', payload)
     },
   },
   getters: {
