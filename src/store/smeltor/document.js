@@ -38,18 +38,6 @@ function saveDocToAPI(mbc, document, { imput, bankOsmiumChanged, keyAttributes, 
   }
 }
 
-function getActivePane(columnName) {
-  const templateColumns = ['Key', 'Value', 'Imputation']
-  const expenseColumns = ['Libelle Référence', 'Prix', 'Compte Référence']
-  if (templateColumns.includes(columnName)) {
-    return 'templatePane'
-  } else if (expenseColumns.includes(columnName)) {
-    return 'expensePane'
-  } else {
-    return 'statementPane'
-  }
-}
-
 function getInvoiceGraphNextMove(osmium, currentIdx, currentCol, move) {
   const graphDepth = osmium.length
   if (move === 'inc') {
@@ -92,21 +80,21 @@ function getExpenseGraphNextMove(references, currentIdx, currentCol, move) {
   const graphDepth = references.length // TODO CHECK IF IS POSSIBLE TO CARRY ONLY OSMIUM.LENGTH AS ARGUMENT INSTEAD OF OSMIUM
   if (move === 'inc') {
     const nextIndex = currentIdx < graphDepth - 1 ? currentIdx + 1 : 0
-    if (currentCol === 'Compte Référence') {
-      return { idx: nextIndex, col: 'Libelle Référence' }
-    } else if (currentCol === 'Libelle Référence') { // Prix
-      return { idx: currentIdx, col: 'Prix' }
-    } else if (currentCol === 'Prix') {
-      return { idx: currentIdx, col: 'Compte Référence' }
+    if (currentCol === 'Imputation') {
+      return { idx: nextIndex, col: 'DisplayedLibelle' }
+    } else if (currentCol === 'DisplayedLibelle') {
+      return { idx: currentIdx, col: 'Price' }
+    } else if (currentCol === 'Price') {
+      return { idx: currentIdx, col: 'Imputation' }
     }
   } else {
     const previousIndex = currentIdx > 0 ? currentIdx - 1 : graphDepth - 1
-    if (currentCol === 'Compte Référence') {
-      return { idx: currentIdx, col: 'Prix' }
-    } else if (currentCol === 'Libelle Référence') { // Prix
-      return { idx: previousIndex, col: 'Compte Référence' }
-    } else if (currentCol === 'Prix') {
-      return { idx: currentIdx, col: 'Libelle Référence' }
+    if (currentCol === 'Imputation') {
+      return { idx: currentIdx, col: 'Price' }
+    } else if (currentCol === 'DisplayedLibelle') {
+      return { idx: previousIndex, col: 'Imputation' }
+    } else if (currentCol === 'Price') {
+      return { idx: currentIdx, col: 'DisplayedLibelle' }
     }
   }
 }
@@ -277,7 +265,7 @@ export default {
     MUTATION_UPDATE_INDEX(state, payload) {
       let nextCoords = null
       if (payload.idx !== undefined && payload.col !== undefined) {
-        state.currentPane = getActivePane(payload.col)
+        state.currentPane = payload.pane
         state.currentIdx = payload.idx
         state.currentCol = payload.col
       } else {
@@ -286,7 +274,7 @@ export default {
         } else if (state.currentPane === 'templatePane') {
           nextCoords = getInvoiceGraphNextMove(state.document.osmium, state.currentIdx, state.currentCol, payload.move)
         } else {
-          nextCoords = getExpenseGraphNextMove(state.document.bankOsmium[`page_${state.page}`], state.currentIdx, state.currentCol, payload.move)
+          nextCoords = getExpenseGraphNextMove(state.document.references, state.currentIdx, state.currentCol, payload.move)
         }
         state.currentIdx = nextCoords.idx
         state.currentCol = nextCoords.col

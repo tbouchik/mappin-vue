@@ -21,7 +21,7 @@
         </a-dropdown>
       </div>
       <br>
-      <div v-if="showImputationAlert && currentActivePane==='statementPane'">
+      <div v-if="showImputationAlert && currentActivePane==='expensePane'">
           <a-alert  :message="currentImputationAlert" type="info" close-text="Fermer" />
       </div>
       <br>
@@ -64,7 +64,7 @@
               </vue-simple-suggest>
             </template>
           </div>
-          <div :key="col"  v-if="col==='Imputation' " @click="activateIndex(dataIndex, col)">
+          <div :key="col"  v-if="col==='Imputation' && !isActive(dataIndex, col) " @click="activateIndex(dataIndex, col)">
             <template>
               <vue-simple-suggest
                 :value="text"
@@ -110,7 +110,7 @@ import 'vue-simple-suggest/dist/styles.css' // Optional CSS
 
 const columns = [
   {
-    title: 'Libelle Référence',
+    title: 'Libelle',
     dataIndex: 'DisplayedLibelle',
     width: '58%',
     scopedSlots: { customRender: 'DisplayedLibelle' },
@@ -122,7 +122,7 @@ const columns = [
     scopedSlots: { customRender: 'Price' },
   },
   {
-    title: 'Compte Référence',
+    title: 'Imputation',
     dataIndex: 'Imputation',
     width: '27%',
     scopedSlots: { customRender: 'Imputation' },
@@ -174,9 +174,8 @@ export default {
     },
     currentActiveIndex: function() {
       const pageNotEmpty = this.references.length > 0
-      if (this.currentActivePane === 'statementPane' && pageNotEmpty) {
-        this.setActiveBboxes()
-        if (this.currentActiveColumn !== 'Compte') {
+      if (this.currentActivePane === 'expensePane' && pageNotEmpty) {
+        if (this.currentActiveColumn !== 'Imputation') {
           this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
         } else {
           this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.children[0].children[0].focus()
@@ -185,8 +184,8 @@ export default {
     },
     currentActiveColumn: function() {
       const pageNotEmpty = this.references.length > 0
-      if (this.currentActivePane === 'statementPane' && pageNotEmpty) {
-        if (this.currentActiveColumn !== 'Compte') {
+      if (this.currentActivePane === 'expensePane' && pageNotEmpty) {
+        if (this.currentActiveColumn !== 'Imputation') {
           this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
         } else {
           this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.children[0].children[0].focus()
@@ -195,12 +194,6 @@ export default {
     },
   },
   methods: {
-    setActiveBboxes() {
-      if (this.references && this.references.length) {
-        let bboxes = Object.values(this.references[this.currentActiveIndex]).map(x => x.Bbox)
-        this.$store.dispatch('ACTION_SET_PDF_ACTIVE_BBOXES', bboxes)
-      }
-    },
     handleChange(value, itemIdx, column) {
       this.pageData[itemIdx][column] = value
       clearTimeout(this.debounce)
@@ -209,10 +202,10 @@ export default {
       }, 600)
     },
     activateIndex(idx, col) {
-      this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', { idx, col })
+      this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', { idx, col, pane: 'expensePane' })
     },
     isActive(dataIndex, column) {
-      return dataIndex === this.currentActiveIndex && column === this.currentActiveColumn && this.currentActivePane === 'statementPane'
+      return dataIndex === this.currentActiveIndex && column === this.currentActiveColumn && this.currentActivePane === 'expensePane'
     },
     toggleCatMode() {
       this.$store.dispatch('ACTION_TOGGLE_CATMODE')

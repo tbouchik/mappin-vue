@@ -221,7 +221,7 @@ export default {
       }, 600)
     },
     activateIndex(idx, col) {
-      this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', { idx, col })
+      this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', { idx, col, pane: 'templatePane' })
     },
     isActive(dataIndex, column) {
       return dataIndex === this.currentActiveIndex && column === this.currentActiveColumn && this.currentActivePane === 'templatePane'

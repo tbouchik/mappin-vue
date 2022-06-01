@@ -126,7 +126,7 @@ export default {
       return DocumentService.fetchDocument(this.documentId).then(doc => {
         this.$store.dispatch('UPDATE_DOCUMENT', doc)
         this.currentDocument = doc
-        const firstActiveCell = this.currentDocument.isBankStatement ? { idx: 0, col: 'Date' } : { idx: 0, col: 'Value' }
+        const firstActiveCell = this.currentDocument.isBankStatement ? { idx: 0, col: 'Date', pane: 'statementPane' } : { idx: 0, col: 'Value', pane: 'templatePane' }
         this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', firstActiveCell)
         this.$store.dispatch('ACTION_RESET_CHANGE_SNAPSHOTS')
       })
@@ -143,7 +143,7 @@ export default {
   },
   computed: {
     ...mapState(['settings']),
-    ...mapGetters(['current', 'documentsIdList', 'currentPageData']),
+    ...mapGetters(['current', 'documentsIdList', 'currentPageData', 'currentActivePane']),
     documentName: function() {
       return get(this.currentDocument, 'alias')
     },
@@ -161,10 +161,10 @@ export default {
     updateActiveIndex(event) {
       switch (event.srcKey) {
         case 'up':
-          this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', { move: 'inc' })
+          this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', { move: 'inc', pane: this.currentActivePane })
           break
         case 'down':
-          this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', { move: 'dec' })
+          this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', { move: 'dec', pane: this.currentActivePane })
           break
       }
     },
