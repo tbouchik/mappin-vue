@@ -14,9 +14,9 @@ function saveDocToAPI(mbc, document, { imput, bankOsmiumChanged, keyAttributes, 
   let updatedDocument = {
     mbc: mbc || null,
     imput: imput || null,
-    osmium: bankOsmiumChanged && !refMapping ? null : document.osmium,
-    bankOsmium: bankOsmiumChanged && !refMapping ? document.bankOsmium : null,
-    ggMetadata: bankOsmiumChanged && !refMapping ? null : document.ggMetadata,
+    osmium: bankOsmiumChanged || refChange ? null : document.osmium,
+    bankOsmium: bankOsmiumChanged ? document.bankOsmium : null,
+    ggMetadata: bankOsmiumChanged || refChange ? null : document.ggMetadata,
     refMapping: refMapping,
     references: refChange ? document.references : null,
     status: 'validated',
@@ -627,19 +627,31 @@ export default {
       if (tempDoc.references[itemIdx]['Libelle']) {
         refMapping = new Map()
         refMapping.set(tempDoc.references[itemIdx]['Libelle'], imputation)
+        refMapping = Object.fromEntries(refMapping)
       }
       state.document = tempDoc
-      let options = { imput: false, bankOsmiumChanged: false, keyAttributes: null, refMapping: Object.fromEntries(refMapping), refChange: true }
+      let options = { imput: false, bankOsmiumChanged: false, keyAttributes: null, refMapping, refChange: true }
       saveDocToAPI({}, state.document, options)
     },
+    MUTATION_MANUAL_CHANGES_TO_REFERENCE(state, payload) {
+      let { value, itemIdx, column } = payload
+      let tempDoc = cloneDeep(state.document)
+      tempDoc.references[itemIdx][column] = value
+      state.document = tempDoc
+      clearTimeout(debounce)
+      debounce = setTimeout(() => {
+        let options = { imput: false, bankOsmiumChanged: false, keyAttributes: null, refChange: true, refMapping: null }
+        saveDocToAPI(null, state.document, options)
+      }, 600)
+    },
     MUTATION_INSERT_REFERENCES(state, payload) {
-      let { offset, selectedStatements, lines } = payload
+      let { offset, selectedReferences, lines } = payload
       let tempDoc = cloneDeep(state.document)
       const emptyReference = { // {'Libelle': libelle, 'DisplayedLibelle': libelle, 'Price': price, 'Imputation': None}
-        'Libelle': null,
-        'DisplayedLibelle': null,
-        'Price': null,
-        'Imputation': null,
+        'Libelle': '',
+        'DisplayedLibelle': '',
+        'Price': '',
+        'Imputation': '',
       }
       let counter = 0
       if (offset === -1) {
@@ -648,7 +660,7 @@ export default {
           tempDoc.references.push(newEmptyStatement)
         })
       } else {
-        selectedStatements.forEach(idx => {
+        selectedReferences.forEach(idx => {
           Array.from({ length: lines }, (_) => {
             const newEmptyStatement = cloneDeep(emptyReference)
             tempDoc.references.splice([idx + offset + counter], 0, newEmptyStatement)
@@ -661,10 +673,10 @@ export default {
       saveDocToAPI({}, state.document, options)
     },
     MUTATION_DELETE_REFERENCES(state, payload) {
-      let { selectedStatements } = payload
+      let { selectedReferences } = payload
       let tempDoc = cloneDeep(state.document)
       let counter = 0
-      selectedStatements.forEach(idx => {
+      selectedReferences.forEach(idx => {
         tempDoc.references.splice([idx - counter], 1)
         counter++
       })
@@ -766,6 +778,9 @@ export default {
     },
     ACTION_DO_IMPUTATION_CHANGES_TO_REFERENCE({ commit }, payload) {
       commit('MUTATION_DO_IMPUTATION_CHANGES_TO_REFERENCE', payload)
+    },
+    ACTION_MANUAL_CHANGES_TO_REFERENCE({ commit }, payload) {
+      commit('MUTATION_MANUAL_CHANGES_TO_REFERENCE', payload)
     },
     ACTION_INSERT_REFERENCES({ commit }, payload) {
       commit('MUTATION_INSERT_REFERENCES', payload)

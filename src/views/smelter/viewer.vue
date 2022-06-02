@@ -99,6 +99,7 @@ export default {
       currenOsmium: [],
       currentDocument: {},
       currentBankOsmium: {},
+      references: [],
     }
   },
   props: {
@@ -139,6 +140,7 @@ export default {
       this.currentDocument = this.current
       this.currentBankOsmium = this.currentDocument.bankOsmium
       this.currenOsmium = this.current.osmium
+      this.references = this.current.references
     },
   },
   computed: {

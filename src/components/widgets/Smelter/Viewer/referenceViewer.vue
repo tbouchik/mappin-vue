@@ -78,7 +78,7 @@
       </a-table>
       <br>
     <br>
-    <a-modal v-model="insertModalVisible" title="Confirmation de Date" @ok="confirmInsertStatements">
+    <a-modal v-model="insertModalVisible" title="Insersion de références" @ok="confirmInsertReferences">
       <div>
         <p>Choisissez le nombre de lignes à insérer: </p>
         <a-dropdown>
@@ -146,7 +146,7 @@ export default {
     }
   },
   created() {
-    this.pageData = this.references.map(x => { return { Libelle: x.DisplayedLibelle, DisplayedLibelle: x.Libelle, Price: x.Price, Imputation: x.Imputation } })
+    this.pageData = this.references.map(x => { return { DisplayedLibelle: x.DisplayedLibelle, Libelle: x.Libelle, Price: x.Price, Imputation: x.Imputation } })
   },
   props: {
     references: {
@@ -169,8 +169,7 @@ export default {
   },
   watch: {
     references: function() {
-      this.pageData = this.references.map(x => { return { Libelle: x.DisplayedLibelle, DisplayedLibelle: x.Libelle, Price: x.Price, Imputation: x.Imputation } })
-      this.dates = []
+      this.pageData = this.references.map(x => { return { DisplayedLibelle: x.DisplayedLibelle, Libelle: x.Libelle, Price: x.Price, Imputation: x.Imputation } })
     },
     currentActiveIndex: function() {
       const pageNotEmpty = this.references.length > 0
@@ -258,7 +257,7 @@ export default {
     handleNumberOfLinesChange(e) {
       this.numberOfLines = parseInt(e.key)
     },
-    confirmInsertStatements() {
+    confirmInsertReferences() {
       this.insertModalVisible = false
       this.$store.dispatch('ACTION_INSERT_REFERENCES', { offset: this.offset, selectedReferences: this.selectedReferences, lines: this.numberOfLines })
       this.selectedReferences = []
@@ -266,9 +265,6 @@ export default {
     deleteReferences() {
       this.$store.dispatch('ACTION_DELETE_REFERENCES', { selectedReferences: this.selectedReferences })
       this.selectedReferences = []
-    },
-    handleDateChange(dates) {
-      this.dates = dates
     },
   },
   destroyed() {
