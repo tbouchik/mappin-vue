@@ -644,6 +644,13 @@ export default {
         saveDocToAPI(null, state.document, options)
       }, 600)
     },
+    MUTATION_DO_AUTO_CHANGES_TO_REFERENCE(state, bbox) {
+      let tempDoc = cloneDeep(state.document)
+      tempDoc.references[state.currentIdx][state.currentCol] = bbox.Text
+      state.document = tempDoc
+      let options = { imput: false, bankOsmiumChanged: false, keyAttributes: null, refChange: true, refMapping: null }
+      saveDocToAPI(null, state.document, options)
+    },
     MUTATION_INSERT_REFERENCES(state, payload) {
       let { offset, selectedReferences, lines } = payload
       let tempDoc = cloneDeep(state.document)
@@ -710,8 +717,12 @@ export default {
     ACTION_UPDATE_ACTIVE_INDEX({ commit }, payload) {
       commit('MUTATION_UPDATE_INDEX', payload)
     },
-    ACTION_DO_AUTO_CHANGES_TO_INVOICE({ commit }, idx) {
-      commit('MUTATION_DO_AUTO_CHANGES_TO_INVOICE', idx)
+    ACTION_DO_AUTO_CHANGES_TO_INVOICE({ state, commit }, bbox) {
+      if (state.currentPane === 'expensePane') {
+        commit('MUTATION_DO_AUTO_CHANGES_TO_REFERENCE', bbox)
+      } else {
+        commit('MUTATION_DO_AUTO_CHANGES_TO_INVOICE', bbox)
+      }
     },
     ACTION_DO_CHANGES_TO_DOCUMENT({ commit }, changeData) {
       commit('MUTATION_DO_MANUAL_CHANGES_TO_INVOICE', changeData)
