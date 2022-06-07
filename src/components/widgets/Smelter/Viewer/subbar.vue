@@ -64,6 +64,38 @@
         </a-modal>
       </b-nav>
     </ul>
+    <div :class="$style.divider" class="mr-4 d-none d-xl-block"  v-if="!isBankStatement"/>
+    <ul :class="$style.breadcrumbs" class=" xs-1 sm-2 col-lg-1" v-if="!isBankStatement">
+      <b-nav @click="showJournalModal">
+        <b-nav-item v-if="current.journal">{{ current.journal.name }}</b-nav-item>
+        <b-nav-item v-else>Sélectionner le Journal</b-nav-item>
+        <a-modal  v-model="journalModalVisible"
+                  title="Change Journal"
+                  on-ok="handleOk"
+                  :width="660"
+                  >
+          <template slot="footer">
+            <a-button key="back" :disabled="journalTableLoading" @click="handleCancelJournalChange">
+              {{ $t('subbar.return') }}
+            </a-button>
+          </template>
+          <div class="demo-infinite-container ">
+            <a-input-search placeholder="Search Journal" v-model="searchedJournal" />
+              <a-list :data-source="journals"
+                      :loading="journalTableLoading">
+                  <a-list-item  slot="renderItem" slot-scope="item">
+                    <a-list-item-meta :description="item.type">
+                      <a slot="title">{{ item.name }} - {{item.code}}</a>
+                    </a-list-item-meta>
+                  <a-button type="primary" @click="selectJournal(item)" ghost>
+                    {{ $t('subbar.select') }}
+                  </a-button>
+                </a-list-item>
+              </a-list>
+            </div>
+        </a-modal>
+      </b-nav>
+    </ul>
     <div :class="$style.divider" class="mr-4 d-none d-xl-block" />
     <ul :class="$style.breadcrumbs" class=" xs-1 sm-2 col-lg-2" style="margin-left:10px; padding-right:0px;">
       <a-tooltip placement="topLeft" :title="current.name" arrowPointAtCenter>
@@ -202,6 +234,8 @@ export default {
       searchedClient: null,
       searchedTemplate: null,
       drawerVisible: false,
+      searchedJournal: null,
+      journalModalVisible: false,
     }
   },
   watch: {
@@ -220,6 +254,13 @@ export default {
         name: this.searchedTemplate,
       })
     },
+    searchedJournal: function() {
+      this.$store.dispatch('ACTION_FETCH_JOURNALS', {
+        limit: 100,
+        page: 1,
+        name: this.searchedJournal,
+      })
+    },
   },
   computed: {
     ...mapState(['settings']),
@@ -230,7 +271,9 @@ export default {
       'clients',
       'clientTableLoading',
       'filters',
-      'templateLoading']),
+      'templateLoading',
+      'journals',
+      'journalTableLoading']),
     currentIndex: function () {
       if (this.smeltedValidation) {
         return this.docSmeltedCache.indexOf(this.current.id)
@@ -483,6 +526,15 @@ export default {
         current: this.current.filter._id,
       })
     },
+    showJournalModal() {
+      this.journalModalVisible = true
+      this.$store.dispatch('ACTION_FETCH_JOURNALS', {
+        limit: 100,
+        page: 1,
+        name: this.searchedJournal,
+        current: this.current.journal ? this.current.journal._id : null,
+      })
+    },
     handleCancelClientChange(e) {
       this.clientModalVisible = false
       this.searchedClient = null
@@ -490,6 +542,10 @@ export default {
     handleCancelTemplateChange(e) {
       this.templateModalVisible = false
       this.searchedTemplate = null
+    },
+    handleCancelJournalChange(e) {
+      this.journalModalVisible = false
+      this.searchedJournal = null
     },
     selectClient(client) {
       this.$store.dispatch('ACTION_START_CLIENT_LOADER')
@@ -516,6 +572,20 @@ export default {
               this.$store.dispatch('ACTION_STOP_FILTER_LOADER')
               this.templateModalVisible = false
               this.searchedClient = null
+            })
+        })
+    },
+    selectJournal(journal) {
+      this.$store.dispatch('ACTION_START_FILTER_LOADER')
+      const body = { newJournal: journal.id }
+      DocumentService.updateDocument(body, this.current.id)
+        .then(() => {
+          DocumentService.fetchDocument(this.current.id)
+            .then(doc => {
+              this.$store.dispatch('UPDATE_DOCUMENT', doc)
+              this.$store.dispatch('ACTION_STOP_FILTER_LOADER')
+              this.templateModalVisible = false
+              this.searchedJournal = null
             })
         })
     },
