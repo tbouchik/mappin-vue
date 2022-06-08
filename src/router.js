@@ -92,6 +92,16 @@ const router = new Router({
           component: () => import('./views/dashboard/filters/filters.vue'),
         },
         {
+          path: '/dashboard/journals',
+          name: 'journals',
+          meta: {
+            title: 'Dashboard Journals',
+            authRequired: true,
+          },
+          props: true,
+          component: () => import('./views/dashboard/journals/journals.vue'),
+        },
+        {
           path: '/dashboard/filter/:filterId',
           name: 'filter',
           meta: {

@@ -22,6 +22,12 @@ export const getMenuData = [
     url: '/dashboard/filters',
   },
   {
+    title: 'Journaux',
+    key: 'journals',
+    icon: 'fe fe-layers',
+    url: '/dashboard/journals',
+  },
+  {
     title: 'Archive',
     key: 'archive',
     icon: 'fe fe-archive',
