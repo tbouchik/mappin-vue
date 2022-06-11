@@ -15,9 +15,8 @@ let invoiceColumns = [
     customRender: 'invoiceDate',
   },
   {
-    title: 'dashboard.document.template',
-    dataIndex: 'filter',
-    customRender: 'customRenderComposed',
+    title: 'Journal',
+    dataIndex: 'journal.name',
   },
   {
     title: 'dashboard.document.client',

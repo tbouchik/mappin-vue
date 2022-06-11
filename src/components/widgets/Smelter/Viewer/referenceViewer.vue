@@ -51,7 +51,7 @@
             />
           </div>
           <div :key="col"  v-if="col==='Imputation' && isActive(dataIndex, col)" @click="activateIndex(dataIndex, col)">
-            <template v-if="record.Imputation !== undefined && record.Imputation !== null">
+            <template >
               <vue-simple-suggest
                 @input="e => changeLibelle(e, dataIndex)"
                 @select="e => updateImputation(e, dataIndex)"
