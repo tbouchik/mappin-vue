@@ -584,7 +584,7 @@ export default {
             .then(doc => {
               this.$store.dispatch('UPDATE_DOCUMENT', doc)
               this.$store.dispatch('ACTION_STOP_FILTER_LOADER')
-              this.templateModalVisible = false
+              this.journalModalVisible = false
               this.searchedJournal = null
             })
         })

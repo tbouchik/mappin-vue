@@ -24,7 +24,7 @@ export const getMenuData = [
   {
     title: 'Journaux',
     key: 'journals',
-    icon: 'fe fe-layers',
+    icon: 'fe fe-list',
     url: '/dashboard/journals',
   },
   {
