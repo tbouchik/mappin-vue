@@ -104,6 +104,7 @@
           <a-col :span="12">
               <a-form-item label="Fournisseur" v-if="!isBankViz">
                 <a-input
+                :disabled="true"
                 v-decorator="[
                   'searchedVendor',
                   {

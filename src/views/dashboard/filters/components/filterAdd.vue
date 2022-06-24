@@ -245,10 +245,6 @@ export default {
             label: 'Total TTC',
           },
           {
-            value: 'VENDOR',
-            label: 'Fournisseur',
-          },
-          {
             value: 'VAT',
             label: 'TVA',
           },
