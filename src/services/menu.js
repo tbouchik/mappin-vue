@@ -28,6 +28,12 @@ export const getMenuData = [
     url: '/dashboard/journals',
   },
   {
+    title: 'Fournisseurs',
+    key: 'vendors',
+    icon: 'fe fe-truck',
+    url: '/dashboard/vendors',
+  },
+  {
     title: 'Archive',
     key: 'archive',
     icon: 'fe fe-archive',

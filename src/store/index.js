@@ -8,6 +8,7 @@ import filter from './filters/filters.js'
 import uploader from './uploader/uploader.js'
 import viewer from './viewer/viewer.js'
 import journal from './journals/journals.js'
+import vendor from './vendors/vendors.js'
 
 Vue.use(Vuex)
 
@@ -21,6 +22,7 @@ export default new Vuex.Store({
     uploader,
     viewer,
     journal,
+    vendor,
   },
   state: {},
   mutations: {},

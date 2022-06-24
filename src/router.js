@@ -85,7 +85,7 @@ const router = new Router({
           path: '/dashboard/filters',
           name: 'filters',
           meta: {
-            title: 'Dashboard Filters',
+            title: 'Templates',
             authRequired: true,
           },
           props: true,
@@ -95,17 +95,27 @@ const router = new Router({
           path: '/dashboard/journals',
           name: 'journals',
           meta: {
-            title: 'Dashboard Journals',
+            title: 'Journaux',
             authRequired: true,
           },
           props: true,
           component: () => import('./views/dashboard/journals/journals.vue'),
         },
         {
+          path: '/dashboard/vendors',
+          name: 'vendors',
+          meta: {
+            title: 'Fournisseurs',
+            authRequired: true,
+          },
+          props: true,
+          component: () => import('./views/dashboard/vendors/vendors.vue'),
+        },
+        {
           path: '/dashboard/filter/:filterId',
           name: 'filter',
           meta: {
-            title: 'Dashboard Filters',
+            title: 'Template',
             authRequired: true,
           },
           props: true,

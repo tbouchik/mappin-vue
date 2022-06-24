@@ -6,7 +6,7 @@ let invoiceColumns = [
   },
   {
     title: 'dashboard.document.vendor',
-    dataIndex: 'vendor',
+    dataIndex: 'vendor.name',
     customRender: 'customRender',
   },
   {

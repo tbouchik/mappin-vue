@@ -47,7 +47,7 @@
             </a-button>
           </template>
           <div class="demo-infinite-container ">
-            <a-input-search placeholder="Search Template" v-model="searchedTemplate" />
+            <a-input-search placeholder="Rechercher le template" v-model="searchedTemplate" />
               <a-list :data-source="filters"
                       :loading="templateLoading">
 
@@ -80,7 +80,7 @@
             </a-button>
           </template>
           <div class="demo-infinite-container ">
-            <a-input-search placeholder="Search Journal" v-model="searchedJournal" />
+            <a-input-search placeholder="Rechercher Journal" v-model="searchedJournal" />
               <a-list :data-source="journals"
                       :loading="journalTableLoading">
                   <a-list-item  slot="renderItem" slot-scope="item">
@@ -88,6 +88,38 @@
                       <a slot="title">{{ item.name }} - {{item.code}}</a>
                     </a-list-item-meta>
                   <a-button type="primary" @click="selectJournal(item)" ghost>
+                    {{ $t('subbar.select') }}
+                  </a-button>
+                </a-list-item>
+              </a-list>
+            </div>
+        </a-modal>
+      </b-nav>
+    </ul>
+    <div :class="$style.divider" class="mr-4 d-none d-xl-block"  v-if="!isBankStatement"/>
+    <ul :class="$style.breadcrumbs" class=" xs-1 sm-2 col-lg-1" v-if="!isBankStatement">
+      <b-nav @click="showVendorModal">
+        <b-nav-item v-if="current.vendor">{{ current.vendor.name }}</b-nav-item>
+        <b-nav-item v-else>Sélectionner le Fournisseur</b-nav-item>
+        <a-modal  v-model="vendorModalVisible"
+                  title="Change Vendor"
+                  on-ok="handleOk"
+                  :width="660"
+                  >
+          <template slot="footer">
+            <a-button key="back" :disabled="vendorTableLoading" @click="handleCancelVendorChange">
+              {{ $t('subbar.return') }}
+            </a-button>
+          </template>
+          <div class="demo-infinite-container ">
+            <a-input-search placeholder="Rechercher Fournisseur" v-model="searchedVendor" />
+              <a-list :data-source="vendors"
+                      :loading="vendorTableLoading">
+                  <a-list-item  slot="renderItem" slot-scope="item">
+                    <a-list-item-meta :description="item.type">
+                      <a slot="title">{{ item.name }} - {{item.code}}</a>
+                    </a-list-item-meta>
+                  <a-button type="primary" @click="selectVendor(item)" ghost>
                     {{ $t('subbar.select') }}
                   </a-button>
                 </a-list-item>
@@ -121,6 +153,7 @@
         <a-tooltip placement="topLeft" :title="$t('subbar.exportCSV')" arrowPointAtCenter>
 
           <button class="btn btn-outline-primary"
+
            @click="csvExport" >
             <span>
               <i class=" fa fa-download"/>
@@ -236,6 +269,8 @@ export default {
       drawerVisible: false,
       searchedJournal: null,
       journalModalVisible: false,
+      searchedVendor: null,
+      vendorModalVisible: false,
     }
   },
   watch: {
@@ -261,6 +296,13 @@ export default {
         name: this.searchedJournal,
       })
     },
+    searchedVendor: function() {
+      this.$store.dispatch('ACTION_FETCH_VENDORS', {
+        limit: 100,
+        page: 1,
+        name: this.searchedVendor,
+      })
+    },
   },
   computed: {
     ...mapState(['settings']),
@@ -273,7 +315,9 @@ export default {
       'filters',
       'templateLoading',
       'journals',
-      'journalTableLoading']),
+      'journalTableLoading',
+      'vendors',
+      'vendorTableLoading']),
     currentIndex: function () {
       if (this.smeltedValidation) {
         return this.docSmeltedCache.indexOf(this.current.id)
@@ -535,6 +579,15 @@ export default {
         current: this.current.journal ? this.current.journal._id : null,
       })
     },
+    showVendorModal() {
+      this.vendorModalVisible = true
+      this.$store.dispatch('ACTION_FETCH_VENDORS', {
+        limit: 100,
+        page: 1,
+        name: this.searchedVendor,
+        current: this.current.vendor ? this.current.vendor._id : null,
+      })
+    },
     handleCancelClientChange(e) {
       this.clientModalVisible = false
       this.searchedClient = null
@@ -546,6 +599,10 @@ export default {
     handleCancelJournalChange(e) {
       this.journalModalVisible = false
       this.searchedJournal = null
+    },
+    handleCancelVendorChange(e) {
+      this.vendorModalVisible = false
+      this.searchedVendor = null
     },
     selectClient(client) {
       this.$store.dispatch('ACTION_START_CLIENT_LOADER')
@@ -586,6 +643,20 @@ export default {
               this.$store.dispatch('ACTION_STOP_FILTER_LOADER')
               this.journalModalVisible = false
               this.searchedJournal = null
+            })
+        })
+    },
+    selectVendor(vendor) {
+      this.$store.dispatch('ACTION_START_FILTER_LOADER')
+      const body = { newVendor: vendor.id }
+      DocumentService.updateDocument(body, this.current.id)
+        .then(() => {
+          DocumentService.fetchDocument(this.current.id)
+            .then(doc => {
+              this.$store.dispatch('UPDATE_DOCUMENT', doc)
+              this.$store.dispatch('ACTION_STOP_FILTER_LOADER')
+              this.vendorModalVisible = false
+              this.searchedVendor = null
             })
         })
     },
