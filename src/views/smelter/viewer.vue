@@ -13,7 +13,6 @@
             <div class="col-md-6">
               <div :class="{ sticky: !isBankViz }">
                 <template-viewer ref="statement" :document="currentDocument" :isBankStatement="currentDocument.isBankStatement" v-if="!currentDocument.isBankStatement"/>
-                <br>
                 <reference-viewer ref="reference" :references="references" :isBankStatement="currentDocument.isBankStatement" v-if="!currentDocument.isBankStatement"/>
                 <a-collapse ref="statement"  class="top-5" :activeKey="[1, 2]" :bordered="true" v-else>
                   <a-collapse-panel key="1" header="En-tête">

@@ -1,7 +1,7 @@
 <template>
   <div>
     <br>
-      <div style="margin-bottom: 16px">
+      <div >
         <a-dropdown :disabled="!hasSelectedReferences" >
           <a-button>{{ $t('template.actions') }}</a-button>
           <a-menu slot="overlay">
@@ -20,15 +20,12 @@
           </a-menu>
         </a-dropdown>
       </div>
-      <br>
       <div v-if="showImputationAlert && currentActivePane==='expensePane'">
           <a-alert  :message="currentImputationAlert" type="info" close-text="Fermer" />
       </div>
-      <br>
       <a-table  :columns="columns"
                 :data-source="pageData"
                 :pagination=false
-                :scroll="{ x: 600 }"
                 :row-selection="{ selectedRowKeys: selectedReferences, onChange: onSelectChange }"
                 bordered>
         <template v-for="col in ['DisplayedLibelle', 'Price', 'Imputation']" :slot="col"   slot-scope="text, record, dataIndex" style="background:blue">
@@ -141,7 +138,7 @@ export default {
       selectedReferences: [],
       insertModalVisible: false,
       offset: null,
-      numberOfLines: 0,
+      numberOfLines: 1,
       debounce: null,
     }
   },
