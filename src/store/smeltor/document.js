@@ -646,7 +646,9 @@ export default {
     },
     MUTATION_DO_AUTO_CHANGES_TO_REFERENCE(state, bbox) {
       let tempDoc = cloneDeep(state.document)
-      tempDoc.references[state.currentIdx][state.currentCol] = bbox.Text
+      const formattingType = state.currentCol === 'Price' ? 'NUMBER' : 'TEXT'
+      const newVal = formatValue(bbox.Text, formattingType, null, null)
+      tempDoc.references[state.currentIdx][state.currentCol] = newVal
       state.document = tempDoc
       let options = { imput: false, bankOsmiumChanged: false, keyAttributes: null, refChange: true, refMapping: null }
       saveDocToAPI(null, state.document, options)
