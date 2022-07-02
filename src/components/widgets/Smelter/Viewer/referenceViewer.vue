@@ -17,7 +17,7 @@
         </a-dropdown>
       </div>
       <div v-if="showImputationAlert && currentActivePane==='expensePane'">
-          <a-alert  :message="currentImputationAlert" type="info" close-text="Fermer" />
+          <a-alert :message="currentImputationAlert" type="info" close-text="Fermer"/>
       </div>
       <a-table  :columns="columns"
                 :data-source="pageData"

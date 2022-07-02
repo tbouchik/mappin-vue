@@ -316,7 +316,13 @@ export default {
       }
       state.document = newDoc
       let options = { imput: false, bankOsmiumChanged: false, keyAttributes: updatedDocumentRoleAttributes }
-      saveDocToAPI(Object.fromEntries(mbcData), newDoc, options)
+      saveDocToAPI(Object.fromEntries(mbcData), newDoc, options).then((resp) => {
+        state.document = resp.data
+        state.document.osmium = state.document.osmium.map((item, index) => {
+          item.key = index // This is to avoid ant design spitting on your face for
+          return item // inserting items from osmium in ant table <a-table> without a unique key
+        })
+      })
     },
     MUTATION_DO_MANUAL_CHANGES_TO_INVOICE(state, changeData) {
       let { value } = changeData
@@ -342,7 +348,13 @@ export default {
       clearTimeout(debounce)
       debounce = setTimeout(() => {
         let options = { imput: false, bankOsmiumChanged: false, keyAttributes: updatedDocumentRoleAttributes }
-        saveDocToAPI({}, state.document, options)
+        saveDocToAPI({}, state.document, options).then((resp) => {
+          state.document = resp.data
+          state.document.osmium = state.document.osmium.map((item, index) => {
+            item.key = index // This is to avoid ant design spitting on your face for
+            return item // inserting items from osmium in ant table <a-table> without a unique key
+          })
+        })
       }, 600)
     },
     MUTATION_DO_ADJUSTMENT_TO_INVOICE(state, changeData) {
@@ -368,7 +380,13 @@ export default {
       clearTimeout(debounce)
       debounce = setTimeout(() => {
         let options = { imput: false, bankOsmiumChanged: false, keyAttributes: updatedDocumentRoleAttributes }
-        saveDocToAPI({}, state.document, options)
+        saveDocToAPI({}, state.document, options).then((resp) => {
+          state.document = resp.data
+          state.document.osmium = state.document.osmium.map((item, index) => {
+            item.key = index // This is to avoid ant design spitting on your face for
+            return item // inserting items from osmium in ant table <a-table> without a unique key
+          })
+        })
       }, 600)
     },
     MUTATION_DO_IMPUTATION_CHANGES_TO_INVOICE(state, changeData) {
@@ -388,7 +406,13 @@ export default {
       tempDoc.osmium[itemIdx]['Imputation'] = imputation
       state.document = tempDoc
       let options = { imput: true, bankOsmiumChanged: false, keyAttributes: null }
-      saveDocToAPI({}, state.document, options)
+      saveDocToAPI({}, state.document, options).then((resp) => {
+        state.document = resp.data
+        state.document.osmium = state.document.osmium.map((item, index) => {
+          item.key = index // This is to avoid ant design spitting on your face for
+          return item // inserting items from osmium in ant table <a-table> without a unique key
+        })
+      })
     },
     MUTATION_AUTO_CHANGES_TO_STATEMENT(state, bbox) {
       let newDoc = cloneDeep(state.document)
@@ -631,7 +655,13 @@ export default {
       }
       state.document = tempDoc
       let options = { imput: false, bankOsmiumChanged: false, keyAttributes: null, refMapping, refChange: true }
-      saveDocToAPI({}, state.document, options)
+      saveDocToAPI({}, state.document, options).then((resp) => {
+        state.document = resp.data
+        state.document.osmium = state.document.osmium.map((item, index) => {
+          item.key = index // This is to avoid ant design spitting on your face for
+          return item // inserting items from osmium in ant table <a-table> without a unique key
+        })
+      })
     },
     MUTATION_MANUAL_CHANGES_TO_REFERENCE(state, payload) {
       let { value, itemIdx, column } = payload
@@ -641,7 +671,13 @@ export default {
       clearTimeout(debounce)
       debounce = setTimeout(() => {
         let options = { imput: false, bankOsmiumChanged: false, keyAttributes: null, refChange: true, refMapping: null }
-        saveDocToAPI(null, state.document, options)
+        saveDocToAPI(null, state.document, options).then((resp) => {
+          state.document = resp.data
+          state.document.osmium = state.document.osmium.map((item, index) => {
+            item.key = index // This is to avoid ant design spitting on your face for
+            return item // inserting items from osmium in ant table <a-table> without a unique key
+          })
+        })
       }, 600)
     },
     MUTATION_DO_AUTO_CHANGES_TO_REFERENCE(state, bbox) {
@@ -651,7 +687,13 @@ export default {
       tempDoc.references[state.currentIdx][state.currentCol] = newVal
       state.document = tempDoc
       let options = { imput: false, bankOsmiumChanged: false, keyAttributes: null, refChange: true, refMapping: null }
-      saveDocToAPI(null, state.document, options)
+      saveDocToAPI(null, state.document, options).then((resp) => {
+        state.document = resp.data
+        state.document.osmium = state.document.osmium.map((item, index) => {
+          item.key = index // This is to avoid ant design spitting on your face for
+          return item // inserting items from osmium in ant table <a-table> without a unique key
+        })
+      })
     },
     MUTATION_INSERT_REFERENCES(state, payload) {
       let { offset, selectedReferences, lines } = payload
@@ -679,7 +721,13 @@ export default {
       }
       state.document = tempDoc
       let options = { imput: false, bankOsmiumChanged: false, keyAttributes: null, refChange: true }
-      saveDocToAPI({}, state.document, options)
+      saveDocToAPI({}, state.document, options).then((resp) => {
+        state.document = resp.data
+        state.document.osmium = state.document.osmium.map((item, index) => {
+          item.key = index // This is to avoid ant design spitting on your face for
+          return item // inserting items from osmium in ant table <a-table> without a unique key
+        })
+      })
     },
     MUTATION_DELETE_REFERENCES(state, payload) {
       let { selectedReferences } = payload
@@ -691,7 +739,13 @@ export default {
       })
       state.document = tempDoc
       let options = { imput: false, bankOsmiumChanged: false, keyAttributes: null, refChange: true }
-      saveDocToAPI({}, state.document, options)
+      saveDocToAPI({}, state.document, options).then((resp) => {
+        state.document = resp.data
+        state.document.osmium = state.document.osmium.map((item, index) => {
+          item.key = index // This is to avoid ant design spitting on your face for
+          return item // inserting items from osmium in ant table <a-table> without a unique key
+        })
+      })
     },
   },
   actions: {
