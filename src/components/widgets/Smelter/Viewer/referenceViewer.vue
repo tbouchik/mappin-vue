@@ -1,19 +1,15 @@
 <template>
   <div>
     <br>
-      <div >
+      <div style="margin-bottom:1%">
+        <a-button shape="circle"
+                  icon="plus"
+                  class="btn-outline-primary"
+                  @click="confirmInsertReferences()"
+                  style="margin-right:1%"/>
         <a-dropdown :disabled="!hasSelectedReferences" >
           <a-button>{{ $t('template.actions') }}</a-button>
           <a-menu slot="overlay">
-            <a-menu-item @click="setInsertModalVisible(-1)" v-if="hasNoReferences">
-              <div>{{ $t('template.insertLine') }}</div>
-            </a-menu-item>
-            <a-menu-item @click="setInsertModalVisible(0)" v-if="!hasNoReferences">
-              <div>{{ $t('template.insertAbove') }}</div>
-            </a-menu-item>
-            <a-menu-item @click="setInsertModalVisible(1)" v-if="!hasNoReferences">
-              <div>{{ $t('template.insertBelow') }}</div>
-            </a-menu-item>
             <a-menu-item @click="deleteReferences" v-if="!hasNoReferences">
               <div>{{ $t('template.deleteAction') }}</div>
             </a-menu-item>
@@ -75,19 +71,6 @@
       </a-table>
       <br>
     <br>
-    <a-modal v-model="insertModalVisible" title="Insersion de références" @ok="confirmInsertReferences">
-      <div>
-        <p>Choisissez le nombre de lignes à insérer: </p>
-        <a-dropdown>
-          <a-menu slot="overlay" @click="handleNumberOfLinesChange">
-            <a-menu-item key="1"> 1 </a-menu-item>
-            <a-menu-item key="2"> 2 </a-menu-item>
-            <a-menu-item key="3"> 3 </a-menu-item>
-          </a-menu>
-          <a-button style="margin-left: 8px"> Nombre de lignes <a-icon type="down" /> </a-button>
-        </a-dropdown>
-      </div>
-    </a-modal>
   </div>
 </template>
 <script>
@@ -136,7 +119,6 @@ export default {
       chosen: '',
       columns,
       selectedReferences: [],
-      insertModalVisible: false,
       offset: null,
       numberOfLines: 1,
       debounce: null,
@@ -247,17 +229,11 @@ export default {
     onSelectChange(selectedReferences) {
       this.selectedReferences = selectedReferences.sort((a, b) => a - b)
     },
-    setInsertModalVisible (offset) {
-      this.insertModalVisible = true
-      this.offset = offset
-    },
     handleNumberOfLinesChange(e) {
       this.numberOfLines = parseInt(e.key)
     },
     confirmInsertReferences() {
-      this.insertModalVisible = false
-      this.$store.dispatch('ACTION_INSERT_REFERENCES', { offset: this.offset, selectedReferences: this.selectedReferences, lines: this.numberOfLines })
-      this.selectedReferences = []
+      this.$store.dispatch('ACTION_INSERT_REFERENCES', { offset: 1, selectedReferences: [this.references.length - 1], lines: 1 })
     },
     deleteReferences() {
       this.$store.dispatch('ACTION_DELETE_REFERENCES', { selectedReferences: this.selectedReferences })
