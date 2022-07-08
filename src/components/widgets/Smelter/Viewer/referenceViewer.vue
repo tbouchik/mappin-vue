@@ -150,26 +150,6 @@ export default {
     references: function() {
       this.pageData = this.references.map(x => { return { DisplayedLibelle: x.DisplayedLibelle, Libelle: x.Libelle, Price: x.Price, Imputation: x.Imputation } })
     },
-    currentActiveIndex: function() {
-      const pageNotEmpty = this.references.length > 0
-      if (this.currentActivePane === 'expensePane' && pageNotEmpty) {
-        if (this.currentActiveColumn !== 'Imputation') {
-          this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
-        } else {
-          this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.children[0].children[0].focus()
-        }
-      }
-    },
-    currentActiveColumn: function() {
-      const pageNotEmpty = this.references.length > 0
-      if (this.currentActivePane === 'expensePane' && pageNotEmpty) {
-        if (this.currentActiveColumn !== 'Imputation') {
-          this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
-        } else {
-          this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.children[0].children[0].focus()
-        }
-      }
-    },
   },
   methods: {
     handleChange(value, itemIdx, column) {
@@ -234,6 +214,7 @@ export default {
     },
     confirmInsertReferences() {
       this.$store.dispatch('ACTION_INSERT_REFERENCES', { offset: 1, selectedReferences: [this.references.length - 1], lines: 1 })
+      this.activateIndex(this.references.length, 'DisplayedLibelle')
     },
     deleteReferences() {
       this.$store.dispatch('ACTION_DELETE_REFERENCES', { selectedReferences: this.selectedReferences })
