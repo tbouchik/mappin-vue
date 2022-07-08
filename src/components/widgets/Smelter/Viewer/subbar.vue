@@ -106,11 +106,14 @@
                   on-ok="handleOk"
                   :width="660"
                   >
-          <template slot="footer">
-            <a-button key="back" :disabled="vendorTableLoading" @click="handleCancelVendorChange">
-              {{ $t('subbar.return') }}
-            </a-button>
-          </template>
+        <template slot="footer">
+          <a-button key="back" :disabled="vendorTableLoading" @click="handleCancelVendorChange" >
+            Annuler
+          </a-button>
+          <a-button key="submit" type="primary" :disabled="vendorTableLoading" @click="showAddVendorModal" ghost>
+            Nouveau Fournisseur
+          </a-button>
+        </template>
           <div class="demo-infinite-container ">
             <a-input-search placeholder="Rechercher Fournisseur" v-model="searchedVendor" />
               <a-list :data-source="vendors"
@@ -119,12 +122,41 @@
                     <a-list-item-meta :description="item.type">
                       <a slot="title">{{ item.name }} - {{item.code}}</a>
                     </a-list-item-meta>
+
                   <a-button type="primary" @click="selectVendor(item)" ghost>
                     {{ $t('subbar.select') }}
                   </a-button>
                 </a-list-item>
               </a-list>
             </div>
+        </a-modal>
+        <a-modal  v-model="addVendorModalVisible"
+                  title="Nouveau Fournisseur"
+                  :confirm-loading="confirmAddNewVendorLoading"
+                  :width="660"
+                  >
+                  <a-form :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
+                    <a-form-item label="Nom">
+                      <a-input
+                      v-model="newVendor"
+                        v-decorator="['Nom', { rules: [{ required: true, message: 'Nom du Fournisseur!' }] }]"
+                      />
+                    </a-form-item>
+                    <a-form-item label="N° Compte">
+                      <a-input
+                      v-model="newVendorCode"
+                        v-decorator="['N° Compte', { rules: [{ required: true, message: 'Nom du Fournisseur!' }] }]"
+                      />
+                    </a-form-item>
+                  </a-form>
+                  <template slot="footer">
+                  <a-button key="back"  @click="hideAddVendorModal">
+                    Annuler
+                  </a-button>
+                  <a-button key="submit" type="primary" :disabled="confirmAddNewVendorLoading" @click="addNewVendorForDocument" ghost>
+                    confirmer
+                  </a-button>
+        </template>
         </a-modal>
       </b-nav>
     </ul>
@@ -251,6 +283,7 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import DocumentService from '../../../../services/documentService'
+import axios from 'axios'
 
 export default {
   name: 'SmelterSubbar',
@@ -271,6 +304,10 @@ export default {
       journalModalVisible: false,
       searchedVendor: null,
       vendorModalVisible: false,
+      addVendorModalVisible: false,
+      confirmAddNewVendorLoading: false,
+      newVendor: '',
+      newVendorCode: '',
     }
   },
   watch: {
@@ -587,6 +624,25 @@ export default {
         name: this.searchedVendor,
         current: this.current.vendor ? this.current.vendor._id : null,
       })
+    },
+    showAddVendorModal() {
+      this.newVendor = ''
+      this.newVendorCode = ''
+      this.addVendorModalVisible = true
+    },
+    hideAddVendorModal() {
+      this.addVendorModalVisible = false
+    },
+    addNewVendorForDocument() {
+      if (this.newVendor) {
+        this.confirmAddNewVendorLoading = true
+        axios.post(`/v1/vendors`, { name: this.newVendor, code: this.newVendorCode }).then(({ data }) => {
+          this.addVendorModalVisible = false
+          this.confirmAddNewVendorLoading = false
+          this.selectVendor(data)
+        }
+        )
+      }
     },
     handleCancelClientChange(e) {
       this.clientModalVisible = false
