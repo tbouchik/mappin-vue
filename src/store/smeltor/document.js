@@ -124,6 +124,13 @@ function filterAlpha (str) {
   return str
 }
 
+function parseAlphaNumericChar (str) {
+  if (typeof str === 'string') {
+    return str.replace(/[^0-9A-Z]+/gi, '')
+  }
+  return str
+}
+
 function getUpdatedDocumentRoles (props) {
   let { keyRole, keyType, newVal, isBank } = props
   let result = {}
@@ -646,18 +653,17 @@ export default {
       let { imputation, itemIdx } = payload
       let tempDoc = cloneDeep(state.document)
       tempDoc.references[itemIdx]['Imputation'] = imputation
-      let refMapping = null
+      let refMapping = new Map()
       if (tempDoc.references[itemIdx]['Libelle']) {
-        refMapping = new Map()
-        refMapping.set(tempDoc.references[itemIdx]['Libelle'], imputation)
-        refMapping = Object.fromEntries(refMapping)
+        refMapping.set(parseAlphaNumericChar(tempDoc.references[itemIdx]['Libelle']), imputation)
       }
+      refMapping = Object.fromEntries(refMapping)
       state.document = tempDoc
       let options = { imput: false, bankOsmiumChanged: false, keyAttributes: null, refMapping, refChange: true }
       saveDocToAPI({}, state.document, options).then((resp) => {
         state.document = resp.data
         state.document.osmium = state.document.osmium.map((item, index) => {
-          item.key = index // This is to avoid ant design spitting on your face for
+          item.key = index // This is to avoid ant design spitting on your face for3
           return item // inserting items from osmium in ant table <a-table> without a unique key
         })
       })
