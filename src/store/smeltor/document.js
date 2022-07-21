@@ -5,6 +5,8 @@ import dateFormats from '../helpers'
 import labels from '../../assets/accounting/labels'
 import { cloneDeep, get, pick, pickBy, isEqual } from 'lodash'
 import moment from 'moment'
+import VendorService from '../../services/vendorService'
+import DocumentService from '../../services/documentService'
 Vue.use(Vuex)
 
 let cancelToken
@@ -117,18 +119,54 @@ function changeDisplayedLibelle(col, osmiumItem) {
   return result
 }
 
-function filterAlpha (str) {
-  if (typeof str === 'string') {
-    return str.replace(',', '.').replace(/[^\d.]/g, '')
-  }
-  return str
-}
-
 function parseAlphaNumericChar (str) {
   if (typeof str === 'string') {
     return str.replace(/[^0-9A-Z]+/gi, '')
   }
   return str
+}
+
+function parseNumericChar (str) {
+  if (typeof str === 'string') {
+    return str.replace(/[^0-9]+/gi, '')
+  }
+  return str
+}
+
+function insertDecimal (str, delta) {
+  if (typeof str === 'string') {
+    let numChars = parseNumericChar(str)
+    let numCharsLen = numChars.length
+    let result = numChars.slice(0, numCharsLen - delta) + ('.' || '') + numChars.slice(numCharsLen - delta)
+    return result
+  }
+  return str
+}
+
+function parsePrice(val) {
+  if (!val) return val
+  let result = val
+  let value = val.replace(/ /g, '')
+  let lastDotIdx = value.lastIndexOf('.')
+  let lastCommaIdx = value.lastIndexOf(',')
+  let len = value.length
+  if (lastDotIdx === -1 && lastCommaIdx === -1) {
+    result = parseNumericChar(value)
+  } else if (lastDotIdx === -1 && lastCommaIdx !== -1) {
+    let delta = len - 1 - lastCommaIdx
+    if (delta <= 2) result = insertDecimal(value, delta)
+    else result = parseNumericChar(value)
+  } else if (lastDotIdx !== -1 && lastCommaIdx === -1) {
+    let delta = len - 1 - lastDotIdx
+    if (delta <= 2) result = insertDecimal(value, delta)
+    else result = parseNumericChar(value)
+  } else {
+    let last = Math.max(lastDotIdx, lastCommaIdx)
+    let delta = len - 1 - last
+    if (delta <= 2) result = insertDecimal(value, delta)
+    else result = parseNumericChar(value)
+  }
+  return result
 }
 
 function getUpdatedDocumentRoles (props) {
@@ -152,16 +190,16 @@ function getUpdatedDocumentRoles (props) {
         result.dateEnd = momentInstanceDate._isValid ? momentInstanceDate.toDate().setHours(0, 0, 0, 0) : null
         break
       case 'TOTAL_HT':
-        result.totalHt = parseFloat(newVal)
+        result.totalHt = parseFloat(parsePrice(newVal))
         break
       case 'TOTAL_TTC':
-        result.totalTtc = parseFloat(newVal)
+        result.totalTtc = parseFloat(parsePrice(newVal))
         break
       case 'VENDOR':
         result.vendor = newVal
         break
       case 'VAT':
-        result.vat = parseFloat(newVal)
+        result.vat = parseFloat(parsePrice(newVal))
         break
     }
   }
@@ -209,7 +247,7 @@ function formatValue (value, keyType, keyRole, entryType) {
   let parsedValue = null
   switch (keyType) {
     case 'NUMBER':
-      parsedValue = filterAlpha(value)
+      parsedValue = parsePrice(value)
       break
     case 'DATE':
       if (keyRole && keyRole.length && (keyRole[keyRole.length - 1] === 'DATE_FROM' || keyRole[keyRole.length - 1] === 'DATE_TO')) {
@@ -234,7 +272,7 @@ export default {
     documentsList: [],
     currentIdx: 0,
     catMode: false,
-    loading: false,
+    confirmVendorLoading: false,
     queryParams: {},
     currentCol: 'Value',
     currentPane: 'templatePane',
@@ -752,6 +790,20 @@ export default {
         })
       })
     },
+    MUTATION_CONFIRM_VENDOR(state, payload) {
+      state.confirmVendorLoading = true
+      const { id, body } = payload
+      VendorService.updateVendor(id, body).then(() => {
+        DocumentService.fetchDocument(state.document.id).then((doc) => {
+          state.document = doc
+          state.confirmVendorLoading = false
+          state.document.osmium = state.document.osmium.map((item, index) => {
+            item.key = index // This is to avoid ant design spitting on your face for
+            return item // inserting items from osmium in ant table <a-table> without a unique key
+          })
+        })
+      })
+    },
   },
   actions: {
     UPDATE_DOCUMENT({ commit }, document) {
@@ -860,6 +912,9 @@ export default {
     ACTION_DELETE_REFERENCES({ commit }, payload) {
       commit('MUTATION_DELETE_REFERENCES', payload)
     },
+    ACTION_CONFIRM_VENDOR({ commit }, payload) {
+      commit('MUTATION_CONFIRM_VENDOR', payload)
+    },
   },
   getters: {
     current: state => state.document,
@@ -874,7 +929,7 @@ export default {
     currentActiveColumn: state => state.currentCol,
     currentActivePane: state => state.currentPane,
     catMode: state => state.catMode,
-    docTableLoading: state => state.loading, // TODO: eliminate
+    confirmVendorLoading: state => state.confirmVendorLoading, // TODO: eliminate
     docQueryParams: state => state.queryParams,
     docSmeltedCache: state => state.smeltedCache,
     docPagination: state => pick(state.queryParams, ['page', 'limit']),

@@ -152,7 +152,8 @@ export default {
       this.deleteVendor(vendorId)
     },
     postNewVendor(idx, vendor) {
-      return axios.post(`/v1/vendors`, pick(vendor, ['name', 'code']))
+      let newVendor = Object.assign(pick(vendor, ['name', 'code']), { confirmed: true })
+      return axios.post(`/v1/vendors`, ...newVendor)
         .then(
           ({ data }) => {
             this.pageData[idx] = data

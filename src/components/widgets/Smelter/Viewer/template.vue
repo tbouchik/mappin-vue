@@ -5,7 +5,31 @@
         <a-alert  :message="currentImputationAlert" type="info" close-text="Fermer" />
     </div>
   <br>
+    <a-form layout="inline" v-if="!document.vendor.confirmed" >
+      <div class="spin-content" v-if="confirmVendorLoading">
+
+      </div>
+      <div v-else>
+
+        <a-form-item
+            label="Veuillez confirmer le nom du Fournisseur"
+          >
+            <a-input placeholder="Nom Fournisseur"
+                :value="vendorName"
+                :disabled="document.vendor.confirmed"/>
+          </a-form-item>
+          <a-form-item>
+          <a-button type="primary"
+            @click="handleConfirmNewVendor"
+            ghost>
+            Confirmer
+          </a-button>
+        </a-form-item>
+      </div>
+    </a-form>
+    <br>
     <a-button type="primary" icon="rollback"
+      v-if="!osmiumSnapshotsEmpty"
       style="margin-bottom:1%"
       :disabled="osmiumSnapshotsEmpty" ghost>
       <a
@@ -154,6 +178,7 @@ export default {
       editMode: false,
       columns,
       pageData: [],
+      vendorName: '',
       chosen: '',
       debounce: null,
       vatRate: null,
@@ -167,6 +192,7 @@ export default {
   },
   created() {
     this.pageData = this.document.osmium.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation } })
+    this.vendorName = this.document.vendor.name
     this.activateIndex(0, 'Value')
   },
   props: {
@@ -178,7 +204,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['osmiumSnapshotsEmpty', 'currentPage', 'currentActiveIndex', 'currentActivePane', 'currentActiveColumn', 'catMode', 'showImputationAlert', 'currentImputationAlert']),
+    ...mapGetters(['osmiumSnapshotsEmpty', 'currentPage', 'currentActiveIndex', 'currentActivePane', 'currentActiveColumn', 'catMode', 'showImputationAlert', 'currentImputationAlert', 'confirmVendorLoading']),
     adjustedColumns: function() {
       return this.document.isBankStatement ? columns.slice(0, 2) : columns
     },
@@ -193,6 +219,7 @@ export default {
   watch: {
     document: function () {
       this.pageData = this.document.osmium.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation } })
+      this.vendorName = this.document.vendor.name
     },
     currentActiveIndex: function() {
       if (this.currentActivePane === 'templatePane') {
@@ -223,6 +250,10 @@ export default {
       this.debounce = setTimeout(() => {
         this.$store.dispatch('ACTION_DO_CHANGES_TO_DOCUMENT', { value, itemIdx, column })
       }, 600)
+    },
+    handleConfirmNewVendor() {
+      let newVendor = { name: this.vendorName, confirmed: true }
+      this.$store.dispatch('ACTION_CONFIRM_VENDOR', { id: this.document.vendor.id, body: newVendor })
     },
     activateIndex(idx, col) {
       this.$store.dispatch('ACTION_UPDATE_ACTIVE_INDEX', { idx, col, pane: 'templatePane' })
