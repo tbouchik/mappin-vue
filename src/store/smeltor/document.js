@@ -247,6 +247,7 @@ function formatValue (value, keyType, keyRole, entryType) {
   let parsedValue = null
   if (keyRole && keyRole.length && (keyRole[keyRole.length - 1]) === 'INVOICE_REF') {
     parsedValue = value.includes(':') ? value.split(':')[1] : value
+    parsedValue = value.includes('°') ? value.split('°')[1] : value
   } else {
     switch (keyType) {
       case 'NUMBER':
