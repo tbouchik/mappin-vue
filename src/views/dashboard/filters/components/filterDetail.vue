@@ -234,7 +234,7 @@ export default {
         label: 'Factures',
         children: [
           {
-            value: 'REF',
+            value: 'INVOICE_REF',
             label: 'Référence Facture',
           },
           {

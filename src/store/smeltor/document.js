@@ -245,20 +245,24 @@ function parseDateRange (value, side) {
 
 function formatValue (value, keyType, keyRole, entryType) {
   let parsedValue = null
-  switch (keyType) {
-    case 'NUMBER':
-      parsedValue = parsePrice(value)
-      break
-    case 'DATE':
-      if (keyRole && keyRole.length && (keyRole[keyRole.length - 1] === 'DATE_FROM' || keyRole[keyRole.length - 1] === 'DATE_TO')) {
-        let parseResult = parseDateRange(value, keyRole[keyRole.length - 1])
-        parsedValue = entryType === 'auto' ? (parseResult.hasRange ? parseDate(parseResult.value) : parseDate(value)) : value
-      } else {
-        parsedValue = entryType === 'auto' ? parseDate(value) : value
-      }
-      break
-    default:
-      parsedValue = value
+  if (keyRole && keyRole.length && (keyRole[keyRole.length - 1]) === 'INVOICE_REF') {
+    parsedValue = value.includes(':') ? value.split(':')[1] : value
+  } else {
+    switch (keyType) {
+      case 'NUMBER':
+        parsedValue = parsePrice(value)
+        break
+      case 'DATE':
+        if (keyRole && keyRole.length && (keyRole[keyRole.length - 1] === 'DATE_FROM' || keyRole[keyRole.length - 1] === 'DATE_TO')) {
+          let parseResult = parseDateRange(value, keyRole[keyRole.length - 1])
+          parsedValue = entryType === 'auto' ? (parseResult.hasRange ? parseDate(parseResult.value) : parseDate(value)) : value
+        } else {
+          parsedValue = entryType === 'auto' ? parseDate(value) : value
+        }
+        break
+      default:
+        parsedValue = value
+    }
   }
   return parsedValue
 }
