@@ -237,6 +237,10 @@ export default {
         label: 'Factures',
         children: [
           {
+            value: 'REF',
+            label: 'Référence Facture',
+          },
+          {
             value: 'TOTAL_HT',
             label: 'Total HT',
           },
@@ -247,6 +251,10 @@ export default {
           {
             value: 'VAT',
             label: 'TVA',
+          },
+          {
+            value: 'DATE_REF',
+            label: 'Date Référence',
           },
         ],
       },
