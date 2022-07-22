@@ -39,7 +39,7 @@ export default {
   data() {
     const panes = [
       { title: this.$t('topBar.panesInvoice'), key: '0', ref: 'invoices', icon: 'home', bankViz: false },
-      { title: this.$t('topBar.panesStatement'), key: '1', ref: 'statements', icon: 'home', bankViz: true },
+      // { title: this.$t('topBar.panesStatement'), key: '1', ref: 'statements', icon: 'home', bankViz: true },
     ]
     return {
       activeKey: panes[0].key,

@@ -52,11 +52,12 @@
                   <p class="text-uppercase text-muted mb-3"></p>
                   <p class="mb-4">
                     Vous souhaitez uploader uniquement des relevés bancaires. <br>
-                    Le format PDF est préférable pour ce type d'upload.
+                    - En cours de construction -
                   </p>
                   <a-button
                     class="mr-2 mb-2"
                     type="primary"
+                    :disabled="true"
                     @click="() => selectBankUploadType(true)"
                     ghost
                     >Sélectionner</a-button
@@ -70,12 +71,13 @@
               <div class="card-body">
                 <div class="text-center">
                   <p class="text-dark font-size-48 font-weight-bold mb-2">
-                    Factures
+                    Facture
                   </p>
                   <p class="text-uppercase text-muted mb-3"></p>
                   <p class="mb-4">
                     Vous souhaitez uploader uniquement des factures. <br>
                     Formats acceptés (PDF, JPG, PNG)
+
                   </p>
                   <a-button
                     class="mr-2 mb-2"
@@ -307,15 +309,16 @@ export default {
       this.$store.dispatch('ACTION_INCREMENT_UPLOADER_INDEX')
     },
     selectBankUploadType(isBankUpload) {
-      this.selectedUploadType = isBankUpload ? { name: 'Relevé Bancaire', id: 'bankStatement' } : { name: 'Facture', id: 'invoice' }
-      this.$store.dispatch('ACTION_FETCH_FILTERS', {
-        limit: 100,
-        page: 1,
-        name: this.searchedTemplate,
-        type: this.selectedUploadType.id,
-      })
-      this.isBankUpload = isBankUpload
-      this.$store.dispatch('ACTION_INCREMENT_UPLOADER_INDEX')
+      // this.selectedUploadType = isBankUpload ? { name: 'Relevé Bancaire', id: 'bankStatement' } : { name: 'Facture', id: 'invoice' }
+      // this.$store.dispatch('ACTION_FETCH_FILTERS', {
+      //   limit: 100,
+      //   page: 1,
+      //   name: this.searchedTemplate,
+      //   type: this.selectedUploadType.id,
+      // })
+      // this.isBankUpload = isBankUpload
+      // this.$store.dispatch('ACTION_INCREMENT_UPLOADER_INDEX')
+
     },
   },
 }
