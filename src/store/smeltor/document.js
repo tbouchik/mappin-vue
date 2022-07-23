@@ -201,6 +201,9 @@ function getUpdatedDocumentRoles (props) {
       case 'VAT':
         result.vat = parseFloat(parsePrice(newVal))
         break
+      case 'INVOICE_REF':
+        result.ref = newVal
+        break
     }
   }
   if (keyType === 'DATE' && !isBank) {

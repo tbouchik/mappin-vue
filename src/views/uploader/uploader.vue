@@ -308,16 +308,15 @@ export default {
       this.$store.dispatch('ACTION_INCREMENT_UPLOADER_INDEX')
     },
     selectBankUploadType(isBankUpload) {
-      // this.selectedUploadType = isBankUpload ? { name: 'Relevé Bancaire', id: 'bankStatement' } : { name: 'Facture', id: 'invoice' }
-      // this.$store.dispatch('ACTION_FETCH_FILTERS', {
-      //   limit: 100,
-      //   page: 1,
-      //   name: this.searchedTemplate,
-      //   type: this.selectedUploadType.id,
-      // })
-      // this.isBankUpload = isBankUpload
-      // this.$store.dispatch('ACTION_INCREMENT_UPLOADER_INDEX')
-
+      this.selectedUploadType = isBankUpload ? { name: 'Relevé Bancaire', id: 'bankStatement' } : { name: 'Facture', id: 'invoice' }
+      this.$store.dispatch('ACTION_FETCH_FILTERS', {
+        limit: 100,
+        page: 1,
+        name: this.searchedTemplate,
+        type: this.selectedUploadType.id,
+      })
+      this.isBankUpload = isBankUpload
+      this.$store.dispatch('ACTION_INCREMENT_UPLOADER_INDEX')
     },
   },
 }

@@ -5,7 +5,7 @@
         <a-alert  :message="currentImputationAlert" type="info" close-text="Fermer" />
     </div>
   <br>
-    <a-form layout="inline" v-if="!document.vendor.confirmed" >
+    <a-form layout="inline" v-if=" document.vendor && !(document.vendor.confirmed)" >
       <div class="spin-content" v-if="confirmVendorLoading">
 
       </div>
@@ -192,7 +192,7 @@ export default {
   },
   created() {
     this.pageData = this.document.osmium.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation } })
-    this.vendorName = this.document.vendor.name
+    this.vendorName = this.document.vendor ? this.document.vendor.name : ''
     this.activateIndex(0, 'Value')
   },
   props: {
@@ -219,7 +219,7 @@ export default {
   watch: {
     document: function () {
       this.pageData = this.document.osmium.map(x => { return { Key: x.Key, Value: x.Value, Imputation: x.Imputation } })
-      this.vendorName = this.document.vendor.name
+      this.vendorName = this.document.vendor ? this.document.vendor.name : ''
     },
     currentActiveIndex: function() {
       if (this.currentActivePane === 'templatePane') {

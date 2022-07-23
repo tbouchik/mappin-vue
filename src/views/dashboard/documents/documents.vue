@@ -106,8 +106,7 @@
                 <a-select
                   show-search
                   :value="searchedVendor"
-                  placeholder="input search text"
-                  style="width: 200px"
+                  placeholder="Entrez le nom du Fournisseur"
                   :default-active-first-option="false"
                   :show-arrow="false"
                   :filter-option="false"
@@ -131,6 +130,19 @@
                 @input="e => debounceFilterSearchedItem(e, 'bankEntity')" placeholder="Entrez le nom du banque"/>
               </a-form-item>
             </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="Référence">
+              <a-input v-decorator="[
+                  'searchedRef',
+                  {
+                    rules: [{ required: false, message: 'Entrez la référence de la facture/avoir' }],
+                  },
+                ]"
+                  @input="e => debounceFilterSearchedItem(e, 'ref')" placeholder="Entrez la référence"/>
+            </a-form-item>
+          </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12" v-if="!isBankViz">
@@ -457,6 +469,7 @@ export default {
       visible: false,
       timeInterval: null,
       searchedName: null,
+      searchedRef: null,
       searchedStatus: '',
       searchedTemplate: '',
       searchedTotalHt: null,
@@ -494,6 +507,7 @@ export default {
   beforeCreate() {
     this.form = this.$form.createForm(this)
     this.form.getFieldDecorator('searchedName', { initialValue: '', preserve: true })
+    this.form.getFieldDecorator('searchedRef', { initialValue: '', preserve: true })
     this.form.getFieldDecorator('searchedBankEntity', { initialValue: '', preserve: true })
     this.form.getFieldDecorator('searchedTemplate', { initialValue: '', preserve: true })
     this.form.getFieldDecorator('searchedStatus', { initialValue: '', preserve: true })
@@ -568,6 +582,7 @@ export default {
         isArchived: this.isArchiveViz,
         isBankStatement: this.isBankViz,
         totalHt: this.searchedTotalHt,
+        ref: this.searchedRef,
         totalHtOperator: this.totalHtOperator,
         totalTtc: this.searchedTotalTtc,
         totalTtcOperator: this.totalTtcOperator,
@@ -636,6 +651,9 @@ export default {
           case 'name':
             this.searchedName = event.target.value
             break
+          case 'ref':
+            this.searchedRef = event.target.value
+            break
           case 'bankEntity':
             this.searchedBankEntity = event.target.value
             break
@@ -662,6 +680,7 @@ export default {
         searchedName: '',
         searchedTemplate: '',
         searchedStatus: '',
+        searchedRef: '',
         searchedTotalHt: null,
         totalHtOperator: 'eq',
         searchedTotalTtc: null,
@@ -684,6 +703,7 @@ export default {
       this.searchedVat = ''
       this.searchedVendor = ''
       this.searchedName = ''
+      this.searchedRef = ''
       this.selectedVendor = null
       this.searchedTotalTtc = null
       this.searchedTotalHt = null
