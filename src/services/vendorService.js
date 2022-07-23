@@ -5,8 +5,8 @@ class VendorService {
     return axios.post(`/v1/vendors`, vendor)
   }
 
-  static fetchVendors(options) {
-    return axios.get(`/v1/vendors`, options)
+  static fetchVendors(params) {
+    return axios.get(`/v1/vendors`, { params })
   }
 
   static updateVendor(id, vendorBody) {

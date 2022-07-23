@@ -103,15 +103,22 @@
           </a-col>
           <a-col :span="12">
               <a-form-item label="Fournisseur" v-if="!isBankViz">
-                <a-input
-                :disabled="true"
-                v-decorator="[
-                  'searchedVendor',
-                  {
-                    rules: [{ required: false, message: 'Entrez le nom du fournisseur' }],
-                  },
-                ]"
-                @input="e => debounceFilterSearchedItem(e, 'vendor')" placeholder="Entrez le nom du fournisseur"/>
+                <a-select
+                  show-search
+                  :value="searchedVendor"
+                  placeholder="input search text"
+                  style="width: 200px"
+                  :default-active-first-option="false"
+                  :show-arrow="false"
+                  :filter-option="false"
+                  :not-found-content="null"
+                  @search="handleVendorSearch"
+                  @change="handleVendorSelect"
+                >
+                  <a-select-option v-for="vd in suggestedVendors" :key="vd.id">
+                    {{ vd.name }}
+                  </a-select-option>
+                </a-select>
               </a-form-item>
               <a-form-item label="Nom de la Banque" v-else>
                 <a-input
@@ -439,6 +446,7 @@ import { mapGetters } from 'vuex'
 import JSZip from 'jszip'
 import { pick, isEqual, cloneDeep } from 'lodash'
 import DocumentService from '../../../services/documentService'
+import VendorService from '../../../services/vendorService'
 import { invoiceColumns, bankColumns } from './columns'
 
 export default {
@@ -457,7 +465,8 @@ export default {
       totalTtcOperator: null,
       searchedVat: null,
       vatOperator: null,
-      searchedVendor: null,
+      searchedVendor: '',
+      selectedVendor: null,
       searchedBankEntity: null,
       searchedWord: null,
       searchedDates: [],
@@ -473,6 +482,7 @@ export default {
       singleDeletionMessage: '',
       modalMessage: '',
       selectedDocuments: [],
+      suggestedVendors: [],
       limit: 10,
       page: 1,
       total: 10,
@@ -484,7 +494,6 @@ export default {
   beforeCreate() {
     this.form = this.$form.createForm(this)
     this.form.getFieldDecorator('searchedName', { initialValue: '', preserve: true })
-    this.form.getFieldDecorator('searchedVendor', { initialValue: '', preserve: true })
     this.form.getFieldDecorator('searchedBankEntity', { initialValue: '', preserve: true })
     this.form.getFieldDecorator('searchedTemplate', { initialValue: '', preserve: true })
     this.form.getFieldDecorator('searchedStatus', { initialValue: '', preserve: true })
@@ -565,7 +574,7 @@ export default {
         vatOperator: this.vatOperator,
         vat: this.searchedVat,
         bankEntity: this.searchedBankEntity,
-        vendor: this.searchedVendor,
+        vendor: this.selectedVendor,
         contains: this.searchedWord,
         dates: this.searchedDates,
       }
@@ -627,9 +636,6 @@ export default {
           case 'name':
             this.searchedName = event.target.value
             break
-          case 'vendor':
-            this.searchedVendor = event.target.value
-            break
           case 'bankEntity':
             this.searchedBankEntity = event.target.value
             break
@@ -662,7 +668,7 @@ export default {
         totalTtcOperator: 'eq',
         vatOperator: 'eq',
         searchedVat: '',
-        searchedVendor: '',
+        selectedVendor: null,
         searchedBankEntity: '',
         searchedWord: '',
         searchedDates: [],
@@ -678,6 +684,7 @@ export default {
       this.searchedVat = ''
       this.searchedVendor = ''
       this.searchedName = ''
+      this.selectedVendor = null
       this.searchedTotalTtc = null
       this.searchedTotalHt = null
       this.fetchDocuments()
@@ -977,6 +984,20 @@ export default {
       if (!this.clientId) {
         clearInterval(this.timeInterval)
       }
+    },
+    handleVendorSearch(name) {
+      clearTimeout(this.debounce)
+      this.debounce = setTimeout(() => {
+        let queryParams = { name, confirmed: true }
+        VendorService.fetchVendors(queryParams)
+          .then((resp) => {
+            this.suggestedVendors = resp.data
+          })
+      }, 600)
+    },
+    handleVendorSelect(vendorId) {
+      this.selectedVendor = vendorId
+      this.fetchDocuments()
     },
   },
 

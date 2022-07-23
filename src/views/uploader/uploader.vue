@@ -77,7 +77,6 @@
                   <p class="mb-4">
                     Vous souhaitez uploader uniquement des factures. <br>
                     Formats acceptés (PDF, JPG, PNG)
-
                   </p>
                   <a-button
                     class="mr-2 mb-2"
