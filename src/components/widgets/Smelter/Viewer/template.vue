@@ -15,6 +15,7 @@
             label="Veuillez confirmer le nom du Fournisseur"
           >
             <a-input placeholder="Nom Fournisseur"
+                @change="e => handleVendorNameChange(e.target.value)"
                 :value="vendorName"
                 :disabled="document.vendor.confirmed"/>
           </a-form-item>
@@ -280,6 +281,9 @@ export default {
         }
         this.$store.dispatch('ACTION_DO_IMPUTATION_CHANGES_TO_INVOICE', payload)
       }, 600)
+    },
+    handleVendorNameChange(name) {
+      this.vendorName = name
     },
     updateImputation(input, idx) {
       this.$store.dispatch('ACTION_CHANGE_LIBELLE', input)
