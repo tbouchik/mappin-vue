@@ -41,7 +41,7 @@ const messages = {
       template: 'Template',
       client: 'Client',
       status: 'Statut',
-      dateAdded: `Date d'ajout`,
+      dateAdded: `Date Traitement`,
       action: 'Action',
       placeholder: {
         name: `Entrez le nom du document`,
