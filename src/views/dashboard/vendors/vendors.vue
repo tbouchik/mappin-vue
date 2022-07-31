@@ -27,6 +27,8 @@
             :columns="columns"
             :row-key="record => record.id"
             :data-source="pageData"
+            :pagination="tablePagination"
+            @change="handlePaginationChange"
         >
         <template
             v-for="col in ['name', 'code']"
@@ -56,7 +58,7 @@
             </a-popconfirm>
           </span>
           <span v-else>
-            <a @click="() => onEdit(index)">Modifier</a>
+            <a @click="() => onEdit(record)">Modifier</a>
               <a-divider type="vertical" />
               <a-popconfirm
                 title="Êtes-vous sûr de supprimer?"
@@ -102,14 +104,31 @@ export default {
       cache: [],
       pageData: [],
       columns,
+      limit: 10,
+      page: 1,
+      total: 10,
     }
   },
   created() {
     this.fetchVendors()
   },
+  computed: {
+    tablePagination: function () {
+      return {
+        limit: this.limit,
+        page: this.page,
+        total: this.total,
+      }
+    },
+  },
   methods: {
     handleChange(value, index, col) {
       this.pageData[index][col] = value
+    },
+    handlePaginationChange(pagination, filters, sorter) {
+      this.limit = pagination.pageSize
+      this.page = pagination.current
+      this.fetchVendors()
     },
     addVendor() {
       this.pageData.forEach(element => {
@@ -137,13 +156,15 @@ export default {
     cancelChange(index) {
       this.pageData = cloneDeep(this.cache)
     },
-    onEdit (idx) {
+    onEdit (record) {
       let newPageData = cloneDeep(this.pageData)
       newPageData.forEach(element => {
         element.editable = false
       })
       this.cache = cloneDeep(newPageData)
-      newPageData[idx].editable = true
+      newPageData.forEach(element => {
+        if ((element.id) === record.id) { element.editable = true } else { element.editable = false }
+      })
       this.pageData = newPageData
     },
     onDelete (idx) {
@@ -163,11 +184,12 @@ export default {
         )
     },
     fetchVendors() {
-      return axios.get(`/v1/vendors`, { page: 1, limit: 100 })
+      return axios.get(`/v1/vendors`, { params: { page: this.page, limit: this.limit } })
         .then(
           ({ data }) => {
-            this.pageData = cloneDeep(data)
-            this.cache = cloneDeep(data)
+            this.total = data.totalResults
+            this.pageData = cloneDeep(data.results)
+            this.cache = cloneDeep(data.results)
           }
         )
     },
