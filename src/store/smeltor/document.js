@@ -146,7 +146,8 @@ function insertDecimal (str, delta) {
 function parsePrice(val) {
   if (!val) return val
   let result = val
-  let value = val.replace(/ /g, '')
+  // eslint-disable-next-line
+  let value = val.replace(/[^0-9,\.]/gi, '')
   let lastDotIdx = value.lastIndexOf('.')
   let lastCommaIdx = value.lastIndexOf(',')
   let len = value.length

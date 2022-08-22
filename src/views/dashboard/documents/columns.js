@@ -29,6 +29,11 @@ let invoiceColumns = [
     customRender: 'status',
   },
   {
+    title: 'Opérateur',
+    dataIndex: 'lastModifiedBy',
+    customRender: 'customRenderComposed',
+  },
+  {
     title: 'dashboard.document.dateAdded',
     dataIndex: 'date',
     customRender: 'date',

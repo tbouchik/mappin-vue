@@ -13,16 +13,16 @@
     </div>
     <div>
       <button
-            type="button"
-            class="btn btn-success btn-with-addon mr-auto text-nowrap d-none d-md-block"
-            style="margin-bottom:1%"
-            @click="addVendor"
-          >
-            <span class="btn-addon">
-              <i class="btn-addon-icon fe fe-plus-circle" />
-            </span>
-            Ajouter Fournisseur
-          </button>
+        type="button"
+        class="btn btn-success btn-with-addon mr-auto text-nowrap d-none d-md-block"
+        style="margin-bottom:1%"
+        @click="addVendor"
+      >
+        <span class="btn-addon">
+          <i class="btn-addon-icon fe fe-plus-circle" />
+        </span>
+        Ajouter Fournisseur
+      </button>
         <a-table
             :columns="columns"
             :row-key="record => record.id"

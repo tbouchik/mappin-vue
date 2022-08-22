@@ -305,7 +305,7 @@
           </a-col>
           </a-row>
         <a-row :gutter="16">
-          <a-form-item label="Période">
+          <a-form-item label="Date Référence">
             <a-range-picker
               v-decorator="[
                   'searchedDates',
