@@ -86,5 +86,6 @@ export default {
     userIsClient: state => !!state.user.user.isClient,
     userCount: state => state.user.user.counter,
     userLimit: state => state.user.user.subscription.credits,
+    userIsAdmin: state => state.user.user.role === 'admin',
   },
 }

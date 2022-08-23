@@ -62,6 +62,7 @@
         &nbsp;	&nbsp;
         <div class="d-flex flex-column justify-content-center">
           <button class="btn btn-success btn-with-addon"
+                  v-if="userIsAdmin"
                   :disabled="!documentsList.length||bulkCsvExportIsLoading"
                   @click="() => bulkExportToCSV()"
           >
@@ -561,6 +562,7 @@ export default {
       'smeltedIdList',
       'filters',
       'docSmeltedCache',
+      'userIsAdmin',
     ]),
     hasSelectedDocuments() {
       return this.selectedDocuments.length > 0

@@ -32,38 +32,6 @@
         </a-modal>
       </b-nav>
     </ul>
-    <!-- <div :class="$style.divider" class="mr-4 d-none d-xl-block"  v-if="!isBankStatement"/>
-    <ul :class="$style.breadcrumbs" class=" xs-1 sm-2 col-lg-1" v-if="!isBankStatement">
-      <b-nav @click="showTemplateModal">
-        <b-nav-item>{{ current.filter.name }}</b-nav-item>
-        <a-modal  v-model="templateModalVisible"
-                  title="Change template"
-                  on-ok="handleOk"
-                  :width="660"
-                  >
-          <template slot="footer">
-            <a-button key="back" :disabled="templateLoading" @click="handleCancelTemplateChange">
-              {{ $t('subbar.return') }}
-            </a-button>
-          </template>
-          <div class="demo-infinite-container ">
-            <a-input-search placeholder="Rechercher le template" v-model="searchedTemplate" />
-              <a-list :data-source="filters"
-                      :loading="templateLoading">
-
-                  <a-list-item  slot="renderItem" slot-scope="item">
-                    <a-list-item-meta :description="item.description">
-                      <a slot="title">{{ item.name }}</a>
-                    </a-list-item-meta>
-                  <a-button type="primary" @click="selectTemplate(item)" ghost>
-                    {{ $t('subbar.select') }}
-                  </a-button>
-                </a-list-item>
-              </a-list>
-            </div>
-        </a-modal>
-      </b-nav>
-    </ul> -->
     <div :class="$style.divider" class="mr-4 d-none d-xl-block"  v-if="!isBankStatement"/>
     <ul :class="$style.breadcrumbs" class=" xs-1 sm-2 col-lg-1" v-if="!isBankStatement">
       <b-nav @click="showJournalModal">
@@ -185,7 +153,7 @@
         <a-tooltip placement="topLeft" :title="$t('subbar.exportCSV')" arrowPointAtCenter>
 
           <button class="btn btn-outline-primary"
-
+            v-if="userIsAdmin"
            @click="csvExport" >
             <span>
               <i class=" fa fa-download"/>
@@ -354,7 +322,8 @@ export default {
       'journals',
       'journalTableLoading',
       'vendors',
-      'vendorTableLoading']),
+      'vendorTableLoading',
+      'userIsAdmin']),
     currentIndex: function () {
       if (this.smeltedValidation) {
         return this.docSmeltedCache.indexOf(this.current.id)
