@@ -253,6 +253,14 @@ export default {
             value: 'DATE_REF',
             label: 'Date Référence',
           },
+          {
+            value: 'DUE_DATE',
+            label: 'Date d\'échéance',
+          },
+          {
+            value: 'PAYMENT_TERMS',
+            label: 'Moyen de paiement',
+          },
         ],
       },
       {

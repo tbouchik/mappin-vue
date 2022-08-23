@@ -202,6 +202,14 @@ function getUpdatedDocumentRoles (props) {
       case 'VAT':
         result.vat = parseFloat(parsePrice(newVal))
         break
+      case 'PAYMENT_TERMS':
+        result.paymentTerms = newVal
+        break
+      case 'DUE_DATE':
+        moment.locale('fr')
+        momentInstanceDate = moment(newVal, 'DD/MM/YYYY')
+        result.dueDate = momentInstanceDate._isValid ? momentInstanceDate.toDate().setHours(0, 0, 0, 0) : null
+        break
       case 'INVOICE_REF':
         result.ref = newVal
         break
