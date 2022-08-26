@@ -12,7 +12,7 @@
       </b-row>
     </div>
     <div>
-      <button
+      <!-- <button
         type="button"
         class="btn btn-success btn-with-addon mr-auto text-nowrap d-none d-md-block"
         style="margin-bottom:1%"
@@ -22,7 +22,91 @@
           <i class="btn-addon-icon fe fe-plus-circle" />
         </span>
         Ajouter Fournisseur
-      </button>
+      </button> -->
+      <div class="d-flex flex-column justify-content-center">
+          <button type="button"
+        class="btn btn-success btn-with-addon mr-auto text-nowrap d-none d-md-block"
+        style="margin-bottom:1%"
+            @click="changeAddMode"
+            v-if="!addMode"
+          >
+          <span class="btn-addon">
+          <i class="btn-addon-icon fe fe-plus-circle" />
+        </span>
+            Ajouter Fournisseur
+          </button>
+          <button
+          type="button"
+        class="btn btn-outline-info  mr-auto d-md-block"
+        style="margin-bottom:1%"
+            @click="changeAddMode"
+            v-if="addMode"
+          >
+           Annuler
+          </button>
+        </div>
+        <div class="card" v-if="addMode">
+          <div class="card-body">
+            <br/>
+          <a-form :form="form" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }" @submit.prevent="handleSubmit">
+            <a-form-item label="Intitulé">
+              <a-input
+                v-decorator="['name', { rules: [{ required: true, message: 'l\'Intitulé doit être indiqué' }] }]"
+              />
+            </a-form-item>
+            <a-form-item label="Référence">
+              <a-input
+                v-decorator="['reference', { rules: [{ required: true, message: 'la Référence doit être indiquée' }] }]"
+              />
+            </a-form-item>
+            <a-form-item label="N° Compte">
+              <a-input
+                v-decorator="['code', { rules: [{ required: true, message: 'Numéro de compte requis' }] }]"
+              />
+            </a-form-item>
+            <a-form-item label="Adresse">
+              <a-input
+                v-decorator="['address', { rules: [{ required: false, message: '' }] }]"
+              />
+            </a-form-item>
+            <a-form-item label="Réf.tiers">
+              <a-input
+                v-decorator="['refTiers', { rules: [{ required: false, message: '' }] }]"
+              />
+            </a-form-item>
+            <a-form-item label="Réf.tiers payeur">
+              <a-input
+                v-decorator="['refTiersPayer', { rules: [{ required: false, message: '' }] }]"
+              />
+            </a-form-item>
+            <a-form-item label="Devise">
+              <a-input
+                v-decorator="['currency', { rules: [{ required: false, message: '' }] }]"
+              />
+            </a-form-item>
+            <a-form-item label="Compte Général">
+              <a-input
+                v-decorator="['generalAccount', { rules: [{ required: false, message: '' }] }]"
+              />
+            </a-form-item>
+            <a-form-item label="IBAN">
+              <a-input
+                v-decorator="['iban', { rules: [{ required: false, message: '' }] }]"
+              />
+            </a-form-item>
+            <a-form-item label="BIC">
+              <a-input
+                v-decorator="['bic', { rules: [{ required: false, message: '' }] }]"
+              />
+            </a-form-item>
+
+            <a-form-item :wrapper-col="{ span: 12, offset: 5 }">
+              <a-button type="primary" html-type="submit">
+                Confirmer
+              </a-button>
+            </a-form-item>
+          </a-form>
+          </div></div>
         <a-table
             :columns="columns"
             :row-key="record => record.id"
@@ -50,16 +134,8 @@
 
         <template slot="operation" slot-scope="text, record, index">
         <div class="editable-row-operations">
-          <span v-if="record.editable">
-            <a @click="() => saveChange(index)">Confirmer</a>
-            <a-divider type="vertical" />
-            <a-popconfirm title="Êtes-vous sûr d'annuler?" @confirm="() => cancelChange(index)">
-              <a>Annuler</a>
-            </a-popconfirm>
-          </span>
-          <span v-else>
+          <span>
             <a @click="() => onEdit(record)">Modifier</a>
-              <a-divider type="vertical" />
               <a-popconfirm
                 title="Êtes-vous sûr de supprimer?"
                 @confirm="() => onDelete(index)"
@@ -76,19 +152,49 @@
 <script>
 import { cloneDeep, pick } from 'lodash'
 import axios from 'axios'
-
+import VendorService from '../../../services/vendorService'
 const columns = [
   {
     title: 'Nom',
     dataIndex: 'name',
-    width: '40%',
+    width: '15%',
     scopedSlots: { customRender: 'name' },
   },
   {
     title: 'N° compte',
     dataIndex: 'code',
-    width: '40%',
+    width: '10%',
     scopedSlots: { customRender: 'code' },
+  },
+  {
+    title: 'Référence',
+    dataIndex: 'reference',
+    width: '15%',
+    scopedSlots: { customRender: 'reference' },
+  },
+  {
+    title: 'Adresse',
+    dataIndex: 'address',
+    width: '10%',
+    scopedSlots: { customRender: 'address' },
+  },
+  {
+    title: 'Réf.Tiers',
+    dataIndex: 'refTiers',
+    width: '10%',
+    scopedSlots: { customRender: 'refTiers' },
+  },
+  {
+    title: 'Réf.Tiers Payeur',
+    dataIndex: 'refTiersPayer',
+    width: '10%',
+    scopedSlots: { customRender: 'refTiersPayer' },
+  },
+  {
+    title: 'Compte Général',
+    dataIndex: 'generalAccount',
+    width: '10%',
+    scopedSlots: { customRender: 'generalAccount' },
   },
   {
     title: 'Opération',
@@ -97,6 +203,19 @@ const columns = [
 ]
 
 export default {
+  beforeCreate() {
+    this.form = this.$form.createForm(this, { name: 'dynamic_form_item' })
+    this.form.getFieldDecorator('name', { initialValue: '', preserve: true })
+    this.form.getFieldDecorator('reference', { initialValue: '', preserve: true })
+    this.form.getFieldDecorator('code', { initialValue: '', preserve: true })
+    this.form.getFieldDecorator('address', { initialValue: '', preserve: true })
+    this.form.getFieldDecorator('refTiers', { initialValue: '', preserve: true })
+    this.form.getFieldDecorator('refTiersPayer', { initialValue: '', preserve: true })
+    this.form.getFieldDecorator('currency', { initialValue: '', preserve: true })
+    this.form.getFieldDecorator('generalAccount', { initialValue: '', preserve: true })
+    this.form.getFieldDecorator('iban', { initialValue: '', preserve: true })
+    this.form.getFieldDecorator('bic', { initialValue: '', preserve: true })
+  },
   data() {
     return {
       pagination: {},
@@ -107,6 +226,9 @@ export default {
       limit: 10,
       page: 1,
       total: 10,
+      addMode: false,
+      editMode: false,
+      editableItemId: '',
     }
   },
   created() {
@@ -142,6 +264,37 @@ export default {
       }
       this.pageData = [...this.pageData, newVendor]
     },
+    handleSubmit(e) {
+      e.preventDefault()
+      this.form.validateFields((err, values) => {
+        this.$nprogress.start()
+        if (!err) {
+          let newVendor = cloneDeep(values)
+          newVendor.confirmed = true
+          if (!this.editMode) {
+            VendorService.postNewVendor(newVendor)
+              .then(
+                () => {
+                  this.fetchVendors()
+                  this.changeAddMode()
+                }
+              ).finally(() => {
+                this.$nprogress.done()
+              })
+          } else {
+            VendorService.updateVendor(this.editableItemId, newVendor)
+              .then(
+                () => {
+                  this.fetchVendors()
+                  this.changeAddMode()
+                }
+              ).finally(() => {
+                this.$nprogress.done()
+              })
+          }
+        }
+      })
+    },
     saveChange(index) {
       let newPageData = cloneDeep(this.pageData)
       newPageData[index].editable = false
@@ -157,15 +310,21 @@ export default {
       this.pageData = cloneDeep(this.cache)
     },
     onEdit (record) {
-      let newPageData = cloneDeep(this.pageData)
-      newPageData.forEach(element => {
-        element.editable = false
+      this.addMode = true
+      this.editMode = true
+      this.editableItemId = record.id
+      this.form.setFieldsValue({
+        name: record.name,
+        reference: record.reference,
+        code: record.code,
+        address: record.address,
+        refTiers: record.refTiers,
+        refTiersPayer: record.refTiersPayer,
+        currency: record.currency,
+        generalAccount: record.generalAccount,
+        iban: record.iban,
+        bic: record.bic,
       })
-      this.cache = cloneDeep(newPageData)
-      newPageData.forEach(element => {
-        if ((element.id) === record.id) { element.editable = true } else { element.editable = false }
-      })
-      this.pageData = newPageData
     },
     onDelete (idx) {
       const vendorId = this.pageData[idx]._id
@@ -179,7 +338,6 @@ export default {
           ({ data }) => {
             this.pageData[idx] = data
             this.cache = cloneDeep(this.pageData)
-            console.log('post req', data)
           }
         )
     },
@@ -199,17 +357,19 @@ export default {
           ({ data }) => {
             this.pageData[idx] = data
             this.cache = cloneDeep(this.pageData)
-            console.log('put req', data)
           }
         )
     },
     deleteVendor(vendorId) {
       return axios.delete(`/v1/vendors/${vendorId}`)
         .then(
-          ({ data }) => {
-            console.log('delete req', data)
+          () => {
           }
         )
+    },
+    changeAddMode() {
+      if (this.addMode) this.editMode = false
+      this.addMode = !this.addMode
     },
   },
 }
