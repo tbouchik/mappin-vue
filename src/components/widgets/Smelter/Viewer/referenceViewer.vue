@@ -150,6 +150,24 @@ export default {
     references: function() {
       this.pageData = this.references.map(x => { return { DisplayedLibelle: x.DisplayedLibelle, Libelle: x.Libelle, Price: x.Price, Imputation: x.Imputation } })
     },
+    currentActiveIndex: function() {
+      if (this.currentActivePane === 'expensePane') {
+        if (this.currentActiveColumn === 'Imputation') {
+          this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.children[0].children[0].focus()
+        } else {
+          this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
+        }
+      }
+    },
+    currentActiveColumn: function() {
+      if (this.currentActivePane === 'expensePane') {
+        if (this.currentActiveColumn === 'Imputation') {
+          this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.children[0].children[0].focus()
+        } else {
+          this.$refs[this.hash(this.currentActiveIndex, this.currentActiveColumn)][0].$el.focus()
+        }
+      }
+    },
   },
   methods: {
     handleChange(value, itemIdx, column) {

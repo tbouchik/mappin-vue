@@ -20,7 +20,7 @@
                 :disabled="document.vendor.confirmed"/>
           </a-form-item>
           <a-form-item>
-          <a-button type="primary"
+          <a-button type="danger"
             @click="handleConfirmNewVendor"
             ghost>
             Confirmer
