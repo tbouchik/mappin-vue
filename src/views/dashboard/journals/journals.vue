@@ -12,24 +12,55 @@
       </b-row>
     </div>
     <div>
-      <button
+      <a-button-group style="margin-bottom:1%">
+      <a-button
             type="button"
-            class="btn btn-success btn-with-addon mr-auto text-nowrap d-none d-md-block"
-            style="margin-bottom:1%"
+            class="btn btn-success btn-with-addon "
             @click="addJournal"
           >
             <span class="btn-addon">
               <i class="btn-addon-icon fe fe-plus-circle" />
             </span>
             Ajouter Journal
-          </button>
+          </a-button>
+        <a-button
+            type="button"
+            class="btn btn-secondary"
+            v-if="!defaultJournalExists"
+            @click="showJournalsModal"
+          >
+            Journal par défaut
+          </a-button>
+        </a-button-group>
         <a-table
             :columns="columns"
             :row-key="record => record.id"
             :data-source="pageData"
         >
         <template
-            v-for="col in ['name', 'code', 'type']"
+            v-for="col in ['name']"
+            slot="name"
+            slot-scope="text, record, index"
+          >
+            <div :key="col">
+              <a-input
+                style="margin: -5px 0"
+                :value="text"
+                v-if="record.editable"
+                @change="e => handleChange(e.target.value, index, col)"
+              />
+              <template v-else>
+                {{ text }}
+                <a-button  v-if="record.isDefault" style="margin-left:1%" @click="showJournalsModal">
+                  <span class="btn-addon">
+                    <i class="btn-addon-icon fe fe-star" />
+                  </span>
+                </a-button>
+              </template>
+            </div>
+        </template>
+        <template
+            v-for="col in ['code', 'type']"
             :slot="col"
             slot-scope="text, record, index"
           >
@@ -69,6 +100,34 @@
       </template>
         </a-table>
     </div>
+    <a-modal  v-model="journalModalVisible"
+      title="Journal par défaut"
+      okText="Aucun"
+      :width="660"
+      >
+      <template slot="footer">
+        <a-button key="back" @click="handleCancelJournalChange">
+          {{ $t('subbar.return') }}
+        </a-button>
+        <a-button key="ok" type="primary" @click="handleResetDefaultJournal">
+          Aucun
+        </a-button>
+      </template>
+      <div class="demo-infinite-container">
+        <a-input-search placeholder="Rechercher Journal" v-model="searchedJournal" />
+          <a-list :data-source="pageData"
+                  >
+              <a-list-item  slot="renderItem" slot-scope="item">
+                <a-list-item-meta :description="item.type">
+                  <a slot="title">{{ item.name }} - {{item.code}}</a>
+                </a-list-item-meta>
+              <a-button type="primary" @click="makeDefaultJournal(item)" ghost>
+                {{ $t('subbar.select') }}
+              </a-button>
+            </a-list-item>
+          </a-list>
+        </div>
+    </a-modal>
  </div>
 </template>
 <script>
@@ -115,10 +174,17 @@ export default {
       cache: [],
       pageData: [],
       columns,
+      journalModalVisible: false,
+      searchedJournal: '',
     }
   },
   created() {
     this.fetchJournals()
+  },
+  computed: {
+    defaultJournalExists: function() {
+      return this.pageData.some(x => x.isDefault)
+    },
   },
   methods: {
     handleChange(value, index, col) {
@@ -199,6 +265,31 @@ export default {
         .then(
           ({ data }) => {
             console.log('delete req', data)
+          }
+        )
+    },
+    showJournalsModal() {
+      this.journalModalVisible = true
+    },
+    handleCancelJournalChange() {
+      this.journalModalVisible = false
+      this.searchedJournal = ''
+    },
+    handleResetDefaultJournal() {
+      return axios.post(`/v1/journals/default`, {})
+        .then(
+          () => {
+            this.handleCancelJournalChange()
+            this.fetchJournals()
+          }
+        )
+    },
+    makeDefaultJournal(journal) {
+      return axios.post(`/v1/journals/default`, { id: journal.id })
+        .then(
+          () => {
+            this.handleCancelJournalChange()
+            this.fetchJournals()
           }
         )
     },
