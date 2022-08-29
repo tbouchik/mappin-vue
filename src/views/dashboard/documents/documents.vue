@@ -21,27 +21,7 @@
             <span class="btn-addon">
               <i class="btn-addon-icon fe fe-filter" />
             </span>
-            {{$t('dashboard.document.filterSettings') }}
-          </button>
-        </div>
-        &nbsp;	&nbsp;
-        <div class="d-flex flex-column justify-content-center">
-          <button class="btn btn-success btn-with-addon"
-                  :disabled="everythingIsValidated"
-
-            @click="goToValidation"
-          >
-           <span v-if="!validatorIsLoading" class="btn-addon">
-              <i class="btn-addon-icon fe fe-edit" />
-            </span>
-            <span v-if="validatorIsLoading" class="btn-addon" style>
-              <i class="btn-addon-icon" >
-                <div class="spinner-grow spinner-grow-sm text-light" role="status">
-                <span class="sr-only">{{ $t('dashboard.document.loading') }}</span>
-                </div>
-              </i>
-            </span>
-            {{ $t('dashboard.document.validate') }}
+            Filtrer
           </button>
         </div>
       </div>
@@ -559,7 +539,6 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'smeltedIdList',
       'filters',
       'docSmeltedCache',
       'userIsAdmin',
@@ -823,12 +802,6 @@ export default {
       this.$nprogress.start()
       this.$store.dispatch('REMOVE_DOCUMENT', record.id)
       this.$nprogress.done()
-    },
-    goToValidation() {
-      this.$router.push({
-        name: 'viewer',
-        params: { documentId: this.smeltedIdList[0], smeltedValidation: true },
-      })
     },
     bulkExportToCSV() {
       if (this.isBankViz) {

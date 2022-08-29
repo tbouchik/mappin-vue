@@ -250,7 +250,7 @@ export default {
       clearTimeout(this.debounce)
       this.debounce = setTimeout(() => {
         this.$store.dispatch('ACTION_DO_CHANGES_TO_DOCUMENT', { value, itemIdx, column })
-      }, 600)
+      }, 1600)
     },
     handleConfirmNewVendor() {
       let newVendor = { name: this.vendorName, confirmed: true }
@@ -280,7 +280,7 @@ export default {
           imputation: input,
         }
         this.$store.dispatch('ACTION_DO_IMPUTATION_CHANGES_TO_INVOICE', payload)
-      }, 600)
+      }, 1600)
     },
     handleVendorNameChange(name) {
       this.vendorName = name

@@ -939,9 +939,6 @@ export default {
     currentPage: state => get(state, 'page'),
     documentsList: state => state.documentsList,
     documentsIdList: state => state.documentsIdList, // todo remove
-    smeltedIdList: state => state.documentsList.filter(x => {
-      return x.status === 'smelted'
-    }).map(x => x.id),
     currentActiveIndex: state => state.currentIdx,
     currentActiveColumn: state => state.currentCol,
     currentActivePane: state => state.currentPane,
