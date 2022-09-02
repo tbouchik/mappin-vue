@@ -281,7 +281,7 @@ export default {
   watch: {
     searchedClient: function() {
       this.$store.dispatch('ACTION_FETCH_CLIENTS', {
-        limit: 100,
+        limit: 10,
         page: 1,
         name: this.searchedClient,
         current: this.current.client._id,
@@ -289,21 +289,21 @@ export default {
     },
     searchedTemplate: function() {
       this.$store.dispatch('ACTION_FETCH_FILTERS', {
-        limit: 100,
+        limit: 10,
         page: 1,
         name: this.searchedTemplate,
       })
     },
     searchedJournal: function() {
       this.$store.dispatch('ACTION_FETCH_JOURNALS', {
-        limit: 100,
+        limit: 10,
         page: 1,
         name: this.searchedJournal,
       })
     },
     searchedVendor: function() {
       this.$store.dispatch('ACTION_FETCH_VENDORS', {
-        limit: 100,
+        limit: 10,
         page: 1,
         name: this.searchedVendor,
       })
@@ -561,7 +561,7 @@ export default {
     showClientModal() {
       this.clientModalVisible = true
       this.$store.dispatch('ACTION_FETCH_CLIENTS', {
-        limit: 100,
+        limit: 10,
         page: 1,
         name: this.searchedClient,
         current: this.current.client._id,
@@ -570,7 +570,7 @@ export default {
     showTemplateModal() {
       this.templateModalVisible = true
       this.$store.dispatch('ACTION_FETCH_FILTERS', {
-        limit: 100,
+        limit: 10,
         page: 1,
         name: this.searchedTemplate,
         current: this.current.filter._id,
@@ -579,7 +579,7 @@ export default {
     showJournalModal() {
       this.journalModalVisible = true
       this.$store.dispatch('ACTION_FETCH_JOURNALS', {
-        limit: 100,
+        limit: 10,
         page: 1,
         name: this.searchedJournal,
         current: this.current.journal ? this.current.journal._id : null,
@@ -588,7 +588,7 @@ export default {
     showVendorModal() {
       this.vendorModalVisible = true
       this.$store.dispatch('ACTION_FETCH_VENDORS', {
-        limit: 100,
+        limit: 10,
         page: 1,
         name: this.searchedVendor,
         current: this.current.vendor ? this.current.vendor._id : null,
@@ -605,7 +605,7 @@ export default {
     addNewVendorForDocument() {
       if (this.newVendor) {
         this.confirmAddNewVendorLoading = true
-        axios.post(`/v1/vendors`, { name: this.newVendor, code: this.newVendorCode }).then(({ data }) => {
+        axios.post(`/v1/vendors`, { name: this.newVendor, code: this.newVendorCode, confirmed: true }).then(({ data }) => {
           this.addVendorModalVisible = false
           this.confirmAddNewVendorLoading = false
           this.selectVendor(data)

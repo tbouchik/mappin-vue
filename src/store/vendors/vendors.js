@@ -59,7 +59,10 @@ export default {
       Object.assign(state.pagination, pick(payload, ['limit', 'page']))
       fetchVendors(payload)
         .then(data => {
-          state.vendorsList = data
+          state.vendorsList = data.results
+          const newPagination = Object.assign({}, state.pagination)
+          newPagination.total = data.totalResults
+          state.pagination = newPagination
           state.loading = false
         })
     },
