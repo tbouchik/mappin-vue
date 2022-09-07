@@ -51,7 +51,7 @@
         <p class="card-text" v-if="document.rules.isAllFieldsPopulated.fields.length !== 0"><b>Champs non renseignés:</b></p>
         <ul>
           <li v-for="field in  document.rules.isAllFieldsPopulated.fields" :key="field">
-            <p>{{field}}</p>
+            <p>{{formatMissingField(field)}}</p>
           </li>
         </ul>
         <p class="card-text" v-if="document.rules.isAllFieldsPopulated.imputations.length !== 0"><b>Imputations non remplies:</b></p>
@@ -251,6 +251,16 @@ export default {
       this.debounce = setTimeout(() => {
         this.$store.dispatch('ACTION_DO_CHANGES_TO_DOCUMENT', { value, itemIdx, column })
       }, 1600)
+    },
+    formatMissingField(fieldName) {
+      switch (fieldName) {
+        case 'invoiceDate':
+          return 'Date Référence'
+        case 'vendor':
+          return 'Fournisseur'
+        default:
+          return fieldName
+      }
     },
     handleConfirmNewVendor() {
       let newVendor = { name: this.vendorName, confirmed: true }
