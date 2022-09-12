@@ -77,7 +77,7 @@
           <div :class="$style.air__menuLeft__container">
             <ul :class="$style.air__menuLeft__list">
               <li :class="$style.air__menuLeft__category">
-                <span>{{user.company}}</span>
+                <span>{{user.company.name}}</span>
               </li>
               <template v-for="(item, index) in menuData">
                 <item
@@ -127,13 +127,23 @@ export default {
   components: { vueCustomScrollbar, SubMenu, Item, Category },
   computed: {
     ...mapState(['settings']),
-    ...mapGetters(['user']),
+    ...mapGetters(['user', 'userIsAdmin']),
     flyoutActive() {
       return (this.settings.menuType === 'flyout' || this.settings.menuType === 'compact' || this.settings.isMenuCollapsed) && !this.settings.isMobileView
     },
   },
   mounted() {
     this.setActiveItems()
+    if (this.userIsAdmin) {
+      const adminItem = {
+        title: 'Admin',
+        key: 'admin',
+        icon: 'fe fe-sliders',
+        url: '/dashboard/operators',
+      }
+      this.menuData = _.cloneDeep(getMenuData)
+      this.menuData.splice(7, 0, adminItem)
+    }
   },
   data() {
     return {

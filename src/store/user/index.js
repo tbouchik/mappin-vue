@@ -57,7 +57,7 @@ export default {
                 credentials
               )
               .then(({ data }) => {
-                commit('SET_USER_COMPANY_NAME', data.name)
+                commit('SET_USER_COMPANY_NAME', data)
               })
           } else {
             commit('SET_USER_COMPANY_NAME', data.user.company)

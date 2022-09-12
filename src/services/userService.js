@@ -17,6 +17,9 @@ class UserService {
     } catch (error) {
     }
   }
+  static getUsers() {
+    return axios.get(`/v1/users`)
+  }
 }
 
 export default UserService

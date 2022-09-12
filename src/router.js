@@ -112,6 +112,16 @@ const router = new Router({
           component: () => import('./views/dashboard/vendors/vendors.vue'),
         },
         {
+          path: '/dashboard/operators',
+          name: 'operators',
+          meta: {
+            title: 'Gestion Crédits',
+            authRequired: true,
+          },
+          props: true,
+          component: () => import('./views/dashboard/operators/operators.vue'),
+        },
+        {
           path: '/dashboard/filter/:filterId',
           name: 'filter',
           meta: {

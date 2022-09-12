@@ -33,9 +33,6 @@ export default {
   computed: {
     ...mapGetters(['currentActivePaneId']),
   },
-  created() {
-    console.log(this.currentActivePaneId)
-  },
   data() {
     const panes = [
       { title: this.$t('topBar.panesInvoice'), key: '0', ref: 'invoices', icon: 'home', bankViz: false },

@@ -200,6 +200,7 @@
 <script>
 import SmelterUppyLoader from '@/components/widgets/Smelter/Uploader/uppyloader.vue'
 import { mapGetters } from 'vuex'
+import CompanyService from './../../services/companyService'
 
 export default {
   components: {
@@ -216,6 +217,8 @@ export default {
       selectedUploadType: null,
       selectedClient: null,
       selectedTemplate: null,
+      companyLimit: 100,
+      companyRemainingCredits: 100,
       steps: [
         {
           title: 'Type',
@@ -259,18 +262,20 @@ export default {
       'clients',
       'clientTableLoading',
       'templateLoading',
-      'userCount',
-      'userLimit',
+      'user',
       'userId',
     ]),
     canUpload: function () {
-      return this.userCount < this.userLimit
+      return this.companyRemainingCredits < this.companyLimit
     },
     creditRatio: function () {
-      return parseInt((this.userCount / this.userLimit) * 100)
+      if (this.companyRemainingCredits <= 0) return 100
+      return parseInt(((this.companyLimit - this.companyRemainingCredits) / this.companyLimit) * 100)
     },
   },
   created() {
+    this.getCurrentCreditCount()
+    this.fetchCompany(this.user.company.id)
     this.$store.dispatch('ACTION_UPDATE_COUNTER', this.userId)
     this.$store.dispatch('ACTION_FETCH_CLIENTS', {
       limit: 100,
@@ -287,6 +292,22 @@ export default {
     this.$store.dispatch('ACTION_RESET_STEPS')
   },
   methods: {
+    getCurrentCreditCount() {
+      CompanyService.getCompanyRemainingCredits()
+        .then(
+          ({ data }) => {
+            this.companyRemainingCredits = data.credits
+          }
+        )
+    },
+    fetchCompany(id) {
+      CompanyService.getCompany(id)
+        .then(
+          ({ data }) => {
+            this.companyLimit = data.subscription.credits
+          }
+        )
+    },
     selectFilter(item) {
       this.selectedTemplate = item
       this.$store.dispatch('ACTION_SELECT_UPLOADER_FILTER', item)

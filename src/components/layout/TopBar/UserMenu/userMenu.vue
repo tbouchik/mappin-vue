@@ -10,7 +10,7 @@
         <strong>{{ $t('topBar.profileMenu.hello') }}, {{user.name}}</strong>
         <div>
           <strong class="mr-1">{{ $t('topBar.profileMenu.company') }}:</strong>
-          {{user.company}}
+          {{user.company.name}}
         </div>
         <div>
           <strong>{{ $t('topBar.profileMenu.role') }}:</strong>
