@@ -10,6 +10,9 @@
         <a-dropdown :disabled="!hasSelectedReferences" >
           <a-button>{{ $t('template.actions') }}</a-button>
           <a-menu slot="overlay">
+            <a-menu-item @click="displayReferencesModal" v-if="!hasNoReferences">
+              <div>Modifier</div>
+            </a-menu-item>
             <a-menu-item @click="deleteReferences" v-if="!hasNoReferences">
               <div>{{ $t('template.deleteAction') }}</div>
             </a-menu-item>
@@ -19,6 +22,33 @@
       <div v-if="showImputationAlert && currentActivePane==='expensePane'">
           <a-alert :message="currentImputationAlert" type="info" close-text="Fermer"/>
       </div>
+      <a-modal  v-model="referencesModalDisplayed"
+                  title="Change client"
+                  on-ok="handleOk"
+                  :width="660"
+                  >
+          <template slot="footer">
+            <a-button key="back" @click="displayReferencesModal">
+              {{ $t('subbar.return') }}
+            </a-button>
+            <a-button key="ok" type="primary" @click="handleAmendReferences">
+              Appliquer
+            </a-button>
+          </template>
+              Nouveau Libellé:
+              <a-input
+                v-model="suggestedLibelle"
+              />
+              <br>
+              Imputation:
+              <vue-simple-suggest
+                v-model="suggestedImputation"
+                :max-suggestions="10"
+                :list="simpleSuggestionList"
+                :filter-by-query="true"
+                :filter="suggestFilter">
+              </vue-simple-suggest>
+        </a-modal>
       <a-table  :columns="columns"
                 :data-source="pageData"
                 :pagination=false
@@ -121,6 +151,9 @@ export default {
       selectedReferences: [],
       offset: null,
       numberOfLines: 1,
+      referencesModalDisplayed: false,
+      suggestedLibelle: '',
+      suggestedImputation: '',
       debounce: null,
     }
   },
@@ -229,6 +262,16 @@ export default {
     },
     handleNumberOfLinesChange(e) {
       this.numberOfLines = parseInt(e.key)
+    },
+    displayReferencesModal() {
+      this.suggestedLibelle = ''
+      this.suggestedImputation = ''
+      this.referencesModalDisplayed = !this.referencesModalDisplayed
+    },
+    handleAmendReferences() {
+      this.$store.dispatch('ACTION_BULK_UPDATE_REFERENCES', { selected: this.selectedReferences, libelle: this.suggestedLibelle, imputation: this.suggestedImputation })
+      this.displayReferencesModal()
+      this.selectedReferences = []
     },
     confirmInsertReferences() {
       this.$store.dispatch('ACTION_INSERT_REFERENCES', { offset: 1, selectedReferences: [this.references.length - 1], lines: 1 })

@@ -755,6 +755,36 @@ export default {
         })
       })
     },
+    MUTATION_BULK_UPDATE_REFERENCES(state, payload) {
+      let tempDoc = cloneDeep(state.document)
+      let { selected, libelle, imputation } = payload
+      const libelleChanged = libelle.trim() !== ''
+      const imputationChanged = imputation.trim() !== ''
+      let refMappings = new Map()
+      if (libelleChanged) {
+        for (const idx of Object.values(selected)) {
+          tempDoc.references[idx]['DisplayedLibelle'] = libelle.trim()
+        }
+      }
+      if (imputationChanged) {
+        for (const idx of Object.values(selected)) {
+          tempDoc.references[idx]['Imputation'] = imputation.trim()
+          if (tempDoc.references[idx]['Libelle']) {
+            refMappings.set(parseAlphaNumericChar(tempDoc.references[idx]['Libelle']), imputation.trim())
+          }
+        }
+        refMappings = Object.fromEntries(refMappings)
+      }
+      state.document = tempDoc
+      let options = { imput: false, bankOsmiumChanged: false, keyAttributes: null, refChange: true, refMapping: refMappings }
+      saveDocToAPI(null, state.document, options).then((resp) => {
+        state.document = resp.data
+        state.document.osmium = state.document.osmium.map((item, index) => {
+          item.key = index // This is to avoid ant design spitting on your face for
+          return item // inserting items from osmium in ant table <a-table> without a unique key
+        })
+      })
+    },
     MUTATION_INSERT_REFERENCES(state, payload) {
       let { offset, selectedReferences, lines } = payload
       let tempDoc = cloneDeep(state.document)
@@ -931,6 +961,9 @@ export default {
     },
     ACTION_CONFIRM_VENDOR({ commit }, payload) {
       commit('MUTATION_CONFIRM_VENDOR', payload)
+    },
+    ACTION_BULK_UPDATE_REFERENCES({ commit }, payload) {
+      commit('MUTATION_BULK_UPDATE_REFERENCES', payload)
     },
   },
   getters: {
