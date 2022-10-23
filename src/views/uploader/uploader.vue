@@ -266,7 +266,7 @@ export default {
       'userId',
     ]),
     canUpload: function () {
-      return this.companyRemainingCredits < this.companyLimit
+      return this.companyRemainingCredits > 0
     },
     creditRatio: function () {
       if (this.companyRemainingCredits <= 0) return 100
