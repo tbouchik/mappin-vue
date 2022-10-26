@@ -36,16 +36,6 @@
                   </template>
                 </a-select>
               </a-form-item>
-              <a-form-item label="Sens">
-                <a-switch  v-model="isActiveDC"/>
-                <br />
-              </a-form-item>
-              <a-form-item label="Journal">
-                <a-switch v-model="isActiveJournal" />
-                <br />
-                <a-select v-if="isActiveJournal" mode="tags" style="width: 100%" placeholder="Achat; Banque; Caisse; Immobilisation..." v-model="journalTags">
-                </a-select>
-              </a-form-item>
               <a-form-item
                 v-for="(k, index) in names"
                 :key="index"
@@ -178,9 +168,6 @@ export default {
     this.form = this.$form.createForm(this, { name: 'dynamic_form_item' })
     this.form.getFieldDecorator('keys', { initialValue: [], preserve: true })
     this.form.getFieldDecorator('names', { initialValue: [], preserve: true })
-    this.form.getFieldDecorator('isActiveDC', { initialValue: true, preserve: true })
-    this.form.getFieldDecorator('isActiveJournal', { initialValue: true, preserve: true })
-    this.form.getFieldDecorator('journalTags', { initialValue: [], preserve: true })
     this.form.getFieldDecorator('description', { initialValue: '', preserve: true })
     this.form.getFieldDecorator('type', { initialValue: '', preserve: true })
     this.form.getFieldDecorator('name', { initialValue: '', preserve: true })
@@ -195,9 +182,7 @@ export default {
       name: '',
       description: '',
       type: 'invoice',
-      isActiveDC: true,
       isActiveJournal: true,
-      journalTags: [],
       keys: [{ type: undefined, value: null, isImputable: false, tags: [] }],
       formItemLayout: {
         labelCol: {
@@ -288,9 +273,6 @@ export default {
       description: this.description,
       type: this.type,
       keys: this.keys,
-      isActiveDC: this.isActiveDC,
-      isActiveJournal: this.isActiveJournal,
-      journalTags: this.journalTags,
       names: this.keys,
     })
     this.names = this.keys
